@@ -133,7 +133,7 @@ impl<'r, 'l, S: MoveStorage> Session<'r, 'l, S> {
 
     /// Publish the given module.
     ///
-    /// The Move VM MUST return a user error (in other words, an error that's not an invariant violation) if
+    /// The Move VM MUST return a user error, i.e., an error that's not an invariant violation, if
     ///   - The module fails to deserialize or verify.
     ///   - The sender address does not match that of the module.
     ///   - (Republishing-only) the module to be updated is not backward compatible with the old module.
@@ -142,16 +142,37 @@ impl<'r, 'l, S: MoveStorage> Session<'r, 'l, S> {
     /// The Move VM should not be able to produce other user errors.
     /// Besides, no user input should cause the Move VM to return an invariant violation.
     ///
-    /// In case an invariant violation occurs, the whole Session should be considered corrupted and one shall
-    /// not proceed with effect generation.
+    /// In case an invariant violation occurs, the whole Session should be considered corrupted and
+    /// one shall not proceed with effect generation.
     pub fn publish_module(
         &mut self,
         module: Vec<u8>,
         sender: AccountAddress,
         gas_status: &mut GasStatus,
     ) -> VMResult<()> {
+        self.publish_module_bundle(vec![module], sender, gas_status)
+    }
+
+    /// Publish a series of modules.
+    ///
+    /// The Move VM MUST return a user error, i.e., an error that's not an invariant violation, if
+    /// any module fails to deserialize or verify (see the full list of  failing conditions in the
+    /// `publish_module` API). The publishing of the module series is an all-or-nothing action:
+    /// either all modules are published to the data store or none is.
+    ///
+    /// Similar to the `publish_module` API, the Move VM should not be able to produce other user
+    /// errors. Besides, no user input should cause the Move VM to return an invariant violation.
+    ///
+    /// In case an invariant violation occurs, the whole Session should be considered corrupted and
+    /// one shall not proceed with effect generation.
+    pub fn publish_module_bundle(
+        &mut self,
+        modules: Vec<Vec<u8>>,
+        sender: AccountAddress,
+        gas_status: &mut GasStatus,
+    ) -> VMResult<()> {
         self.runtime
-            .publish_module(module, sender, &mut self.data_cache, gas_status)
+            .publish_module_bundle(modules, sender, &mut self.data_cache, gas_status)
     }
 
     pub fn num_mutated_accounts(&self, sender: &AccountAddress) -> u64 {
