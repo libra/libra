@@ -115,6 +115,9 @@ pub enum SandboxCommand {
         /// Set this flag to ignore breaking changes checks and publish anyway
         #[structopt(long = "ignore-breaking-changes")]
         ignore_breaking_changes: bool,
+        /// fix publishing order
+        #[structopt(short = "m", long = "override-ordering")]
+        override_ordering: Option<Vec<String>>,
     },
     /// Compile/run a Move script that reads/writes resources stored on disk in `storage`.
     /// This command compiles the script first before running it.
@@ -265,6 +268,7 @@ fn handle_sandbox_commands(
             source_files,
             no_republish,
             ignore_breaking_changes,
+            override_ordering,
         } => {
             let state = mode.prepare_state(&move_args.build_dir, &move_args.storage_dir)?;
             sandbox::commands::publish(
@@ -273,6 +277,7 @@ fn handle_sandbox_commands(
                 source_files,
                 !*no_republish,
                 *ignore_breaking_changes,
+                override_ordering.as_ref().map(|o| o.as_slice()),
                 move_args.verbose,
             )
         }

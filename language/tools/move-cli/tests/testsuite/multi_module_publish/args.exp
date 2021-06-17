@@ -1,0 +1,45 @@
+Command `sandbox publish src/GoodFriends.move -m A -v`:
+Compiling Move modules...
+Found and compiled 2 modules
+Invalid multi-module publishing: VMError with status LINKER_ERROR at location UNDEFINED and message Cannot find ModuleId { address: 00000000000000000000000000000002, name: Identifier("B") } in data cache
+Command `sandbox publish src/GoodFriends.move -m B -v`:
+Compiling Move modules...
+Found and compiled 2 modules
+Invalid multi-module publishing: VMError with status LINKER_ERROR at location UNDEFINED and message Cannot find ModuleId { address: 00000000000000000000000000000002, name: Identifier("A") } in data cache
+Command `sandbox publish src/GoodFriends.move -m B -m A -v`:
+Compiling Move modules...
+Found and compiled 2 modules
+Invalid multi-module publishing: VMError with status LINKER_ERROR at location UNDEFINED and message Cannot find ModuleId { address: 00000000000000000000000000000002, name: Identifier("A") } in data cache
+Command `sandbox publish src/GoodFriends.move -m A -m B -v`:
+Compiling Move modules...
+Found and compiled 2 modules
+Publishing a new module 00000000000000000000000000000002::A (wrote 89 bytes)
+Publishing a new module 00000000000000000000000000000002::B (wrote 97 bytes)
+Wrote 186 bytes of module ID's and code
+Command `sandbox view storage/0x00000000000000000000000000000002/modules/A.mv`:
+module 2.A {
+
+
+public(friend) foo() {
+	0: Ret
+}
+}
+Command `sandbox view storage/0x00000000000000000000000000000002/modules/B.mv`:
+module 2.B {
+
+
+bar() {
+	0: Call[1](foo())
+	1: Ret
+}
+}
+Command `sandbox publish src/CyclicFriendsPart1.move -m A -m B -v`:
+Compiling Move modules...
+Found and compiled 2 modules
+Publishing a new module 00000000000000000000000000000003::A (wrote 82 bytes)
+Publishing a new module 00000000000000000000000000000003::B (wrote 93 bytes)
+Wrote 175 bytes of module ID's and code
+Command `sandbox publish src/CyclicFriendsPart2.move -m A -m C -v`:
+Compiling Move modules...
+Found and compiled 2 modules
+Invalid multi-module publishing: VMError with status INVALID_FRIEND_DECL_WITH_MODULES_IN_DEPENDENCIES at location Module ModuleId { address: 00000000000000000000000000000003, name: Identifier("C") } and message At least one module, 00000000000000000000000000000003::A, appears in both the dependency set and the friend set
