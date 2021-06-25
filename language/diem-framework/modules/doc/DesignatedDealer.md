@@ -173,7 +173,7 @@ If <code>add_all_currencies = <b>true</b></code> this will add a <code>PreburnQu
 for each known currency at launch.
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="DesignatedDealer.md#0x1_DesignatedDealer_publish_designated_dealer_credential">publish_designated_dealer_credential</a>&lt;CoinType: store&gt;(dd: &signer, tc_account: &signer, add_all_currencies: bool)
+<pre><code><b>public</b>(<b>friend</b>) <b>fun</b> <a href="DesignatedDealer.md#0x1_DesignatedDealer_publish_designated_dealer_credential">publish_designated_dealer_credential</a>&lt;CoinType: store&gt;(dd: &signer, tc_account: &signer, add_all_currencies: bool)
 </code></pre>
 
 
@@ -182,7 +182,7 @@ for each known currency at launch.
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="DesignatedDealer.md#0x1_DesignatedDealer_publish_designated_dealer_credential">publish_designated_dealer_credential</a>&lt;CoinType: store&gt;(
+<pre><code><b>public</b>(<b>friend</b>) <b>fun</b> <a href="DesignatedDealer.md#0x1_DesignatedDealer_publish_designated_dealer_credential">publish_designated_dealer_credential</a>&lt;CoinType: store&gt;(
     dd: &signer,
     tc_account: &signer,
     add_all_currencies: bool,

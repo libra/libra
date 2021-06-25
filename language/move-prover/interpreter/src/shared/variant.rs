@@ -3,9 +3,7 @@
 
 use bytecode::{
     function_target::FunctionTarget,
-    function_target_pipeline::{
-        FunctionTargetsHolder, FunctionVariant, REGULAR_VERIFICATION_VARIANT,
-    },
+    function_target_pipeline::{FunctionTargetsHolder, FunctionVariant, VerificationFlavor},
 };
 use move_model::model::FunctionEnv;
 
@@ -23,7 +21,7 @@ pub fn choose_variant<'env>(
                     target_variant = Some(target);
                 }
             }
-            FunctionVariant::Verification(REGULAR_VERIFICATION_VARIANT) => {
+            FunctionVariant::Verification(VerificationFlavor::Regular) => {
                 target_variant = Some(target);
             }
             _ => (),

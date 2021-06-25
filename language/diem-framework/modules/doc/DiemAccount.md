@@ -2512,8 +2512,6 @@ Creating an account at address 0x0 will abort as it is a reserved address for th
         &<b>mut</b> borrow_global_mut&lt;<a href="DiemAccount.md#0x1_DiemAccount_AccountOperationsCapability">AccountOperationsCapability</a>&gt;(@DiemRoot).creation_events,
         <a href="DiemAccount.md#0x1_DiemAccount_CreateAccountEvent">CreateAccountEvent</a> { created: new_account_addr, role_id: <a href="Roles.md#0x1_Roles_get_role_id">Roles::get_role_id</a>(new_account_addr) },
     );
-    // Publishing the account <b>resource</b> last makes it possible <b>to</b> prove invariants that simplify
-    // <b>aborts_if</b>'s, etc.
     move_to(
         new_account,
         <a href="DiemAccount.md#0x1_DiemAccount">DiemAccount</a> {
@@ -2741,7 +2739,8 @@ AccountOperationsCapability, WriteSetManager, and finally makes the account.
 
 
 
-<pre><code><b>pragma</b> opaque;
+<pre><code><b>pragma</b> disable_invariants_in_body;
+<b>pragma</b> opaque;
 <b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateDiemRootAccountModifies">CreateDiemRootAccountModifies</a>;
 <b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateDiemRootAccountAbortsIf">CreateDiemRootAccountAbortsIf</a>;
 <b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateDiemRootAccountEnsures">CreateDiemRootAccountEnsures</a>;
@@ -2855,7 +2854,8 @@ event handle generator, then makes the account.
 
 
 
-<pre><code><b>pragma</b> opaque;
+<pre><code><b>pragma</b> disable_invariants_in_body;
+<b>pragma</b> opaque;
 <b>let</b> tc_addr = @TreasuryCompliance;
 <b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateTreasuryComplianceAccountModifies">CreateTreasuryComplianceAccountModifies</a>;
 <b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateTreasuryComplianceAccountAbortsIf">CreateTreasuryComplianceAccountAbortsIf</a>;
@@ -2972,7 +2972,8 @@ Creates Preburn resource under account 'new_account_address'
 
 
 
-<pre><code><b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateDesignatedDealerAbortsIf">CreateDesignatedDealerAbortsIf</a>&lt;CoinType&gt;;
+<pre><code><b>pragma</b> disable_invariants_in_body;
+<b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateDesignatedDealerAbortsIf">CreateDesignatedDealerAbortsIf</a>&lt;CoinType&gt;;
 <b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateDesignatedDealerEnsures">CreateDesignatedDealerEnsures</a>&lt;CoinType&gt;;
 <b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_MakeAccountEmits">MakeAccountEmits</a>;
 </code></pre>
@@ -3063,7 +3064,8 @@ all available currencies in the system will also be added.
 
 
 
-<pre><code><b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateParentVASPAccountAbortsIf">CreateParentVASPAccountAbortsIf</a>&lt;Token&gt;;
+<pre><code><b>pragma</b> disable_invariants_in_body;
+<b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateParentVASPAccountAbortsIf">CreateParentVASPAccountAbortsIf</a>&lt;Token&gt;;
 <b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateParentVASPAccountEnsures">CreateParentVASPAccountEnsures</a>&lt;Token&gt;;
 <b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_MakeAccountEmits">MakeAccountEmits</a>;
 </code></pre>
@@ -3156,7 +3158,8 @@ also be added. This account will be a child of <code>creator</code>, which must 
 
 
 
-<pre><code><b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateChildVASPAccountAbortsIf">CreateChildVASPAccountAbortsIf</a>&lt;Token&gt;;
+<pre><code><b>pragma</b> disable_invariants_in_body;
+<b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateChildVASPAccountAbortsIf">CreateChildVASPAccountAbortsIf</a>&lt;Token&gt;;
 <b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateChildVASPAccountEnsures">CreateChildVASPAccountEnsures</a>&lt;Token&gt;{
     parent_addr: <a href="../../../../../../move-stdlib/docs/Signer.md#0x1_Signer_spec_address_of">Signer::spec_address_of</a>(parent),
     child_addr: new_account_address,
@@ -4594,7 +4597,8 @@ Create a Validator account
 
 
 
-<pre><code><b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateValidatorAccountAbortsIf">CreateValidatorAccountAbortsIf</a>;
+<pre><code><b>pragma</b> disable_invariants_in_body;
+<b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateValidatorAccountAbortsIf">CreateValidatorAccountAbortsIf</a>;
 <b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateValidatorAccountEnsures">CreateValidatorAccountEnsures</a>;
 <b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_MakeAccountEmits">MakeAccountEmits</a>;
 </code></pre>
@@ -4674,7 +4678,8 @@ Create a Validator Operator account
 
 
 
-<pre><code><b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateValidatorOperatorAccountAbortsIf">CreateValidatorOperatorAccountAbortsIf</a>;
+<pre><code><b>pragma</b> disable_invariants_in_body;
+<b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateValidatorOperatorAccountAbortsIf">CreateValidatorOperatorAccountAbortsIf</a>;
 <b>include</b> <a href="DiemAccount.md#0x1_DiemAccount_CreateValidatorOperatorAccountEnsures">CreateValidatorOperatorAccountEnsures</a>;
 </code></pre>
 
@@ -4966,51 +4971,129 @@ resource struct <code><a href="DiemAccount.md#0x1_DiemAccount_AccountOperationsC
 ### Other invariants
 
 
-Every address that has a published account has a published RoleId
+An address has a published account iff it has a published RoleId
 
 
-<pre><code><b>invariant</b> <b>forall</b> addr: address <b>where</b> <a href="DiemAccount.md#0x1_DiemAccount_exists_at">exists_at</a>(addr): <b>exists</b>&lt;<a href="Roles.md#0x1_Roles_RoleId">Roles::RoleId</a>&gt;(addr);
+<pre><code><b>invariant</b> <b>forall</b> addr: address:  <a href="DiemAccount.md#0x1_DiemAccount_exists_at">exists_at</a>(addr) &lt;==&gt; <b>exists</b>&lt;<a href="Roles.md#0x1_Roles_RoleId">Roles::RoleId</a>&gt;(addr);
 </code></pre>
 
 
-If an account has a balance, the role of the account is compatible with having a balance.
+There is a published AccountOperationsCapability iff there is an account and it's at Diem root address
 
 
-<pre><code><b>invariant</b> <b>forall</b> token: type: <b>forall</b> addr: address <b>where</b> <b>exists</b>&lt;<a href="DiemAccount.md#0x1_DiemAccount_Balance">Balance</a>&lt;token&gt;&gt;(addr):
-    <a href="Roles.md#0x1_Roles_spec_can_hold_balance_addr">Roles::spec_can_hold_balance_addr</a>(addr);
+<pre><code><b>invariant</b> <b>forall</b> addr: address:
+    <b>exists</b>&lt;<a href="DiemAccount.md#0x1_DiemAccount_AccountOperationsCapability">AccountOperationsCapability</a>&gt;(addr) &lt;==&gt; (addr == @DiemRoot && <a href="DiemAccount.md#0x1_DiemAccount_exists_at">exists_at</a>(addr));
 </code></pre>
 
 
-If there is a <code><a href="DesignatedDealer.md#0x1_DesignatedDealer_Dealer">DesignatedDealer::Dealer</a></code> resource published at <code>addr</code>, the <code>addr</code> has a
+There is a published DiemWriteSetManager iff there is an account and it's at Diem root address
+
+
+<pre><code><b>invariant</b> <b>forall</b> addr: address:
+    <b>exists</b>&lt;<a href="DiemAccount.md#0x1_DiemAccount_DiemWriteSetManager">DiemWriteSetManager</a>&gt;(addr) &lt;==&gt; (addr == @DiemRoot && <a href="DiemAccount.md#0x1_DiemAccount_exists_at">exists_at</a>(addr));
+</code></pre>
+
+
+There is a VASPDomainManager at an address iff the address is a diem treasury compliance account
+
+
+<pre><code><b>invariant</b> <b>forall</b> addr: address:
+    <b>exists</b>&lt;<a href="VASPDomain.md#0x1_VASPDomain_VASPDomainManager">VASPDomain::VASPDomainManager</a>&gt;(addr) &lt;==&gt; <a href="Roles.md#0x1_Roles_spec_has_treasury_compliance_role_addr">Roles::spec_has_treasury_compliance_role_addr</a>(addr);
+</code></pre>
+
+
+There is a VASPDomains at an address iff the address is a Diem treasury compliance account
+
+
+<pre><code><b>invariant</b> <b>forall</b> addr: address:
+    <b>exists</b>&lt;<a href="VASPDomain.md#0x1_VASPDomain_VASPDomains">VASPDomain::VASPDomains</a>&gt;(addr) &lt;==&gt; <a href="Roles.md#0x1_Roles_spec_has_treasury_compliance_role_addr">Roles::spec_has_treasury_compliance_role_addr</a>(addr);
+</code></pre>
+
+
+Account has a balance only iff it is parent or child VASP or a designated dealer
+> Note: It would be better to make this generic over all existing and future coins, but that
+would require existential quantification over types, and I'm not sure if that works with monomorphization.
+
+
+<pre><code><b>invariant</b> <b>forall</b> addr: address:
+    (<b>exists</b>&lt;<a href="DiemAccount.md#0x1_DiemAccount_Balance">Balance</a>&lt;<a href="XUS.md#0x1_XUS">XUS</a>&gt;&gt;(addr) || <b>exists</b>&lt;<a href="DiemAccount.md#0x1_DiemAccount_Balance">Balance</a>&lt;<a href="XDX.md#0x1_XDX">XDX</a>&gt;&gt;(addr)) &lt;==&gt; !<a href="Roles.md#0x1_Roles_spec_can_hold_balance_addr">Roles::spec_can_hold_balance_addr</a>(addr);
+</code></pre>
+
+
+There is a <code><a href="DesignatedDealer.md#0x1_DesignatedDealer_Dealer">DesignatedDealer::Dealer</a></code> published at <code>addr</code> iff the <code>addr</code> has a
 <code>Roles::DesignatedDealer</code> role.
 
 
-<pre><code><b>invariant</b> <b>forall</b> addr: address <b>where</b> <b>exists</b>&lt;<a href="DesignatedDealer.md#0x1_DesignatedDealer_Dealer">DesignatedDealer::Dealer</a>&gt;(addr):
-    <a href="Roles.md#0x1_Roles_spec_has_designated_dealer_role_addr">Roles::spec_has_designated_dealer_role_addr</a>(addr);
+<pre><code><b>invariant</b> <b>forall</b> addr: address: <b>exists</b>&lt;<a href="DesignatedDealer.md#0x1_DesignatedDealer_Dealer">DesignatedDealer::Dealer</a>&gt;(addr)
+    &lt;==&gt; <a href="Roles.md#0x1_Roles_spec_has_designated_dealer_role_addr">Roles::spec_has_designated_dealer_role_addr</a>(addr);
 </code></pre>
 
 
-If there is a DualAttestation credential, account has designated dealer role
+There is a DualAttestation credential iff account has designated dealer or parent VASP role
 
 
-<pre><code><b>invariant</b> <b>forall</b> addr: address <b>where</b> <b>exists</b>&lt;<a href="DualAttestation.md#0x1_DualAttestation_Credential">DualAttestation::Credential</a>&gt;(addr):
-    <a href="Roles.md#0x1_Roles_spec_has_designated_dealer_role_addr">Roles::spec_has_designated_dealer_role_addr</a>(addr)
-    || <a href="Roles.md#0x1_Roles_spec_has_parent_VASP_role_addr">Roles::spec_has_parent_VASP_role_addr</a>(addr);
+<pre><code><b>invariant</b> <b>forall</b> addr: address:
+    <b>exists</b>&lt;<a href="DualAttestation.md#0x1_DualAttestation_Credential">DualAttestation::Credential</a>&gt;(addr)
+    &lt;==&gt; (<a href="Roles.md#0x1_Roles_spec_has_designated_dealer_role_addr">Roles::spec_has_designated_dealer_role_addr</a>(addr)
+          || <a href="Roles.md#0x1_Roles_spec_has_parent_VASP_role_addr">Roles::spec_has_parent_VASP_role_addr</a>(addr));
 </code></pre>
 
 
-Every address that has a published account has a published FreezingBit
+An address has an account iff there is a published FreezingBit struct
 
 
-<pre><code><b>invariant</b> <b>forall</b> addr: address <b>where</b> <a href="DiemAccount.md#0x1_DiemAccount_exists_at">exists_at</a>(addr): <b>exists</b>&lt;<a href="AccountFreezing.md#0x1_AccountFreezing_FreezingBit">AccountFreezing::FreezingBit</a>&gt;(addr);
+<pre><code><b>invariant</b> <b>forall</b> addr: address:
+    <a href="DiemAccount.md#0x1_DiemAccount_exists_at">exists_at</a>(addr) &lt;==&gt; <b>exists</b>&lt;<a href="AccountFreezing.md#0x1_AccountFreezing_FreezingBit">AccountFreezing::FreezingBit</a>&gt;(addr);
 </code></pre>
 
 
-Balances can only be published underneath addresses where an account exists
+Balances can only be published at addresses where an account exists
+>TODO: I think this is redundant with previous invariants. exists_at <==> Role, and
+Balance <==> can_hold_balance
 
 
 <pre><code><b>invariant</b> <b>forall</b> token: type: <b>forall</b> addr: address <b>where</b> <b>exists</b>&lt;<a href="DiemAccount.md#0x1_DiemAccount_Balance">Balance</a>&lt;token&gt;&gt;(addr):
     <a href="DiemAccount.md#0x1_DiemAccount_exists_at">exists_at</a>(addr);
+</code></pre>
+
+
+Account has SlidingNonce only if it's Diem Root or Treasury Compliance
+
+
+<pre><code><b>invariant</b> <b>forall</b> addr: address: <b>exists</b>&lt;<a href="SlidingNonce.md#0x1_SlidingNonce_SlidingNonce">SlidingNonce::SlidingNonce</a>&gt;(addr)
+    &lt;==&gt; (<a href="Roles.md#0x1_Roles_spec_has_diem_root_role_addr">Roles::spec_has_diem_root_role_addr</a>(addr) || <a href="Roles.md#0x1_Roles_spec_has_treasury_compliance_role_addr">Roles::spec_has_treasury_compliance_role_addr</a>(addr));
+</code></pre>
+
+
+Address has a ValidatorConfig iff it is a Validator address
+
+
+<pre><code><b>invariant</b> <b>forall</b> addr: address: <a href="ValidatorConfig.md#0x1_ValidatorConfig_exists_config">ValidatorConfig::exists_config</a>(addr)
+    &lt;==&gt; <a href="Roles.md#0x1_Roles_spec_has_validator_role_addr">Roles::spec_has_validator_role_addr</a>(addr);
+</code></pre>
+
+
+Address has a ValidatorOperatorConfig iff it is a ValidatorOperator address
+
+
+<pre><code><b>invariant</b> <b>forall</b> addr: address: <a href="ValidatorOperatorConfig.md#0x1_ValidatorOperatorConfig_has_validator_operator_config">ValidatorOperatorConfig::has_validator_operator_config</a>(addr)
+    &lt;==&gt; <a href="Roles.md#0x1_Roles_spec_has_validator_operator_role_addr">Roles::spec_has_validator_operator_role_addr</a>(addr);
+</code></pre>
+
+
+Address has a parent VASP credential iff it has a parent VASP role
+
+
+<pre><code><b>invariant</b> <b>forall</b> addr: address: <a href="VASP.md#0x1_VASP_is_parent">VASP::is_parent</a>(addr)
+    &lt;==&gt; <a href="Roles.md#0x1_Roles_spec_has_parent_VASP_role_addr">Roles::spec_has_parent_VASP_role_addr</a>(addr);
+</code></pre>
+
+
+Address has a child VASP credential iff it has a child VASP role
+
+
+<pre><code><b>invariant</b> <b>forall</b> addr: address: <a href="VASP.md#0x1_VASP_is_child">VASP::is_child</a>(addr)
+    &lt;==&gt; <a href="Roles.md#0x1_Roles_spec_has_child_VASP_role_addr">Roles::spec_has_child_VASP_role_addr</a>(addr);
 </code></pre>
 
 

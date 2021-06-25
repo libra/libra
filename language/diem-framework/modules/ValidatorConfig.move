@@ -11,6 +11,7 @@ module DiemFramework::ValidatorConfig {
     use DiemFramework::ValidatorOperatorConfig;
     use Std::Option::{Self, Option};
     use Std::Signer;
+    friend DiemFramework::DiemAccount;
 
     struct Config has copy, drop, store {
         consensus_pubkey: vector<u8>,
@@ -44,7 +45,7 @@ module DiemFramework::ValidatorConfig {
     /// Publishes a mostly empty ValidatorConfig struct. Eventually, it
     /// will have critical info such as keys, network addresses for validators,
     /// and the address of the validator operator.
-    public fun publish(
+    public(friend) fun publish(
         validator_account: &signer,
         dr_account: &signer,
         human_name: vector<u8>,

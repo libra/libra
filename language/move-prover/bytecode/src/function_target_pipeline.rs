@@ -20,6 +20,22 @@ pub struct FunctionTargetsHolder {
     targets: BTreeMap<QualifiedId<FunId>, BTreeMap<FunctionVariant, FunctionData>>,
 }
 
+/// Describes a function verification flavor.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub enum VerificationFlavor {
+    Regular,
+    Inconsistency,
+}
+
+impl std::fmt::Display for VerificationFlavor {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            VerificationFlavor::Regular => write!(f, ""),
+            VerificationFlavor::Inconsistency => write!(f, "inconsistency"),
+        }
+    }
+}
+
 /// Describes a function target variant.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum FunctionVariant {
@@ -28,8 +44,8 @@ pub enum FunctionVariant {
     Baseline,
     /// A variant which is instrumented for verification. Only functions which are target
     /// of verification have one of those. There can be multiple verification variants,
-    /// identified by a well-known string.
-    Verification(&'static str),
+    /// each identified by a unique flavor.
+    Verification(VerificationFlavor),
 }
 
 impl FunctionVariant {
@@ -38,22 +54,13 @@ impl FunctionVariant {
     }
 }
 
-/// The variant for regular verification.
-pub const REGULAR_VERIFICATION_VARIANT: &str = "";
-pub const INCONSISTENCY_CHECK_VARIANT: &str = "inconsistency";
-
 impl std::fmt::Display for FunctionVariant {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         use FunctionVariant::*;
         match self {
             Baseline => write!(f, "baseline"),
-            Verification(s) => {
-                if s.is_empty() {
-                    write!(f, "verification")
-                } else {
-                    write!(f, "verification[{}]", s)
-                }
-            }
+            Verification(VerificationFlavor::Regular) => write!(f, "verification"),
+            Verification(v) => write!(f, "verification[{}]", v),
         }
     }
 }

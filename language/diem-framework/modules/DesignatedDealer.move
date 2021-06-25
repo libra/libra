@@ -6,6 +6,7 @@ module DiemFramework::DesignatedDealer {
     use Std::Errors;
     use Std::Event;
     use Std::Signer;
+    friend DiemFramework::DiemAccount;
 
     /// A `DesignatedDealer` always holds this `Dealer` resource regardless of the
     /// currencies it can hold. All `ReceivedMintEvent` events for all
@@ -59,7 +60,7 @@ module DiemFramework::DesignatedDealer {
     /// Publishes a `Dealer` resource under `dd` with a `PreburnQueue`.
     /// If `add_all_currencies = true` this will add a `PreburnQueue`,
     /// for each known currency at launch.
-    public fun publish_designated_dealer_credential<CoinType: store>(
+    public(friend) fun publish_designated_dealer_credential<CoinType: store>(
         dd: &signer,
         tc_account: &signer,
         add_all_currencies: bool,

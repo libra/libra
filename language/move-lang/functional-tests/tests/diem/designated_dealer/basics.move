@@ -1,32 +1,36 @@
 //! account: bob, 0,0, address
 //! account: validatorvivian, 10000000XUS, 0, validator
 
-//! new-transaction
-script {
-use DiemFramework::DesignatedDealer;
-use DiemFramework::XUS::XUS;
-fun main(account: signer) {
-    let account = &account;
-    DesignatedDealer::publish_designated_dealer_credential<XUS>(
-        account, account, false
-    );
-}
-}
-// check: "Keep(ABORTED { code: 258,"
+// TODO: Commented out because DesignatedDealer::publish_designated_dealer_credential
+// is now a friend, so not accessible.  Keeping the code because it will soon become
+// a unit test.
+// //! new-transaction
+// script {
+// use DiemFramework::DesignatedDealer;
+// use DiemFramework::XUS::XUS;
+// fun main(account: signer) {
+//     let account = &account;
+//     DesignatedDealer::publish_designated_dealer_credential<XUS>(
+//         account, account, false
+//     );
+// }
+// }
+// // check: "Keep(ABORTED { code: 258,"
 
-//! new-transaction
-//! sender: blessed
-script {
-use DiemFramework::DesignatedDealer;
-use DiemFramework::XUS::XUS;
-fun main(account: signer) {
-    let account = &account;
-    DesignatedDealer::publish_designated_dealer_credential<XUS>(
-        account, account, false
-    );
-}
-}
-// check: "Keep(ABORTED { code: 1539,"
+// TODO: friend function problem
+// //! new-transaction
+// //! sender: blessed
+// script {
+// use DiemFramework::DesignatedDealer;
+// use DiemFramework::XUS::XUS;
+// fun main(account: signer) {
+//     let account = &account;
+//     DesignatedDealer::publish_designated_dealer_credential<XUS>(
+//         account, account, false
+//     );
+// }
+// }
+// // check: "Keep(ABORTED { code: 1539,"
 
 //! new-transaction
 script {
@@ -55,7 +59,6 @@ fun main(account: signer) {
 //! sender: blessed
 //! type-args: 0x1::XUS::XUS
 //! args: 0, {{bob}}, {{bob::auth_key}}, x"", false
-
 stdlib_script::AccountCreationScripts::create_designated_dealer
 // check: CreateAccountEvent
 // check: "Keep(EXECUTED)"

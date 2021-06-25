@@ -1079,8 +1079,6 @@ module DiemFramework::DiemAccount {
             &mut borrow_global_mut<AccountOperationsCapability>(@DiemRoot).creation_events,
             CreateAccountEvent { created: new_account_addr, role_id: Roles::get_role_id(new_account_addr) },
         );
-        // Publishing the account resource last makes it possible to prove invariants that simplify
-        // aborts_if's, etc.
         move_to(
             new_account,
             DiemAccount {
@@ -1101,6 +1099,7 @@ module DiemFramework::DiemAccount {
     }
     spec make_account {
         pragma opaque;
+        // This is called from a context where invariants are disabled
         let new_account_addr = Signer::address_of(new_account);
         modifies global<DiemAccount>(new_account_addr);
         modifies global<Event::EventHandleGenerator>(new_account_addr);
@@ -1108,6 +1107,7 @@ module DiemFramework::DiemAccount {
         modifies global<AccountOperationsCapability>(@DiemRoot);
         ensures exists<AccountOperationsCapability>(@DiemRoot);
         // Next requires is needed to prove invariant
+        // TODO: This may not be necessary now that invariants are disabled in callers.
         requires exists<Roles::RoleId>(new_account_addr);
         include MakeAccountAbortsIf{addr: new_account_addr};
         ensures exists_at(new_account_addr);
@@ -1214,6 +1214,7 @@ module DiemFramework::DiemAccount {
     }
 
     spec create_diem_root_account {
+        pragma disable_invariants_in_body;
         pragma opaque;
         include CreateDiemRootAccountModifies;
         include CreateDiemRootAccountAbortsIf;
@@ -1276,6 +1277,7 @@ module DiemFramework::DiemAccount {
         make_account(&new_account, auth_key_prefix)
     }
     spec create_treasury_compliance_account {
+        pragma disable_invariants_in_body;
         pragma opaque;
         let tc_addr = @TreasuryCompliance;
         include CreateTreasuryComplianceAccountModifies;
@@ -1345,6 +1347,7 @@ module DiemFramework::DiemAccount {
     }
 
     spec create_designated_dealer {
+        pragma disable_invariants_in_body;
         include CreateDesignatedDealerAbortsIf<CoinType>;
         include CreateDesignatedDealerEnsures<CoinType>;
         include MakeAccountEmits;
@@ -1397,6 +1400,7 @@ module DiemFramework::DiemAccount {
     }
 
     spec create_parent_vasp_account {
+        pragma disable_invariants_in_body;
         include CreateParentVASPAccountAbortsIf<Token>;
         include CreateParentVASPAccountEnsures<Token>;
         include MakeAccountEmits;
@@ -1447,6 +1451,7 @@ module DiemFramework::DiemAccount {
         add_currencies_for_account<Token>(&new_account, add_all_currencies)
     }
     spec create_child_vasp_account {
+        pragma disable_invariants_in_body;
         include CreateChildVASPAccountAbortsIf<Token>;
         include CreateChildVASPAccountEnsures<Token>{
             parent_addr: Signer::spec_address_of(parent),
@@ -2118,6 +2123,7 @@ module DiemFramework::DiemAccount {
     }
 
     spec create_validator_account {
+        pragma disable_invariants_in_body;
         include CreateValidatorAccountAbortsIf;
         include CreateValidatorAccountEnsures;
         include MakeAccountEmits;
@@ -2159,6 +2165,7 @@ module DiemFramework::DiemAccount {
     }
 
     spec create_validator_operator_account {
+        pragma disable_invariants_in_body;
         include CreateValidatorOperatorAccountAbortsIf;
         include CreateValidatorOperatorAccountEnsures;
     }
@@ -2301,31 +2308,85 @@ module DiemFramework::DiemAccount {
     /// # Other invariants
     spec module {
 
-        /// Every address that has a published account has a published RoleId
-        invariant forall addr: address where exists_at(addr): exists<Roles::RoleId>(addr);
+        /// An address has a published account iff it has a published RoleId
+        invariant forall addr: address:  exists_at(addr) <==> exists<Roles::RoleId>(addr);
 
-        /// If an account has a balance, the role of the account is compatible with having a balance.
-        invariant forall token: type: forall addr: address where exists<Balance<token>>(addr):
-            Roles::spec_can_hold_balance_addr(addr);
+        // Every address with a published account has a publish event handle generator
+        // >TODO: Prover can't deal with this because it gets an error when a public functions
+        // such as Events::publish_generator, are called while invariants are disabled.
+        // However, this particular invariant does not need to be disabled, and the function
+        // needs to be public because it is a general-purpose function in stdlib.
+        // Also, the invariant is not specified in Events, which also seems relevant.
+        // invariant forall addr: address where exists_at(addr): exists<Event::EventHandleGenerator>(addr);
 
-        /// If there is a `DesignatedDealer::Dealer` resource published at `addr`, the `addr` has a
+        /// There is a published AccountOperationsCapability iff there is an account and it's at Diem root address
+        invariant forall addr: address:
+            exists<AccountOperationsCapability>(addr) <==> (addr == @DiemRoot && exists_at(addr));
+
+        /// There is a published DiemWriteSetManager iff there is an account and it's at Diem root address
+        invariant forall addr: address:
+            exists<DiemWriteSetManager>(addr) <==> (addr == @DiemRoot && exists_at(addr));
+
+        /// There is a VASPDomainManager at an address iff the address is a diem treasury compliance account
+        invariant forall addr: address:
+            exists<VASPDomain::VASPDomainManager>(addr) <==> Roles::spec_has_treasury_compliance_role_addr(addr);
+
+        /// There is a VASPDomains at an address iff the address is a Diem treasury compliance account
+        invariant forall addr: address:
+            exists<VASPDomain::VASPDomains>(addr) <==> Roles::spec_has_treasury_compliance_role_addr(addr);
+
+        /// Account has a balance only iff it is parent or child VASP or a designated dealer
+        /// > Note: It would be better to make this generic over all existing and future coins, but that
+        /// would require existential quantification over types, and I'm not sure if that works with monomorphization.
+        invariant forall addr: address:
+            (exists<Balance<XUS>>(addr) || exists<Balance<XDX>>(addr)) <==> !Roles::spec_can_hold_balance_addr(addr);
+
+        ///  There is a `DesignatedDealer::Dealer` published at `addr` iff the `addr` has a
         /// `Roles::DesignatedDealer` role.
-        // Verified with additional target DesignatedDealer.move
-        invariant forall addr: address where exists<DesignatedDealer::Dealer>(addr):
-            Roles::spec_has_designated_dealer_role_addr(addr);
+        invariant forall addr: address: exists<DesignatedDealer::Dealer>(addr)
+            <==> Roles::spec_has_designated_dealer_role_addr(addr);
 
-        /// If there is a DualAttestation credential, account has designated dealer role
-        // Verified with additional target "VASP.move"
-        invariant forall addr: address where exists<DualAttestation::Credential>(addr):
-            Roles::spec_has_designated_dealer_role_addr(addr)
-            || Roles::spec_has_parent_VASP_role_addr(addr);
+        /// There is a DualAttestation credential iff account has designated dealer or parent VASP role
+        invariant forall addr: address:
+            exists<DualAttestation::Credential>(addr)
+            <==> (Roles::spec_has_designated_dealer_role_addr(addr)
+                  || Roles::spec_has_parent_VASP_role_addr(addr));
 
-        /// Every address that has a published account has a published FreezingBit
-        invariant forall addr: address where exists_at(addr): exists<AccountFreezing::FreezingBit>(addr);
+        /// An address has an account iff there is a published FreezingBit struct
+        invariant forall addr: address:
+            exists_at(addr) <==> exists<AccountFreezing::FreezingBit>(addr);
 
-        /// Balances can only be published underneath addresses where an account exists
+        /// Balances can only be published at addresses where an account exists
+        /// >TODO: I think this is redundant with previous invariants. exists_at <==> Role, and
+        /// Balance <==> can_hold_balance
         invariant forall token: type: forall addr: address where exists<Balance<token>>(addr):
             exists_at(addr);
+
+        /// Account has SlidingNonce only if it's Diem Root or Treasury Compliance
+        invariant forall addr: address: exists<SlidingNonce::SlidingNonce>(addr)
+            <==> (Roles::spec_has_diem_root_role_addr(addr) || Roles::spec_has_treasury_compliance_role_addr(addr));
+
+
+        /// Address has a ValidatorConfig iff it is a Validator address
+        invariant forall addr: address: ValidatorConfig::exists_config(addr)
+            <==> Roles::spec_has_validator_role_addr(addr);
+
+
+        /// Address has a ValidatorOperatorConfig iff it is a ValidatorOperator address
+        invariant forall addr: address: ValidatorOperatorConfig::has_validator_operator_config(addr)
+            <==> Roles::spec_has_validator_operator_role_addr(addr);
+
+        /// Address has a parent VASP credential iff it has a parent VASP role
+        invariant forall addr: address: VASP::is_parent(addr)
+            <==> Roles::spec_has_parent_VASP_role_addr(addr);
+
+
+        /// Address has a child VASP credential iff it has a child VASP role
+        invariant forall addr: address: VASP::is_child(addr)
+            <==> Roles::spec_has_child_VASP_role_addr(addr);
+
+
+
     }
 
     /// # Helper Functions and Schemas

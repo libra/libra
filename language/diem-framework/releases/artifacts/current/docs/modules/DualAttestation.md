@@ -345,7 +345,7 @@ the <code>created</code> account must send a transaction that invokes <code>rota
 <code>rotate_compliance_public_key</code> to set these fields to a valid URL/public key.
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="DualAttestation.md#0x1_DualAttestation_publish_credential">publish_credential</a>(created: &signer, creator: &signer, human_name: vector&lt;u8&gt;)
+<pre><code><b>public</b>(<b>friend</b>) <b>fun</b> <a href="DualAttestation.md#0x1_DualAttestation_publish_credential">publish_credential</a>(created: &signer, creator: &signer, human_name: vector&lt;u8&gt;)
 </code></pre>
 
 
@@ -354,7 +354,7 @@ the <code>created</code> account must send a transaction that invokes <code>rota
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="DualAttestation.md#0x1_DualAttestation_publish_credential">publish_credential</a>(
+<pre><code><b>public</b>(<b>friend</b>) <b>fun</b> <a href="DualAttestation.md#0x1_DualAttestation_publish_credential">publish_credential</a>(
     created: &signer,
     creator: &signer,
     human_name: vector&lt;u8&gt;,

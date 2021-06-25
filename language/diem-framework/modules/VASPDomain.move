@@ -5,6 +5,8 @@ module DiemFramework::VASPDomain {
     use Std::Event::{Self, EventHandle};
     use Std::Signer;
     use Std::Vector;
+    friend DiemFramework::DiemAccount;
+    friend DiemFramework::AccountAdministrationScripts;
 
     /// This resource holds an entity's domain names.
     struct VASPDomains has key {
@@ -75,7 +77,7 @@ module DiemFramework::VASPDomain {
     /// Publish a `VASPDomains` resource under `created` with an empty `domains`.
     /// Before VASP Domains, the Treasury Compliance account must send
     /// a transaction that invokes `add_vasp_domain` to set the `domains` field with a valid domain
-    public fun publish_vasp_domains(
+    public(friend) fun publish_vasp_domains(
         vasp_account: &signer,
     ) {
         Roles::assert_parent_vasp_role(vasp_account);
@@ -114,7 +116,7 @@ module DiemFramework::VASPDomain {
     /// Publish a `VASPDomainManager` resource under `tc_account` with an empty `vasp_domain_events`.
     /// When Treasury Compliance account sends a transaction that invokes either `add_vasp_domain` or
     /// `remove_vasp_domain`, a `VASPDomainEvent` is emitted and added to `vasp_domain_events`.
-    public fun publish_vasp_domain_manager(
+    public(friend) fun publish_vasp_domain_manager(
         tc_account : &signer,
     ) {
         Roles::assert_treasury_compliance(tc_account);

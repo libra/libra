@@ -17,8 +17,7 @@ use crate::{
     function_data_builder::FunctionDataBuilder,
     function_target::{FunctionData, FunctionTarget},
     function_target_pipeline::{
-        FunctionTargetProcessor, FunctionTargetsHolder, FunctionVariant,
-        INCONSISTENCY_CHECK_VARIANT, REGULAR_VERIFICATION_VARIANT,
+        FunctionTargetProcessor, FunctionTargetsHolder, FunctionVariant, VerificationFlavor,
     },
     livevar_analysis::LiveVarAnalysisProcessor,
     options::ProverOptions,
@@ -129,7 +128,7 @@ impl FunctionTargetProcessor for SpecInstrumentationProcessor {
             // Create a clone of the function data, moving annotations
             // out of this data and into the clone.
             let mut verification_data =
-                data.fork(FunctionVariant::Verification(REGULAR_VERIFICATION_VARIANT));
+                data.fork(FunctionVariant::Verification(VerificationFlavor::Regular));
             verification_data = Instrumenter::run(&*options, targets, fun_env, verification_data);
             targets.insert_target_data(
                 &fun_env.get_qualified_id(),
@@ -139,8 +138,9 @@ impl FunctionTargetProcessor for SpecInstrumentationProcessor {
 
             if options.check_inconsistency {
                 // Create another clone for the inconsistency check
-                let mut new_data =
-                    data.fork(FunctionVariant::Verification(INCONSISTENCY_CHECK_VARIANT));
+                let mut new_data = data.fork(FunctionVariant::Verification(
+                    VerificationFlavor::Inconsistency,
+                ));
                 new_data = Instrumenter::run(&*options, targets, fun_env, new_data);
                 targets.insert_target_data(
                     &fun_env.get_qualified_id(),
@@ -967,10 +967,9 @@ impl<'a> Instrumenter<'a> {
 
             if matches!(
                 self.builder.data.variant,
-                FunctionVariant::Verification(INCONSISTENCY_CHECK_VARIANT)
+                FunctionVariant::Verification(VerificationFlavor::Inconsistency)
             ) {
                 let loc = self.builder.fun_env.get_spec_loc();
-
                 self.builder.set_loc_and_vc_info(loc, EXPECTED_TO_FAIL);
                 let exp = self.builder.mk_bool_const(false);
                 self.builder.emit_with(|id| Prop(id, Assert, exp));

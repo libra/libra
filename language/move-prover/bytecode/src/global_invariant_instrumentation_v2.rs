@@ -88,13 +88,7 @@ impl<'a> Instrumenter<'a> {
         let disabled_inv_fun_set = &inv_ana_data.disabled_inv_fun_set;
         let target_invariants = &inv_ana_data.target_invariants;
 
-        // Emit entrypoint assumptions if this is a verification entry.
-        // let assumed_at_update = if self.builder.data.variant.is_verified() {
-        //     self.instrument_entrypoint()
-        // } else {
-        //     BTreeSet::new()
-        // };
-
+        // Emit entrypoint assumptions if this is a verification variant.
         if self.builder.data.variant.is_verified() {
             let fun_id = fun_env.get_qualified_id();
 
@@ -121,7 +115,10 @@ impl<'a> Instrumenter<'a> {
             // So, the next code finds the set of target invariants (which will be assumed on return)
             // and assumes those that are not entrypoint invariants.
             if disabled_inv_fun_set.contains(&fun_id) {
-                let return_invariants: BTreeSet<GlobalId> = target_invariants
+                // Separate the update invariants, because we never want to assume them.
+                let (global_target_invs, _update_target_invs) =
+                    self.separate_update_invariants(&target_invariants);
+                let return_invariants: BTreeSet<GlobalId> = global_target_invs
                     .difference(&entrypoint_invariants)
                     .cloned()
                     .collect();
@@ -153,19 +150,19 @@ impl<'a> Instrumenter<'a> {
         // Emit an assume of each invariant over memory touched by this function, and which
         // are declared in this module or transitively dependent modules.
         //
-        // Excludes invariants (a) those which are marked by the user
+        // Excludes global invariants (a) those which are marked by the user
         // explicitly as `[isolated]` (b) those which are not declared
         // in dependent modules of the module defining the function
         // (which may not be the target module) and upon which the
         // code should therefore not depend, apart from the update
-        // itself.
+        // itself. Also excludes "update" invariants.
         let env = self.builder.global_env();
         // Invariants with types that are read or written by the function
         let mut invariants_for_used_memory = BTreeSet::new();
         // Invariants with types that are written by the function
         let mut invariants_for_modified_memory = BTreeSet::new();
-        // get memory (list of structs) read or written by the function target, then find all invariants in loaded
-        // modules that refer to that memory.
+        // get memory (list of structs) read or written by the function target,
+        // then find all invariants in loaded modules that refer to that memory.
         for mem in usage_analysis::get_used_memory_inst(&self.builder.get_target()).iter() {
             invariants_for_used_memory.extend(env.get_global_invariants_for_memory(mem));
         }
@@ -243,15 +240,17 @@ impl<'a> Instrumenter<'a> {
             // callers, assert them just before a return instruction (the caller will be
             // assuming they hold).
             Ret(_, _) => {
+                let (global_target_invs, _update_target_invs) =
+                    self.separate_update_invariants(&target_invariants);
                 if disabled_inv_fun_set.contains(&fun_id) {
                     let xlated_spec = SpecTranslator::translate_invariants_by_id(
                         self.options.auto_trace_level.invariants(),
                         &mut self.builder,
-                        target_invariants,
+                        &global_target_invs,
                     );
                     self.assert_or_assume_translated_invariants(
                         &xlated_spec.invariants,
-                        &target_invariants,
+                        &global_target_invs,
                         PropKind::Assert,
                     );
                 }
@@ -365,8 +364,12 @@ impl<'a> Instrumenter<'a> {
         entrypoint_invariants: &BTreeSet<GlobalId>,
     ) {
         // translate all the invariants. Some were already translated at the entrypoint, but
-        // that's ok because they are global invariants that don't have "old", so redundant
-        // state tags are not going to be a problem
+        // that's ok because entrypoint invariants are global invariants that don't have "old",
+        // so redundant state tags are not going to be a problem.
+        // TODO: Several changes need to be made in this code: (1) don't check update
+        // invariants across opaque calls, (2) separate global & update invariants earlier,
+        // (3) eliminate redundant refactoring.  However, these are tricky and require significant
+        // refactorings, so not doing it now.
         let mut xlated_invs = SpecTranslator::translate_invariants_by_id(
             self.options.auto_trace_level.invariants(),
             &mut self.builder,
@@ -375,6 +378,7 @@ impl<'a> Instrumenter<'a> {
         // separate out the update invariants, which need to be handled differently from global invs.
         // Specifically, update invariants are not assumed, but need consistent save tags.
         let (global_assumes, _update_invs) = self.separate_update_invariants(&modified_invs);
+
         // remove entrypoint invariants so we don't assume them again here.
         let modified_assumes: BTreeSet<GlobalId> = global_assumes
             .difference(entrypoint_invariants)
@@ -476,8 +480,19 @@ impl<'a> Instrumenter<'a> {
         inv_set: &BTreeSet<GlobalId>,
         prop_kind: PropKind,
     ) {
+        let global_env = self.builder.global_env();
         for (loc, mid, cond) in xlated_invariants {
             if inv_set.contains(mid) {
+                // Check for hard-to-debug coding error (this is not a user error)
+                if inv_set.contains(mid)
+                    && matches!(prop_kind, PropKind::Assume)
+                    && matches!(
+                        global_env.get_global_invariant(*mid).unwrap().kind,
+                        ConditionKind::InvariantUpdate
+                    )
+                {
+                    panic!("Not allowed to assume update invariant");
+                }
                 self.emit_invariant(loc, cond, prop_kind);
             }
         }
