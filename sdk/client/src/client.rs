@@ -13,7 +13,7 @@ use crate::{
     views::{
         AccountStateWithProofView, AccountView, AccumulatorConsistencyProofView, CurrencyInfoView,
         EventView, EventWithProofView, MetadataView, StateProofView, TransactionView,
-        TransactionsWithProofsView,
+        TransactionsWithProofsView, AccountRoleView, EventDataView,
     },
     Error, Result, Retry, State,
 };
@@ -22,11 +22,13 @@ use diem_types::{
     account_address::AccountAddress,
     event::EventKey,
     transaction::{SignedTransaction, Transaction},
+    account_config::treasury_compliance_account_address,
 };
 use move_core_types::move_resource::{MoveResource, MoveStructType};
 use reqwest::Client as ReqwestClient;
 use serde::{de::DeserializeOwned, Serialize};
 use std::time::Duration;
+use std::collections::HashMap;
 
 #[derive(Clone, Debug)]
 pub struct Client {
@@ -207,6 +209,36 @@ impl Client {
             include_events,
         ))
         .await
+    }
+
+    pub async fn get_diem_id_domain_map(&self) -> Result<HashMap<String, AccountAddress>> {
+        let mut domain_map = HashMap::new();
+        let account = self.get_account(treasury_compliance_account_address()).await?.into_inner();
+        if let Some(account) = account {
+            if let AccountRoleView::TreasuryCompliance {  diem_id_domain_events_key } = account.role {
+                let mut event_index = 0;
+                let batch_size = 100;
+                if let Some(key) = diem_id_domain_events_key {
+                    loop {
+                        let domain_events = self.get_events(key, event_index, batch_size).await?.into_inner();
+                        for event in domain_events.iter() {
+                            if let EventDataView::DiemIdDomain { removed, domain, address, .. } = event.clone().data {
+                                if removed {
+                                    domain_map.remove(&domain.as_str().to_string());
+                                } else {
+                                    domain_map.insert(domain.as_str().to_string(), address);
+                                }
+                            }
+                        }
+                        if domain_events.len() < batch_size as usize {
+                            break;
+                        }
+                        event_index += batch_size;
+                    }
+                }
+            };
+        }
+        return Ok(domain_map);
     }
 
     pub async fn get_events(

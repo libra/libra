@@ -345,6 +345,7 @@ mod tests {
         let auth_key = "459c77a38803bd53f3adee52703810e3a74fd7c46952c497e75afb0a7932586d";
         let diem_id_domain = DiemIdVaspDomainIdentifier::new("diem").unwrap();
 
+        // Test adding a domain
         {
             let resp = warp::test::request()
                 .method("POST")
@@ -368,6 +369,32 @@ mod tests {
             );
         }
 
+        // Test adding same domain again does not change the account's domain list
+        {
+            let resp = warp::test::request()
+                .method("POST")
+                .path(
+                    format!(
+                        "/mint?auth_key={}&diem_id_domain={}&is_remove_domain={}&amount=1&currency_code=XDX",
+                        auth_key, "diem", false,
+                    )
+                        .as_str(),
+                )
+                .reply(&filter)
+                .await;
+            assert_eq!(resp.body(), 2.to_string().as_str());
+            let reader = accounts.read();
+            let addr =
+                AccountAddress::try_from("a74fd7c46952c497e75afb0a7932586d".to_owned()).unwrap();
+
+            let account = reader.get(&addr).expect("account should be created");
+            assert_eq!(
+                account["role"]["diem_id_domains"].as_array().unwrap().len(),
+                1
+            );
+        }
+
+        // Test removing a domain
         {
             let diem_id_domain_to_remove = "diem";
             let resp = warp::test::request()
@@ -381,7 +408,7 @@ mod tests {
                 )
                 .reply(&filter)
                 .await;
-            assert_eq!(resp.body(), 2.to_string().as_str());
+            assert_eq!(resp.body(), 3.to_string().as_str());
             let reader = accounts.read();
             let addr =
                 AccountAddress::try_from("a74fd7c46952c497e75afb0a7932586d".to_owned()).unwrap();
@@ -461,10 +488,18 @@ mod tests {
                                 String::from_utf8(domain).unwrap().as_str(),
                             )
                             .unwrap();
-                            account["role"]["diem_id_domains"]
-                                .as_array_mut()
+                            let json_domain = &serde_json::json!(domain);
+                            let index = account["role"]["diem_id_domains"]
+                                .as_array()
                                 .unwrap()
-                                .push(serde_json::json!(domain));
+                                .iter()
+                                .position(|x| x == json_domain);
+                            if index.is_none() {
+                                account["role"]["diem_id_domains"]
+                                    .as_array_mut()
+                                    .unwrap()
+                                    .push(serde_json::json!(domain));
+                            }
                         }
                         ScriptFunctionCall::RemoveDiemIdDomain {
                             address, domain, ..
@@ -530,7 +565,7 @@ mod tests {
                 blessed,
                 serde_json::json!([]),
                 serde_json::json!({
-                    "type": "unknown"
+                    "type": "treasury_compliance"
                 }),
             ),
         );
