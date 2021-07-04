@@ -115,7 +115,10 @@ impl<'a> Instrumenter<'a> {
             // So, the next code finds the set of target invariants (which will be assumed on return)
             // and assumes those that are not entrypoint invariants.
             if disabled_inv_fun_set.contains(&fun_id) {
-                let return_invariants: BTreeSet<GlobalId> = target_invariants
+                // Separate the update invariants, because we never want to assume them.
+                let (global_target_invs, _update_target_invs) =
+                    self.separate_update_invariants(target_invariants);
+                let return_invariants: BTreeSet<_> = global_target_invs
                     .difference(&entrypoint_invariants)
                     .cloned()
                     .collect();
@@ -150,6 +153,7 @@ impl<'a> Instrumenter<'a> {
         // - invariants declared in transitively dependent modules
         //
         // Excludes invariants that
+        // - are "update" invariants
         // - are marked by the user explicitly as `[isolated]`, or
         // - are not declared in dependent modules of the module defining the
         //   function (which may not be the target module) and upon which the
@@ -241,14 +245,16 @@ impl<'a> Instrumenter<'a> {
             // assuming they hold).
             Ret(_, _) => {
                 if disabled_inv_fun_set.contains(&fun_id) {
+                    let (global_target_invs, _update_target_invs) =
+                        self.separate_update_invariants(target_invariants);
                     let xlated_spec = SpecTranslator::translate_invariants_by_id(
                         self.options.auto_trace_level.invariants(),
                         &mut self.builder,
-                        target_invariants,
+                        &global_target_invs,
                     );
                     self.assert_or_assume_translated_invariants(
                         &xlated_spec.invariants,
-                        &target_invariants,
+                        &global_target_invs,
                         PropKind::Assert,
                     );
                 }
@@ -477,8 +483,19 @@ impl<'a> Instrumenter<'a> {
         inv_set: &BTreeSet<GlobalId>,
         prop_kind: PropKind,
     ) {
+        let global_env = self.builder.global_env();
         for (loc, mid, cond) in xlated_invariants {
             if inv_set.contains(mid) {
+                // Check for hard-to-debug coding error (this is not a user error)
+                if inv_set.contains(mid)
+                    && matches!(prop_kind, PropKind::Assume)
+                    && matches!(
+                        global_env.get_global_invariant(*mid).unwrap().kind,
+                        ConditionKind::InvariantUpdate
+                    )
+                {
+                    panic!("Not allowed to assume update invariant");
+                }
                 self.emit_invariant(loc, cond, prop_kind);
             }
         }
