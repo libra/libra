@@ -10,18 +10,19 @@ use crate::{
     function_data_builder::FunctionDataBuilder,
     function_target::FunctionData,
     function_target_pipeline::{FunctionTargetProcessor, FunctionTargetsHolder},
+    options::ProverOptions,
     stackless_bytecode::{BorrowNode, Bytecode, Operation, PropKind},
     usage_analysis,
     verification_analysis_v2::InvariantAnalysisData,
 };
 
-use crate::options::ProverOptions;
 use move_model::{
-    ast::{ConditionKind, Exp},
+    ast::{ConditionKind, Exp, GlobalInvariant},
     exp_generator::ExpGenerator,
     model::{FunId, FunctionEnv, GlobalEnv, GlobalId, Loc, QualifiedId, QualifiedInstId, StructId},
     pragmas::CONDITION_ISOLATED_PROP,
     spec_translator::{SpecTranslator, TranslatedSpec},
+    ty::{Type, TypeUnifier, Variance},
 };
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -63,6 +64,7 @@ impl FunctionTargetProcessor for GlobalInvariantInstrumentationProcessorV2 {
 struct Instrumenter<'a> {
     options: &'a ProverOptions,
     builder: FunctionDataBuilder<'a>,
+    func_insts: BTreeMap<BTreeMap<u16, Type>, BTreeSet<GlobalId>>,
     saved_from_before_instr_or_call: Option<(TranslatedSpec, BTreeSet<GlobalId>)>,
 }
 
@@ -74,6 +76,7 @@ impl<'a> Instrumenter<'a> {
         let mut instrumenter = Instrumenter {
             options: options.as_ref(),
             builder,
+            func_insts: BTreeMap::new(),
             saved_from_before_instr_or_call: None,
         };
         instrumenter.instrument(global_env);
@@ -83,6 +86,7 @@ impl<'a> Instrumenter<'a> {
     fn instrument(&mut self, global_env: &GlobalEnv) {
         // Extract and clear current code
         let old_code = std::mem::take(&mut self.builder.data.code);
+
         let fun_env = self.builder.fun_env;
         let inv_ana_data = global_env.get_extension::<InvariantAnalysisData>().unwrap();
         let disabled_inv_fun_set = &inv_ana_data.disabled_inv_fun_set;
@@ -92,7 +96,8 @@ impl<'a> Instrumenter<'a> {
         if self.builder.data.variant.is_verified() {
             let fun_id = fun_env.get_qualified_id();
 
-            let entrypoint_invariants = self.compute_entrypoint_invariants();
+            let related_invariants = self.collect_related_global_invariants();
+            let entrypoint_invariants = self.filter_entrypoint_invariants(&related_invariants);
             let xlated_spec = SpecTranslator::translate_invariants_by_id(
                 self.options.auto_trace_level.invariants(),
                 &mut self.builder,
@@ -145,8 +150,79 @@ impl<'a> Instrumenter<'a> {
         }
     }
 
+    /// Collect global invariants that are read and written by this function
+    fn collect_related_global_invariants(&mut self) -> BTreeSet<GlobalId> {
+        let env = self.builder.global_env();
+
+        // get memory (list of structs) read or written by the function target,
+        // then find all invariants in loaded modules that refer to that memory.
+        let mut invariants_for_used_memory = BTreeSet::new();
+        for mem in usage_analysis::get_used_memory_inst(&self.builder.get_target()).iter() {
+            invariants_for_used_memory.extend(env.get_global_invariants_for_memory(mem));
+        }
+
+        // filter non-applicable global invariants
+        for invariant_id in &invariants_for_used_memory {
+            // TODO (mengxu): filtering is not actually done, pending changes to the mono backend
+            self.check_gloabl_invariant_applicability(
+                env.get_global_invariant(*invariant_id).unwrap(),
+            );
+        }
+        invariants_for_used_memory
+    }
+
+    fn check_gloabl_invariant_applicability(&mut self, invariant: &GlobalInvariant) -> bool {
+        // collect instantiations of this function that are needed to check this global invariant
+        let mut func_insts = BTreeSet::new();
+
+        let fun_target = self.builder.get_target();
+        let fun_mems = usage_analysis::get_used_memory_inst(&fun_target);
+        for inv_mem in &invariant.mem_usage {
+            for fun_mem in fun_mems.iter() {
+                if inv_mem.module_id != fun_mem.module_id || inv_mem.id != fun_mem.id {
+                    continue;
+                }
+                let unifier = TypeUnifier::new_vec(&fun_mem.inst, &inv_mem.inst, true, true);
+                let rel = unifier.unify(Variance::Allow);
+                match rel {
+                    None => continue,
+                    Some((subst_lhs, _)) => {
+                        let inst: BTreeMap<_, _> = subst_lhs
+                            .into_iter()
+                            .map(|(k, v)| match k {
+                                Type::TypeParameter(param_idx) => (param_idx, v),
+                                _ => panic!("Only TypeParameter is expected in the substitution"),
+                            })
+                            .collect();
+                        if !inst.is_empty() {
+                            func_insts.insert(inst);
+                        }
+                    }
+                }
+            }
+        }
+
+        if func_insts.is_empty() {
+            // this global invariant is applicable in this function
+            true
+        } else {
+            // save the instantiation required to evaluate this invariant
+            for inst in func_insts {
+                self.func_insts
+                    .entry(inst)
+                    .or_insert_with(BTreeSet::new)
+                    .insert(invariant.id);
+            }
+            // this global invariant is not applicable to be evaluated in this function
+            false
+        }
+    }
+
     /// Returns list of invariant ids to be assumed at the beginning of the current function.
-    fn compute_entrypoint_invariants(&mut self) -> BTreeSet<GlobalId> {
+    fn filter_entrypoint_invariants(
+        &self,
+        related_invariants: &BTreeSet<GlobalId>,
+    ) -> BTreeSet<GlobalId> {
         // Emit an assume of each invariant over memory touched by this function.
         // Such invariants include
         // - invariants declared in this module, or
@@ -160,23 +236,8 @@ impl<'a> Instrumenter<'a> {
         //   code should therefore not depend, apart from the update itself.
 
         let env = self.builder.global_env();
-        // Invariants with types that are read or written by the function
-        let mut invariants_for_used_memory = BTreeSet::new();
-        // Invariants with types that are written by the function
-        let mut invariants_for_modified_memory = BTreeSet::new();
-        // get memory (list of structs) read or written by the function target, then find all
-        // invariants in loaded modules that refer to that memory.
-        for mem in usage_analysis::get_used_memory_inst(&self.builder.get_target()).iter() {
-            invariants_for_used_memory.extend(env.get_global_invariants_for_memory(mem));
-        }
-        // get memory (list of structs) written by function, find the invariants referring to that
-        // memory. Also called "invariants updated by the function"
-        for mem in usage_analysis::get_modified_memory_inst(&self.builder.get_target()).iter() {
-            invariants_for_modified_memory.extend(env.get_global_invariants_for_memory(mem));
-        }
-
         let module_env = &self.builder.fun_env.module_env;
-        invariants_for_used_memory
+        related_invariants
             .iter()
             .filter_map(|id| {
                 env.get_global_invariant(*id).filter(|inv| {
@@ -441,7 +502,7 @@ impl<'a> Instrumenter<'a> {
 
     /// Returns the set of invariants modified by a function
     fn get_invs_modified_by_fun(
-        &mut self,
+        &self,
         inv_set: &BTreeSet<GlobalId>,
         fun_id: QualifiedId<FunId>,
         funs_that_modify_inv: &BTreeMap<GlobalId, BTreeSet<QualifiedId<FunId>>>,
