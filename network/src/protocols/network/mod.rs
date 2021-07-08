@@ -138,7 +138,7 @@ fn peer_mgr_notif_to_event<TMessage: Message>(
 ) -> future::Ready<Option<Event<TMessage>>> {
     let maybe_event = match notif {
         PeerManagerNotification::RecvRpc(peer_id, rpc_req) => {
-            match bcs::from_bytes(&rpc_req.data) {
+            match rpc_req.protocol_id.from_bytes(&rpc_req.data) {
                 Ok(req_msg) => Some(Event::RpcRequest(peer_id, req_msg, rpc_req.res_tx)),
                 Err(err) => {
                     let data = &rpc_req.data;
@@ -153,20 +153,22 @@ fn peer_mgr_notif_to_event<TMessage: Message>(
                 }
             }
         }
-        PeerManagerNotification::RecvMessage(peer_id, msg) => match bcs::from_bytes(&msg.mdata) {
-            Ok(msg) => Some(Event::Message(peer_id, msg)),
-            Err(err) => {
-                let data = &msg.mdata;
-                warn!(
-                    SecurityEvent::InvalidNetworkEvent,
-                    error = ?err,
-                    remote_peer_id = peer_id.short_str(),
-                    protocol_id = msg.protocol_id,
-                    data_prefix = hex::encode(&data[..min(16, data.len())]),
-                );
-                None
+        PeerManagerNotification::RecvMessage(peer_id, msg) => {
+            match msg.protocol_id.from_bytes(&msg.mdata) {
+                Ok(msg) => Some(Event::Message(peer_id, msg)),
+                Err(err) => {
+                    let data = &msg.mdata;
+                    warn!(
+                        SecurityEvent::InvalidNetworkEvent,
+                        error = ?err,
+                        remote_peer_id = peer_id.short_str(),
+                        protocol_id = msg.protocol_id,
+                        data_prefix = hex::encode(&data[..min(16, data.len())]),
+                    );
+                    None
+                }
             }
-        },
+        }
     };
     future::ready(maybe_event)
 }
@@ -255,7 +257,7 @@ impl<TMessage: Message> NetworkSender<TMessage> {
         protocol: ProtocolId,
         message: TMessage,
     ) -> Result<(), NetworkError> {
-        let mdata = bcs::to_bytes(&message)?.into();
+        let mdata = protocol.to_bytes(&message)?.into();
         self.peer_mgr_reqs_tx.send_to(recipient, protocol, mdata)?;
         Ok(())
     }
@@ -269,7 +271,7 @@ impl<TMessage: Message> NetworkSender<TMessage> {
         message: TMessage,
     ) -> Result<(), NetworkError> {
         // Serialize message.
-        let mdata = bcs::to_bytes(&message)?.into();
+        let mdata = protocol.to_bytes(&message)?.into();
         self.peer_mgr_reqs_tx
             .send_to_many(recipients, protocol, mdata)?;
         Ok(())
@@ -286,12 +288,12 @@ impl<TMessage: Message> NetworkSender<TMessage> {
         timeout: Duration,
     ) -> Result<TMessage, RpcError> {
         // serialize request
-        let req_data = bcs::to_bytes(&req_msg)?.into();
+        let req_data = protocol.to_bytes(&req_msg)?.into();
         let res_data = self
             .peer_mgr_reqs_tx
             .send_rpc(recipient, protocol, req_data, timeout)
             .await?;
-        let res_msg: TMessage = bcs::from_bytes(&res_data)?;
+        let res_msg: TMessage = protocol.from_bytes(&res_data)?;
         Ok(res_msg)
     }
 }

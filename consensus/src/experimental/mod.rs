@@ -20,5 +20,6 @@
 //                               │ Decision    │ (Asynchronously)
 //                               └─────────────┘
 
+#![allow(dead_code)]
 pub mod execution_phase;
 pub mod ordering_state_computer;

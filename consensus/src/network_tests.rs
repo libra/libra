@@ -27,6 +27,7 @@ use network::{
     protocols::{
         network::{NewNetworkEvents, NewNetworkSender},
         rpc::InboundRpcRequest,
+        wire::handshake::v1::SupportedProtocols,
     },
     ProtocolId,
 };
@@ -77,6 +78,8 @@ pub struct NetworkPlayground {
     /// Maps authors to twins IDs
     /// An author may have multiple twin IDs for Twins
     author_to_twin_ids: Arc<RwLock<AuthorToTwinIds>>,
+    /// Supported protocols for peers.
+    shared_connections: Arc<RwLock<HashMap<PeerId, SupportedProtocols>>>,
 }
 
 impl NetworkPlayground {
@@ -91,7 +94,13 @@ impl NetworkPlayground {
             drop_config_round: DropConfigRound::default(),
             executor,
             author_to_twin_ids: Arc::new(RwLock::new(AuthorToTwinIds::default())),
+            shared_connections: Arc::new(RwLock::new(HashMap::new())),
         }
+    }
+
+    /// HashMap of supported protocols to initialize ConsensusNetworkSender.
+    pub fn peer_protocols(&self) -> Arc<RwLock<HashMap<PeerId, SupportedProtocols>>> {
+        self.shared_connections.clone()
     }
 
     /// Create a new async task that handles outbound messages sent by a node.
@@ -215,7 +224,7 @@ impl NetworkPlayground {
         // copy message data
         let msg_copy = match &msg_notif {
             PeerManagerNotification::RecvMessage(src, msg) => {
-                let msg: ConsensusMsg = bcs::from_bytes(&msg.mdata).unwrap();
+                let msg: ConsensusMsg = msg.protocol_id.from_bytes(&msg.mdata).unwrap();
                 (*src, msg)
             }
             msg_notif => panic!(
@@ -262,7 +271,7 @@ impl NetworkPlayground {
 
             let dst_twin_ids = self.get_twin_ids(dst);
             for (idx, dst_twin_id) in dst_twin_ids.iter().enumerate() {
-                let consensus_msg = bcs::from_bytes(&msg.mdata).unwrap();
+                let consensus_msg = msg.protocol_id.from_bytes(&msg.mdata).unwrap();
 
                 // Deliver and copy message if it's not dropped
                 if !self.is_message_dropped(&src_twin_id, dst_twin_id, consensus_msg) {
@@ -378,7 +387,7 @@ impl NetworkPlayground {
             for dst_twin_id in dst_twin_ids.iter() {
                 let msg_notif =
                     PeerManagerNotification::RecvMessage(src_twin_id.author, msg.clone());
-                let consensus_msg = bcs::from_bytes(&msg.mdata).unwrap();
+                let consensus_msg = msg.protocol_id.from_bytes(&msg.mdata).unwrap();
 
                 // Deliver and copy message it if it's not dropped
                 if !self.is_message_dropped(&src_twin_id, &dst_twin_id, consensus_msg) {
@@ -531,6 +540,7 @@ mod tests {
         let mut nodes = Vec::new();
         let (signers, validator_verifier) = random_validator_verifier(num_nodes, None, false);
         let peers: Vec<_> = signers.iter().map(|signer| signer.author()).collect();
+        let shared_connections = Arc::new(RwLock::new(HashMap::new()));
 
         for (peer_id, peer) in peers.iter().enumerate() {
             let (network_reqs_tx, network_reqs_rx) = diem_channel::new(QueueStyle::FIFO, 8, None);
@@ -538,10 +548,21 @@ mod tests {
             let (consensus_tx, consensus_rx) = diem_channel::new(QueueStyle::FIFO, 8, None);
             let (_conn_mgr_reqs_tx, conn_mgr_reqs_rx) = channel::new_test(8);
             let (_, conn_status_rx) = conn_notifs_channel::new();
-            let network_sender = ConsensusNetworkSender::new(
+            shared_connections.write().insert(
+                *peer,
+                vec![
+                    ProtocolId::ConsensusDirectSendJSON,
+                    ProtocolId::ConsensusDirectSend,
+                    ProtocolId::ConsensusRpc,
+                ]
+                .iter()
+                .into(),
+            );
+            let mut network_sender = ConsensusNetworkSender::new(
                 PeerManagerRequestSender::new(network_reqs_tx),
                 ConnectionRequestSender::new(connection_reqs_tx),
             );
+            network_sender.initialize(shared_connections.clone());
             let network_events = ConsensusNetworkEvents::new(consensus_rx, conn_status_rx);
 
             let twin_id = TwinId {
@@ -558,7 +579,8 @@ mod tests {
                 self_sender,
                 validator_verifier.clone(),
             );
-            let (task, receiver) = NetworkTask::new(network_events, self_receiver);
+            let (task, receiver) =
+                NetworkTask::new(network_events, self_receiver, shared_connections.clone());
             receivers.push(receiver);
             runtime.handle().spawn(task.start());
             nodes.push(node);
@@ -617,6 +639,7 @@ mod tests {
         let mut nodes = Vec::new();
         let (signers, validator_verifier) = random_validator_verifier(num_nodes, None, false);
         let peers: Vec<_> = signers.iter().map(|signer| signer.author()).collect();
+        let shared_connections = Arc::new(RwLock::new(HashMap::new()));
 
         for (peer_id, peer) in peers.iter().enumerate() {
             let (network_reqs_tx, network_reqs_rx) = diem_channel::new(QueueStyle::FIFO, 8, None);
@@ -624,10 +647,21 @@ mod tests {
             let (consensus_tx, consensus_rx) = diem_channel::new(QueueStyle::FIFO, 8, None);
             let (_conn_mgr_reqs_tx, conn_mgr_reqs_rx) = channel::new_test(8);
             let (_, conn_status_rx) = conn_notifs_channel::new();
-            let network_sender = ConsensusNetworkSender::new(
+            let mut network_sender = ConsensusNetworkSender::new(
                 PeerManagerRequestSender::new(network_reqs_tx),
                 ConnectionRequestSender::new(connection_reqs_tx),
             );
+            shared_connections.write().insert(
+                *peer,
+                vec![
+                    ProtocolId::ConsensusDirectSendJSON,
+                    ProtocolId::ConsensusDirectSend,
+                    ProtocolId::ConsensusRpc,
+                ]
+                .iter()
+                .into(),
+            );
+            network_sender.initialize(shared_connections.clone());
             let network_events = ConsensusNetworkEvents::new(consensus_rx, conn_status_rx);
 
             let twin_id = TwinId {
@@ -644,7 +678,8 @@ mod tests {
                 self_sender,
                 validator_verifier.clone(),
             );
-            let (task, receiver) = NetworkTask::new(network_events, self_receiver);
+            let (task, receiver) =
+                NetworkTask::new(network_events, self_receiver, shared_connections.clone());
             senders.push(network_sender);
             receivers.push(receiver);
             runtime.handle().spawn(task.start());
@@ -706,9 +741,10 @@ mod tests {
         let consensus_network_events =
             ConsensusNetworkEvents::new(peer_mgr_notifs_rx, connection_notifs_rx);
         let (self_sender, self_receiver) = channel::new_test(8);
+        let shared_connections = Arc::new(RwLock::new(HashMap::new()));
 
         let (network_task, mut network_receivers) =
-            NetworkTask::new(consensus_network_events, self_receiver);
+            NetworkTask::new(consensus_network_events, self_receiver, shared_connections);
 
         let peer_id = PeerId::random();
         let protocol_id = ProtocolId::ConsensusDirectSend;

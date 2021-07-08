@@ -30,6 +30,7 @@ use futures::channel::mpsc;
 use network::{
     peer_manager::{conn_notifs_channel, ConnectionRequestSender, PeerManagerRequestSender},
     protocols::network::{NewNetworkEvents, NewNetworkSender},
+    ProtocolId,
 };
 use std::{collections::HashMap, sync::Arc};
 use tokio::runtime::{Builder, Runtime};
@@ -60,10 +61,11 @@ impl SMRNode {
         let (consensus_tx, consensus_rx) = diem_channel::new(QueueStyle::FIFO, 8, None);
         let (_conn_mgr_reqs_tx, conn_mgr_reqs_rx) = channel::new_test(8);
         let (_, conn_notifs_channel) = conn_notifs_channel::new();
-        let network_sender = ConsensusNetworkSender::new(
+        let mut network_sender = ConsensusNetworkSender::new(
             PeerManagerRequestSender::new(network_reqs_tx),
             ConnectionRequestSender::new(connection_reqs_tx),
         );
+        network_sender.initialize(playground.peer_protocols());
         let network_events = ConsensusNetworkEvents::new(consensus_rx, conn_notifs_channel);
 
         playground.add_node(twin_id, consensus_tx, network_reqs_rx, conn_mgr_reqs_rx);
@@ -116,7 +118,8 @@ impl SMRNode {
             storage.clone(),
             reconfig_events,
         );
-        let (network_task, network_receiver) = NetworkTask::new(network_events, self_receiver);
+        let (network_task, network_receiver) =
+            NetworkTask::new(network_events, self_receiver, playground.peer_protocols());
 
         runtime.spawn(network_task.start());
         runtime.spawn(epoch_mgr.start(timeout_receiver, network_receiver));
@@ -142,6 +145,19 @@ impl SMRNode {
         let ValidatorSwarm {
             nodes: mut node_configs,
         } = generator::validator_swarm_for_testing(num_nodes);
+        let shared_connections = playground.peer_protocols();
+        node_configs.iter().for_each(|config| {
+            shared_connections.write().insert(
+                author_from_config(config),
+                vec![
+                    ProtocolId::ConsensusDirectSendJSON,
+                    ProtocolId::ConsensusDirectSend,
+                    ProtocolId::ConsensusRpc,
+                ]
+                .iter()
+                .into(),
+            );
+        });
 
         let validator_set = ValidatorSet::new(
             node_configs

@@ -15,16 +15,21 @@ use consensus_types::{
     sync_info::SyncInfo,
     vote_msg::VoteMsg,
 };
+use diem_infallible::RwLock;
 use diem_logger::prelude::*;
 use diem_metrics::monitor;
 use diem_types::{
     account_address::AccountAddress, epoch_change::EpochChangeProof,
-    validator_verifier::ValidatorVerifier,
+    validator_verifier::ValidatorVerifier, PeerId,
 };
 use futures::{channel::oneshot, stream::select, SinkExt, Stream, StreamExt};
-use network::protocols::{network::Event, rpc::error::RpcError};
+use network::protocols::{
+    network::Event, rpc::error::RpcError, wire::handshake::v1::SupportedProtocols,
+};
 use std::{
+    collections::HashMap,
     mem::{discriminant, Discriminant},
+    sync::Arc,
     time::Duration,
 };
 
@@ -201,6 +206,7 @@ pub struct NetworkTask {
     >,
     block_retrieval_tx: diem_channel::Sender<AccountAddress, IncomingBlockRetrievalRequest>,
     all_events: Box<dyn Stream<Item = Event<ConsensusMsg>> + Send + Unpin>,
+    connections: Arc<RwLock<HashMap<PeerId, SupportedProtocols>>>,
 }
 
 impl NetworkTask {
@@ -208,6 +214,7 @@ impl NetworkTask {
     pub fn new(
         network_events: ConsensusNetworkEvents,
         self_receiver: channel::Receiver<Event<ConsensusMsg>>,
+        connections: Arc<RwLock<HashMap<PeerId, SupportedProtocols>>>,
     ) -> (NetworkTask, NetworkReceivers) {
         let (consensus_messages_tx, consensus_messages) =
             diem_channel::new(QueueStyle::LIFO, 1, Some(&counters::CONSENSUS_CHANNEL_MSGS));
@@ -222,6 +229,7 @@ impl NetworkTask {
                 consensus_messages_tx,
                 block_retrieval_tx,
                 all_events,
+                connections,
             },
             NetworkReceivers {
                 consensus_messages,
@@ -275,9 +283,13 @@ impl NetworkTask {
                 },
                 Event::NewPeer(metadata) => {
                     debug!(remote_peer = metadata.remote_peer_id, "Peer connected");
+                    self.connections
+                        .write()
+                        .insert(metadata.remote_peer_id, metadata.application_protocols);
                 }
                 Event::LostPeer(metadata) => {
                     debug!(remote_peer = metadata.remote_peer_id, "Peer disconnected");
+                    self.connections.write().remove(&metadata.remote_peer_id);
                 }
             }
         }

@@ -13,20 +13,21 @@ use crate::{
 };
 use channel::diem_channel;
 use diem_config::config::NodeConfig;
+use diem_infallible::RwLock;
 use diem_logger::prelude::*;
 use diem_mempool::ConsensusRequest;
 use diem_types::on_chain_config::OnChainConfigPayload;
 use execution_correctness::ExecutionCorrectnessManager;
 use futures::channel::mpsc;
 use state_sync::client::StateSyncClient;
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 use storage_interface::DbReader;
 use tokio::runtime::{self, Runtime};
 
 /// Helper function to start consensus based on configuration and return the runtime
 pub fn start_consensus(
     node_config: &NodeConfig,
-    network_sender: ConsensusNetworkSender,
+    mut network_sender: ConsensusNetworkSender,
     network_events: ConsensusNetworkEvents,
     state_sync_client: StateSyncClient,
     consensus_to_mempool_sender: mpsc::Sender<ConsensusRequest>,
@@ -56,6 +57,8 @@ pub fn start_consensus(
 
     let (timeout_sender, timeout_receiver) = channel::new(1_024, &counters::PENDING_ROUND_TIMEOUTS);
     let (self_sender, self_receiver) = channel::new(1_024, &counters::PENDING_SELF_MESSAGES);
+    let shared_connections = Arc::new(RwLock::new(HashMap::new()));
+    network_sender.initialize(shared_connections.clone());
 
     let epoch_mgr = EpochManager::new(
         node_config,
@@ -69,7 +72,8 @@ pub fn start_consensus(
         reconfig_events,
     );
 
-    let (network_task, network_receiver) = NetworkTask::new(network_events, self_receiver);
+    let (network_task, network_receiver) =
+        NetworkTask::new(network_events, self_receiver, shared_connections);
 
     runtime.spawn(network_task.start());
     runtime.spawn(epoch_mgr.start(timeout_receiver, network_receiver));
