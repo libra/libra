@@ -1666,15 +1666,6 @@ pub struct CompiledScript {
 impl CompiledScript {
     /// Returns the index of `main` in case a script is converted to a module.
     pub const MAIN_INDEX: FunctionDefinitionIndex = FunctionDefinitionIndex(0);
-
-    /// Converts this instance into `CompiledScript` after verifying it for basic internal
-    /// consistency. This includes bounds checks but no others.
-    #[allow(deprecated)]
-    pub fn freeze(self) -> PartialVMResult<CompiledScript> {
-        let script = self;
-        BoundsChecker::verify_script(&script)?;
-        Ok(script)
-    }
 }
 
 /// A `CompiledModule` defines the structure of a module which is the unit of published code.

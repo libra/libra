@@ -6,7 +6,8 @@ use invalid_mutations::bounds::{
     OutOfBoundsMutation,
 };
 use move_binary_format::{
-    file_format::*, file_format_common, proptest_types::CompiledModuleStrategyGen,
+    check_bounds::BoundsChecker, file_format::*, file_format_common,
+    proptest_types::CompiledModuleStrategyGen,
 };
 use move_core_types::{
     account_address::AccountAddress, identifier::Identifier, vm_status::StatusCode,
@@ -20,7 +21,7 @@ fn empty_module_no_errors() {
 
 #[test]
 fn empty_script_no_errors() {
-    basic_test_script().freeze().unwrap();
+    BoundsChecker::verify_script(&basic_test_script()).unwrap();
 }
 
 #[test]
@@ -165,7 +166,7 @@ fn script_invalid_locals_id_in_call() {
     let func_inst_idx = FunctionInstantiationIndex(s.function_instantiations.len() as u16 - 1);
     s.code.code = vec![CallGeneric(func_inst_idx)];
     assert_eq!(
-        s.freeze().unwrap_err().major_status(),
+        BoundsChecker::verify_script(&s).unwrap_err().major_status(),
         StatusCode::INDEX_OUT_OF_BOUNDS
     );
 }
@@ -203,7 +204,7 @@ fn script_invalid_type_param_in_call() {
     let func_inst_idx = FunctionInstantiationIndex(s.function_instantiations.len() as u16 - 1);
     s.code.code = vec![CallGeneric(func_inst_idx)];
     assert_eq!(
-        s.freeze().unwrap_err().major_status(),
+        BoundsChecker::verify_script(&s).unwrap_err().major_status(),
         StatusCode::INDEX_OUT_OF_BOUNDS
     );
 }
@@ -243,7 +244,7 @@ fn script_invalid_struct_as_type_argument_in_exists() {
     let func_inst_idx = FunctionInstantiationIndex(s.function_instantiations.len() as u16 - 1);
     s.code.code = vec![CallGeneric(func_inst_idx)];
     assert_eq!(
-        s.freeze().unwrap_err().major_status(),
+        BoundsChecker::verify_script(&s).unwrap_err().major_status(),
         StatusCode::INDEX_OUT_OF_BOUNDS
     );
 }
@@ -282,7 +283,7 @@ fn script_missing_signature() {
     s.signatures.clear();
     // Bounds-checking the script should now result in an out-of-bounds error.
     assert_eq!(
-        s.freeze().unwrap_err().major_status(),
+        BoundsChecker::verify_script(&s).unwrap_err().major_status(),
         StatusCode::INDEX_OUT_OF_BOUNDS
     );
 }

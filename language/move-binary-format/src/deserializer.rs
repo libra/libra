@@ -1,7 +1,7 @@
 // Copyright (c) The Diem Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{errors::*, file_format::*, file_format_common::*};
+use crate::{check_bounds::BoundsChecker, errors::*, file_format::*, file_format_common::*};
 use move_core_types::{
     account_address::AccountAddress, identifier::Identifier, vm_status::StatusCode,
 };
@@ -10,7 +10,9 @@ use std::{collections::HashSet, convert::TryInto, io::Read};
 impl CompiledScript {
     /// Deserializes a &[u8] slice into a `CompiledScript` instance.
     pub fn deserialize(binary: &[u8]) -> BinaryLoaderResult<Self> {
-        CompiledScript::deserialize_no_check_bounds(binary)?.freeze()
+        let script = CompiledScript::deserialize_no_check_bounds(binary)?;
+        BoundsChecker::verify_script(&script)?;
+        Ok(script)
     }
 
     // exposed as a public function to enable testing the deserializer

@@ -9,7 +9,8 @@ use crate::{
     script_signature, signature::SignatureChecker, struct_defs::RecursiveStructDefChecker,
 };
 use move_binary_format::{
-    errors::VMResult,
+    check_bounds::BoundsChecker,
+    errors::{Location, VMResult},
     file_format::{CompiledModule, CompiledScript},
 };
 
@@ -46,6 +47,7 @@ pub fn verify_module(module: &CompiledModule) -> VMResult<()> {
 /// minimize the code locations that need to be updated should a new checker
 /// is introduced.
 pub fn verify_script(script: &CompiledScript) -> VMResult<()> {
+    BoundsChecker::verify_script(&script).map_err(|e| e.finish(Location::Script))?;
     DuplicationChecker::verify_script(&script)?;
     SignatureChecker::verify_script(&script)?;
     InstructionConsistency::verify_script(&script)?;
