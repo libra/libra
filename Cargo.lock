@@ -2664,6 +2664,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bcs",
+ "bytecode-verifier",
  "diem-crypto",
  "diem-crypto-derive",
  "diem-framework",

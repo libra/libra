@@ -562,7 +562,7 @@ pub fn compile_module<'a>(
         _compiled_deps,
         source_map,
     ) = context.materialize_pools();
-    CompiledModule {
+    let module = CompiledModule {
         version: VERSION_MAX,
         module_handles,
         self_module_handle_idx,
@@ -579,12 +579,14 @@ pub fn compile_module<'a>(
         constant_pool,
         struct_defs,
         function_defs,
+    };
+    match BoundsChecker::verify_module(&module) {
+        Ok(()) => Ok((module, source_map)),
+        Err(e) => Err(InternalCompilerError::BoundsCheckErrors(
+            e.finish(VMErrorLocation::Undefined),
+        )
+        .into()),
     }
-    .freeze()
-    .map_err(|e| {
-        InternalCompilerError::BoundsCheckErrors(e.finish(VMErrorLocation::Undefined)).into()
-    })
-    .map(|frozen_module| (frozen_module, source_map))
 }
 
 // Note: DO NOT try to recover from this function as it zeros out the `outer_contexts` dependencies
@@ -658,9 +660,8 @@ fn compile_explicit_dependency_declarations(
             constant_pool,
             struct_defs: vec![],
             function_defs: vec![],
-        }
-        .freeze()
-        .map_err(|e| {
+        };
+        BoundsChecker::verify_module(&compiled_module).map_err(|e| {
             InternalCompilerError::BoundsCheckErrors(e.finish(VMErrorLocation::Undefined))
         })?;
         dependencies_acc = compiled_deps;

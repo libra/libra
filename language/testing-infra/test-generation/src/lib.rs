@@ -269,7 +269,6 @@ pub fn bytecode_generation(
         let module = bytecode_module(&mut rng, module);
 
         debug!("Done...Running module on verifier...");
-        let module = module.freeze().expect("generated module failed to freeze.");
         let verified_module = match run_verifier(module.clone()) {
             Ok(verified_module) => {
                 status = Status::ExecutionFailure;

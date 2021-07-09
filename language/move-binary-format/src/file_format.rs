@@ -28,7 +28,6 @@
 
 use crate::{
     access::ModuleAccess,
-    check_bounds::BoundsChecker,
     errors::{PartialVMError, PartialVMResult},
     file_format_common,
     internals::ModuleIndex,
@@ -1861,15 +1860,6 @@ impl CompiledModule {
             | other @ IndexKind::TypeParameter
             | other @ IndexKind::MemberCount => unreachable!("invalid kind for count: {:?}", other),
         }
-    }
-
-    /// Converts this instance into `CompiledModule` after verifying it for basic internal
-    /// consistency. This includes bounds checks but no others.
-    pub fn freeze(self) -> PartialVMResult<CompiledModule> {
-        // Impossible to access self_id for location as it might not be safe due to bounds failing
-        let module = self;
-        BoundsChecker::verify_module(&module)?;
-        Ok(module)
     }
 
     /// Returns the code key of `module_handle`

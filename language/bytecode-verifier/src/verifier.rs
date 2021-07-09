@@ -25,6 +25,11 @@ use move_binary_format::{
 /// minimize the code locations that need to be updated should a new checker
 /// is introduced.
 pub fn verify_module(module: &CompiledModule) -> VMResult<()> {
+    BoundsChecker::verify_module(&module).map_err(|e| {
+        // We can't point the error at the module, because if bounds-checking
+        // failed, we cannot safely index into module's handle to itself.
+        e.finish(Location::Undefined)
+    })?;
     DuplicationChecker::verify_module(&module)?;
     SignatureChecker::verify_module(&module)?;
     InstructionConsistency::verify_module(&module)?;

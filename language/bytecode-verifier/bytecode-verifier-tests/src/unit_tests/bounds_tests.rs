@@ -16,7 +16,7 @@ use proptest::{collection::vec, prelude::*};
 
 #[test]
 fn empty_module_no_errors() {
-    basic_test_module().freeze().unwrap();
+    BoundsChecker::verify_module(&basic_test_module()).unwrap();
 }
 
 #[test]
@@ -26,11 +26,10 @@ fn empty_script_no_errors() {
 
 #[test]
 fn invalid_default_module() {
-    CompiledModule {
+    BoundsChecker::verify_module(&CompiledModule {
         version: file_format_common::VERSION_MAX,
         ..Default::default()
-    }
-    .freeze()
+    })
     .unwrap_err();
 }
 
@@ -39,7 +38,7 @@ fn invalid_self_module_handle_index() {
     let mut m = basic_test_module();
     m.self_module_handle_idx = ModuleHandleIndex(12);
     assert_eq!(
-        m.freeze().unwrap_err().major_status(),
+        BoundsChecker::verify_module(&m).unwrap_err().major_status(),
         StatusCode::INDEX_OUT_OF_BOUNDS
     );
 }
@@ -53,7 +52,7 @@ fn invalid_type_param_in_fn_return_() {
     m.signatures.push(Signature(vec![TypeParameter(0)]));
     assert_eq!(m.signatures.len(), 2);
     assert_eq!(
-        m.freeze().unwrap_err().major_status(),
+        BoundsChecker::verify_module(&m).unwrap_err().major_status(),
         StatusCode::INDEX_OUT_OF_BOUNDS
     );
 }
@@ -66,7 +65,7 @@ fn invalid_type_param_in_fn_parameters() {
     m.function_handles[0].parameters = SignatureIndex(1);
     m.signatures.push(Signature(vec![TypeParameter(0)]));
     assert_eq!(
-        m.freeze().unwrap_err().major_status(),
+        BoundsChecker::verify_module(&m).unwrap_err().major_status(),
         StatusCode::INDEX_OUT_OF_BOUNDS
     );
 }
@@ -80,7 +79,7 @@ fn invalid_struct_in_fn_return_() {
     m.signatures
         .push(Signature(vec![Struct(StructHandleIndex::new(1))]));
     assert_eq!(
-        m.freeze().unwrap_err().major_status(),
+        BoundsChecker::verify_module(&m).unwrap_err().major_status(),
         StatusCode::INDEX_OUT_OF_BOUNDS
     );
 }
@@ -94,7 +93,7 @@ fn invalid_type_param_in_field() {
         StructFieldInformation::Declared(ref mut fields) => {
             fields[0].signature.0 = TypeParameter(0);
             assert_eq!(
-                m.freeze().unwrap_err().major_status(),
+                BoundsChecker::verify_module(&m).unwrap_err().major_status(),
                 StatusCode::INDEX_OUT_OF_BOUNDS
             );
         }
@@ -111,7 +110,7 @@ fn invalid_struct_in_field() {
         StructFieldInformation::Declared(ref mut fields) => {
             fields[0].signature.0 = Struct(StructHandleIndex::new(3));
             assert_eq!(
-                m.freeze().unwrap_err().major_status(),
+                BoundsChecker::verify_module(&m).unwrap_err().major_status(),
                 StatusCode::INDEX_OUT_OF_BOUNDS
             );
         }
@@ -129,7 +128,7 @@ fn invalid_struct_with_actuals_in_field() {
             fields[0].signature.0 =
                 StructInstantiation(StructHandleIndex::new(0), vec![TypeParameter(0)]);
             assert_eq!(
-                m.freeze().unwrap_err().major_status(),
+                BoundsChecker::verify_module(&m).unwrap_err().major_status(),
                 StatusCode::NUMBER_OF_TYPE_ARGUMENTS_MISMATCH
             );
         }
@@ -149,7 +148,7 @@ fn invalid_locals_id_in_call() {
     let func_inst_idx = FunctionInstantiationIndex(m.function_instantiations.len() as u16 - 1);
     m.function_defs[0].code.as_mut().unwrap().code = vec![CallGeneric(func_inst_idx)];
     assert_eq!(
-        m.freeze().unwrap_err().major_status(),
+        BoundsChecker::verify_module(&m).unwrap_err().major_status(),
         StatusCode::INDEX_OUT_OF_BOUNDS
     );
 }
@@ -185,7 +184,7 @@ fn invalid_type_param_in_call() {
     let func_inst_idx = FunctionInstantiationIndex(m.function_instantiations.len() as u16 - 1);
     m.function_defs[0].code.as_mut().unwrap().code = vec![CallGeneric(func_inst_idx)];
     assert_eq!(
-        m.freeze().unwrap_err().major_status(),
+        BoundsChecker::verify_module(&m).unwrap_err().major_status(),
         StatusCode::INDEX_OUT_OF_BOUNDS
     );
 }
@@ -224,7 +223,7 @@ fn invalid_struct_as_type_actual_in_exists() {
     let func_inst_idx = FunctionInstantiationIndex(m.function_instantiations.len() as u16 - 1);
     m.function_defs[0].code.as_mut().unwrap().code = vec![CallGeneric(func_inst_idx)];
     assert_eq!(
-        m.freeze().unwrap_err().major_status(),
+        BoundsChecker::verify_module(&m).unwrap_err().major_status(),
         StatusCode::INDEX_OUT_OF_BOUNDS
     );
 }
@@ -257,7 +256,7 @@ fn invalid_friend_module_address() {
         name: IdentifierIndex::new(0),
     });
     assert_eq!(
-        m.freeze().unwrap_err().major_status(),
+        BoundsChecker::verify_module(&m).unwrap_err().major_status(),
         StatusCode::INDEX_OUT_OF_BOUNDS
     );
 }
@@ -270,7 +269,7 @@ fn invalid_friend_module_name() {
         name: IdentifierIndex::new(m.identifiers.len() as TableIndex),
     });
     assert_eq!(
-        m.freeze().unwrap_err().major_status(),
+        BoundsChecker::verify_module(&m).unwrap_err().major_status(),
         StatusCode::INDEX_OUT_OF_BOUNDS
     );
 }
@@ -319,7 +318,7 @@ proptest! {
             oob_context.apply()
         };
 
-        let actual_violations = module.freeze();
+        let actual_violations = BoundsChecker::verify_module(&module);
         prop_assert_eq!(expected_violations.is_empty(), actual_violations.is_ok());
     }
 
@@ -333,8 +332,7 @@ proptest! {
             context.apply()
         };
 
-        let actual_violations = module.freeze();
-
+        let actual_violations = BoundsChecker::verify_module(&module);
         prop_assert_eq!(expected_violations.is_empty(), actual_violations.is_ok());
     }
 
@@ -352,7 +350,7 @@ proptest! {
         };
 
         prop_assert_eq!(
-            module.freeze().map_err(|e| e.major_status()),
+            BoundsChecker::verify_module(&module).map_err(|e| e.major_status()),
             Err(StatusCode::NO_MODULE_HANDLES)
         );
     }
@@ -366,6 +364,6 @@ proptest! {
     /// Make sure that garbage inputs don't crash the bounds checker.
     #[test]
     fn garbage_inputs(module in any_with::<CompiledModule>(16)) {
-        let _ = module.freeze();
+        let _ = BoundsChecker::verify_module(&module);
     }
 }

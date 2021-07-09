@@ -243,7 +243,6 @@ fn test_unverifiable_module() {
 
         let mut m = m;
         m.function_defs[0].code.as_mut().unwrap().code = vec![];
-        let m = m.freeze().unwrap();
         let mut blob = vec![];
         m.serialize(&mut blob).unwrap();
         storage.publish_or_overwrite_module(m.self_id(), blob);
@@ -433,7 +432,6 @@ fn test_unverifiable_module_dependency() {
     {
         let mut m = m;
         m.function_defs[0].code.as_mut().unwrap().code = vec![];
-        let m = m.freeze().unwrap();
         let mut blob_m = vec![];
         m.serialize(&mut blob_m).unwrap();
 

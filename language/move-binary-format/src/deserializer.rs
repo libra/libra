@@ -25,7 +25,9 @@ impl CompiledScript {
 impl CompiledModule {
     /// Deserialize a &[u8] slice into a `CompiledModule` instance.
     pub fn deserialize(binary: &[u8]) -> BinaryLoaderResult<Self> {
-        CompiledModule::deserialize_no_check_bounds(binary)?.freeze()
+        let module = CompiledModule::deserialize_no_check_bounds(binary)?;
+        BoundsChecker::verify_module(&module)?;
+        Ok(module)
     }
 
     // exposed as a public function to enable testing the deserializer

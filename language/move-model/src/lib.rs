@@ -12,6 +12,7 @@ use std::collections::BTreeSet;
 use builder::module_builder::ModuleBuilder;
 use move_binary_format::{
     access::ModuleAccess,
+    check_bounds::BoundsChecker,
     file_format::{
         self_module_name, AddressIdentifierIndex, CompiledModule, CompiledScript,
         FunctionDefinition, FunctionDefinitionIndex, FunctionHandle, FunctionHandleIndex,
@@ -373,7 +374,7 @@ fn script_into_module(compiled_script: CompiledScript) -> CompiledModule {
         code: Some(script.code),
     };
 
-    CompiledModule {
+    let module = CompiledModule {
         version: script.version,
         module_handles: script.module_handles,
         self_module_handle_idx,
@@ -394,9 +395,9 @@ fn script_into_module(compiled_script: CompiledScript) -> CompiledModule {
 
         struct_defs: vec![],
         function_defs: vec![main_def],
-    }
-    .freeze()
-    .unwrap()
+    };
+    BoundsChecker::verify_module(&module).expect("invalid bounds in module");
+    module
 }
 
 #[allow(deprecated)]

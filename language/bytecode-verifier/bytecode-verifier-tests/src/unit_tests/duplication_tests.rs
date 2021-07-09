@@ -14,7 +14,7 @@ fn duplicated_friend_decls() {
     };
     m.friend_decls.push(handle.clone());
     m.friend_decls.push(handle);
-    DuplicationChecker::verify_module(&m.freeze().unwrap()).unwrap_err();
+    DuplicationChecker::verify_module(&m).unwrap_err();
 }
 
 proptest! {
