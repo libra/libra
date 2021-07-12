@@ -23,6 +23,7 @@ bcs = "0.1.2"
 cli = { path = "../../../testsuite/cli" }
 diem-client = { path = "../../../sdk/client/"}
 diem-config = { path = "../../../config" }
+diem-framework-releases = { path = "../../diem-framework/releases"}
 diem-genesis-tool = { path = "../../../config/management/genesis" }
 diem-json-rpc-types = { path = "../../../json-rpc/types" }
 diem-types = { path = "../../../types" }

@@ -115,10 +115,13 @@ impl LocalSwarmBuilder {
             SwarmDirectory::Temporary(TempDir::new()?)
         };
 
-        let (root_keys, validators) = ValidatorBuilder::new(&dir)
-            .num_validators(self.number_of_validators)
-            .template(self.template)
-            .build()?;
+        let (root_keys, validators) = ValidatorBuilder::new(
+            &dir,
+            diem_framework_releases::current_module_blobs().to_vec(),
+        )
+        .num_validators(self.number_of_validators)
+        .template(self.template)
+        .build()?;
         let diem_node_bin_path = self.diem_node_bin_path;
 
         let validators = validators

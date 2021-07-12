@@ -25,6 +25,7 @@ executor = { path = "../execution/executor" }
 executor-types = { path = "../execution/executor-types" }
 diem-config = { path = "../config" }
 diem-crypto = { path = "../crypto/crypto" }
+diem-framework-releases = { path = "../language/diem-framework/releases" }
 diem-genesis-tool = {path = "../config/management/genesis", features = ["testing"] }
 diem-json-rpc = { path = "../json-rpc" }
 diem-logger = { path = "../common/logger" }

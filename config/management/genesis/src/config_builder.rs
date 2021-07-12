@@ -121,9 +121,12 @@ impl BuildSwarm for FullnodeBuilder {
 pub fn test_config() -> (NodeConfig, Ed25519PrivateKey) {
     let path = TempPath::new();
     path.create_as_dir().unwrap();
-    let builder = ValidatorBuilder::new(path.path())
-        .num_validators(1)
-        .template(NodeConfig::default_for_validator());
+    let builder = ValidatorBuilder::new(
+        path.path(),
+        diem_framework_releases::current_module_blobs().to_vec(),
+    )
+    .num_validators(1)
+    .template(NodeConfig::default_for_validator());
     let (mut configs, key) = builder.build_swarm().unwrap();
 
     let mut config = configs.swap_remove(0);

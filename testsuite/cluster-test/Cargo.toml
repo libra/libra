@@ -40,6 +40,7 @@ generate-key = { path = "../../config/generate-key" }
 bcs = "0.1.2"
 diem-crypto = { path = "../../crypto/crypto" }
 diem-config = { path = "../../config" }
+diem-framework-releases = { path = "../../language/diem-framework/releases" }
 diem-genesis-tool = { path = "../../config/management/genesis", features = ["testing"] }
 diem-global-constants = { path = "../../config/global-constants" }
 diem-logger = { path = "../../common/logger" }
@@ -51,6 +52,7 @@ diem-node = { path = "../../diem-node" }
 diem-operational-tool = {path = "../../config/management/operational", features = ["testing"] }
 diem-secure-storage = { path = "../../secure/storage", features = ["testing"] }
 diem-swarm = { path = "../diem-swarm" }
+diem-temppath = { path = "../../common/temppath" }
 diem-time-service = { path = "../../common/time-service" }
 diem-types = { path = "../../types", features = ["fuzzing"] }
 diem-workspace-hack = { path = "../../common/workspace-hack" }

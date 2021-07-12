@@ -256,6 +256,26 @@ impl StorageHelper {
         command.set_layout()
     }
 
+    #[cfg(test)]
+    pub fn set_move_modules(&self, dir: &str) -> Result<Vec<Vec<u8>>, Error> {
+        println!("setting move modules with dir {}", dir);
+        let args = format!(
+            "
+                diem-genesis-tool
+                set-move-modules
+                --dir {dir}
+                --shared-backend backend={backend};\
+                    path={storage_path}
+            ",
+            dir = dir,
+            backend = DISK,
+            storage_path = self.path_string(),
+        );
+
+        let command = Command::from_iter(args.split_whitespace());
+        command.set_move_modules()
+    }
+
     pub fn set_operator(&self, operator_name: &str, shared_ns: &str) -> Result<String, Error> {
         let args = format!(
             "

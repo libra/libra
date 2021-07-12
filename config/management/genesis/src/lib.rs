@@ -8,6 +8,7 @@ pub mod command;
 mod genesis;
 mod key;
 pub mod layout;
+mod move_modules;
 pub mod validator_builder;
 mod validator_config;
 mod validator_operator;

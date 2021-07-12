@@ -155,15 +155,18 @@ impl RootKeys {
 #[derive(Clone)]
 pub struct ValidatorBuilder {
     config_directory: PathBuf,
+    /// Bytecodes of Move genesis modules
+    move_modules: Vec<Vec<u8>>,
     num_validators: usize,
     randomize_first_validator_ports: bool,
     template: NodeConfig,
 }
 
 impl ValidatorBuilder {
-    pub fn new<T: AsRef<Path>>(config_directory: T) -> Self {
+    pub fn new<T: AsRef<Path>>(config_directory: T, move_modules: Vec<Vec<u8>>) -> Self {
         Self {
             config_directory: config_directory.as_ref().into(),
+            move_modules,
             num_validators: 1,
             randomize_first_validator_ports: true,
             template: NodeConfig::default_for_validator(),
@@ -210,8 +213,12 @@ impl ValidatorBuilder {
         // Build genesis
         let mut genesis_storage =
             OnDiskStorage::new(self.config_directory.join("genesis-storage.json"));
-        let (genesis, waypoint) =
-            Self::genesis_ceremony(&mut genesis_storage, &root_keys, &validators)?;
+        let (genesis, waypoint) = Self::genesis_ceremony(
+            &mut genesis_storage,
+            &root_keys,
+            &validators,
+            self.move_modules,
+        )?;
 
         // Insert Genesis and Waypoint into each validator
         for validator in &mut validators {
@@ -358,10 +365,11 @@ impl ValidatorBuilder {
         genesis_storage: &mut OnDiskStorage,
         root_keys: &RootKeys,
         validators: &[ValidatorConfig],
+        move_modules: Vec<Vec<u8>>,
     ) -> Result<(Transaction, Waypoint)> {
         let mut genesis_builder = GenesisBuilder::new(genesis_storage);
 
-        // Set the Layout
+        // Set the Layout and Move modules
         let layout = Layout {
             owners: validators.iter().map(|v| v.owner()).collect(),
             operators: validators.iter().map(|v| v.operator()).collect(),
@@ -369,6 +377,7 @@ impl ValidatorBuilder {
             treasury_compliance: DIEM_ROOT_NS.into(),
         };
         genesis_builder.set_layout(&layout)?;
+        genesis_builder.set_move_modules(move_modules)?;
 
         // Set Root and Treasury public keys
         genesis_builder.set_root_key(Ed25519PublicKey::from(&root_keys.root_key))?;

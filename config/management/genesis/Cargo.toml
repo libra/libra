@@ -23,6 +23,7 @@ generate-key = { path = "../../generate-key" }
 bcs = "0.1.2"
 diem-config = { path = "../.."}
 diem-crypto = { path = "../../../crypto/crypto" }
+diem-framework-releases = { path = "../../../language/diem-framework/releases"}
 diem-global-constants = { path = "../../global-constants" }
 diem-management = { path = ".." }
 diem-network-address-encryption = {path = "../network-address-encryption"}

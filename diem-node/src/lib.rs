@@ -107,10 +107,13 @@ pub fn load_test_environment(config_path: Option<PathBuf>, random_ports: bool) {
     maybe_config.push("validator_node_template.yaml");
     let template = NodeConfig::load_config(maybe_config)
         .unwrap_or_else(|_| NodeConfig::default_for_validator());
-    let builder = diem_genesis_tool::validator_builder::ValidatorBuilder::new(&config_path)
-        .num_validators(1)
-        .template(template)
-        .randomize_first_validator_ports(random_ports);
+    let builder = diem_genesis_tool::validator_builder::ValidatorBuilder::new(
+        &config_path,
+        diem_framework_releases::current_module_blobs().to_vec(),
+    )
+    .num_validators(1)
+    .template(template)
+    .randomize_first_validator_ports(random_ports);
     let test_config =
         diem_genesis_tool::swarm_config::SwarmConfig::build(&builder, &config_path).unwrap();
 

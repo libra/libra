@@ -57,7 +57,7 @@ pub fn encode_genesis_transaction(
     diem_root_key: Ed25519PublicKey,
     treasury_compliance_key: Ed25519PublicKey,
     validators: &[Validator],
-
+    stdlib_module_bytes: &[Vec<u8>],
     vm_publishing_option: Option<VMPublishingOption>,
     chain_id: ChainId,
 ) -> Transaction {
@@ -65,7 +65,7 @@ pub fn encode_genesis_transaction(
         &diem_root_key,
         &treasury_compliance_key,
         validators,
-        current_module_blobs(), // Must use compiled stdlib,
+        stdlib_module_bytes,
         vm_publishing_option
             .unwrap_or_else(|| VMPublishingOption::locked(LegacyStdlibScript::allowlist())),
         chain_id,

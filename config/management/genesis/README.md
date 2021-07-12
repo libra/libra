@@ -4,9 +4,9 @@ The `diem-genesis-tool` provides a tool for the genesis ceremony of the Diem blo
 
 * A diem root account that maintains the set of validator owners, validator operators, and the active validator set.
 * A treasury compliance account that maintains VASPs, DDs, and other related topics.
+* The initial set of Move modules published at genesis.
 * Validator owners (OW) that have accounts on the blockchain. These accounts contain a validator configuration and specify a validator operator.
 * Validator operators (OP) that have accounts on the blockchain. These accounts have the ability to manipulate validator configuration.
-
 ## Generating Genesis
 
 The process for starting organization of the planned and current functionality includes:
@@ -14,6 +14,7 @@ The process for starting organization of the planned and current functionality i
 * Initialization ceremony
   * The association sets up a secure-backend for data uploads, `shared storage`, e.g., GitHub.  The association then distributes credentials for each OW and OP.
   * The association generates its `diem root key` and shares the public key to the `shared storage`.
+  * The association uploads the initial set of Move modules to `shared storage`.
   * Each OW will generate a private `owner key` and share the public key to the `shared storage`.
   * Each OP will generate a private `operator key` and share the public key to the `shared storage`.
 * Validator initialization
@@ -98,13 +99,21 @@ cargo run -p diem-genesis-tool -- \
     --config config_file.yaml \
     --path $PATH_TO_LAYOUT
 ```
+* The association will publish the initial set of Move modules to `shared storage`:
+```
+cargo run -p diem-genesis-tool -- \
+    set-move-modules \
+    --config config_file.yaml \
+    --dir $MOVE_MODULES_DIR
+```
+This should be a directory containing only Move bytecode files (`.mv` extension).
 * The association will publish the the `diem root`  public key to the `shared storage`:
 ```
 cargo run -p diem-genesis-tool -- \
     diem-root-key \
     --config config_file.yaml
 ```
-* The association will publish the the `diem root`  public key to the `shared storage`:
+* The association will publish the the `treasury compliance` public key to the `shared storage`:
 ```
 cargo run -p diem-genesis-tool -- \
     diem-treasury-compliance-key \

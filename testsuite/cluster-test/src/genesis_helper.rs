@@ -43,6 +43,32 @@ impl GenesisHelper {
             .expect("tokio spawn_blocking runtime error")
     }
 
+    pub async fn set_move_modules(
+        &self,
+        dir: &str,
+        namespace: &str,
+    ) -> Result<Vec<Vec<u8>>, Error> {
+        let args = format!(
+            "
+                diem-genesis-tool
+                set-move-modules
+                --dir {dir}
+                --shared-backend backend={backend};\
+                    path={storage_path};\
+                    namespace={ns}
+            ",
+            dir = dir,
+            backend = DISK,
+            storage_path = self.path,
+            ns = namespace,
+        );
+
+        let command = Command::from_iter(args.split_whitespace());
+        spawn_blocking(|| command.set_move_modules())
+            .await
+            .expect("tokio spawn_blocking runtime error")
+    }
+
     pub async fn diem_root_key(
         &self,
         validator_backend: &str,

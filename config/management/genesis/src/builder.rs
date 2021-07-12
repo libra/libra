@@ -4,7 +4,9 @@
 use crate::layout::Layout;
 use anyhow::Result;
 use diem_crypto::ed25519::Ed25519PublicKey;
-use diem_global_constants::{DIEM_ROOT_KEY, OPERATOR_KEY, OWNER_KEY, TREASURY_COMPLIANCE_KEY};
+use diem_global_constants::{
+    DIEM_ROOT_KEY, MOVE_MODULES, OPERATOR_KEY, OWNER_KEY, TREASURY_COMPLIANCE_KEY,
+};
 use diem_management::constants::{self, VALIDATOR_CONFIG, VALIDATOR_OPERATOR};
 use diem_secure_storage::{KVStorage, Namespaced};
 use diem_types::{
@@ -46,6 +48,19 @@ impl<S: KVStorage> GenesisBuilder<S> {
             .get::<String>(constants::LAYOUT)?
             .value;
         Layout::parse(&raw_layout).map_err(Into::into)
+    }
+
+    pub fn set_move_modules(&mut self, modules: Vec<Vec<u8>>) -> Result<()> {
+        self.with_namespace_mut(constants::COMMON_NS)
+            .set(MOVE_MODULES, modules)
+            .map_err(Into::into)
+    }
+
+    pub fn move_modules(&self) -> Result<Vec<Vec<u8>>> {
+        self.with_namespace(constants::COMMON_NS)
+            .get(MOVE_MODULES)
+            .map(|r| r.value)
+            .map_err(Into::into)
     }
 
     pub fn set_root_key(&mut self, root_key: Ed25519PublicKey) -> Result<()> {
@@ -199,6 +214,7 @@ impl<S: KVStorage> GenesisBuilder<S> {
         let diem_root_key = self.root_key()?;
         let treasury_compliance_key = self.treasury_compliance_key()?;
         let validators = self.validators()?;
+        let move_modules = self.move_modules()?;
 
         // Only have an allowlist of stdlib scripts
         let script_policy = None;
@@ -207,6 +223,7 @@ impl<S: KVStorage> GenesisBuilder<S> {
             diem_root_key,
             treasury_compliance_key,
             &validators,
+            &move_modules,
             script_policy,
             chain_id,
         );

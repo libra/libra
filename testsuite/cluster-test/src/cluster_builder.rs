@@ -53,6 +53,11 @@ pub struct ClusterBuilderParams {
         default_value = "vault"
     )]
     pub lsr_backend: String,
+    #[structopt(
+        long,
+        help = "Directory containing Move module bytecodes to be published in genesis"
+    )]
+    pub move_modules_dir: Option<String>,
 }
 
 impl ClusterBuilderParams {
@@ -115,6 +120,25 @@ impl ClusterBuilder {
                 .await
                 .map_err(|err| format_err!("{} scale up failed: {}", asg_name, err))?;
         }
+        let modules_dir = if let Some(modules_dir) = &params.move_modules_dir {
+            modules_dir.clone()
+        } else {
+            // No modules specified on command line. Create a tmpdir and populate it with the Diem genesis modules
+            let mut tempdir = diem_temppath::TempPath::new();
+            tempdir.create_as_dir()?;
+            tempdir.persist();
+            for b in diem_framework_releases::current_module_blobs() {
+                let mut temppath =
+                    diem_temppath::TempPath::new_with_temp_dir(tempdir.path().to_path_buf());
+                temppath.create_as_file()?;
+                temppath.persist(); // otherwise, file will disappear when temppath goes out of scope
+                let mut file = File::create(temppath.path())?;
+                file.write_all(b)?;
+                file.sync_all()?;
+            }
+            tempdir.path().to_str().unwrap().to_string()
+        };
+
         let (validators, lsrs, vaults, fullnodes, waypoint) = self
             .spawn_validator_and_fullnode_set(
                 params.num_validators,
@@ -122,6 +146,7 @@ impl ClusterBuilder {
                 params.enable_lsr(),
                 &params.lsr_backend,
                 current_tag,
+                &modules_dir,
                 clean_data,
             )
             .await
@@ -144,6 +169,7 @@ impl ClusterBuilder {
         enable_lsr: bool,
         lsr_backend: &str,
         image_tag: &str,
+        move_modules_dir: &str,
         clean_data: bool,
     ) -> Result<(
         Vec<Instance>,
@@ -262,6 +288,7 @@ impl ClusterBuilder {
                     &vault_nodes,
                     &validator_nodes,
                     &fullnode_nodes,
+                    move_modules_dir,
                 )
                 .await?,
             );
@@ -438,6 +465,7 @@ impl ClusterBuilder {
         vault_nodes: &[KubeNode],
         validator_nodes: &[KubeNode],
         fullnode_nodes: &[KubeNode],
+        move_modules_dir: &str,
     ) -> Result<Waypoint> {
         let genesis_helper = GenesisHelper::new("/tmp/genesis.json");
         let owners: Vec<_> = (0..num_validators).map(validator_pod_name).collect();
@@ -473,6 +501,10 @@ impl ClusterBuilder {
             .set_layout(layout_path, "common")
             .await
             .map_err(|e| format_err!("Failed to set_layout : {}", e))?;
+        genesis_helper
+            .set_move_modules(move_modules_dir, "common")
+            .await
+            .map_err(|e| format_err!("Failed to set_move_modules : {}", e))?;
         genesis_helper
             .diem_root_key(
                 VAULT_BACKEND,

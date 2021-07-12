@@ -524,9 +524,12 @@ impl DiemSwarm {
         let node_config = template.unwrap_or_else(NodeConfig::default_for_validator);
 
         let config_path = &swarm_config_dir.as_ref().to_path_buf();
-        let builder = ValidatorBuilder::new(&config_path)
-            .num_validators(num_nodes)
-            .template(node_config);
+        let builder = ValidatorBuilder::new(
+            &config_path,
+            diem_framework_releases::current_module_blobs().to_vec(),
+        )
+        .num_validators(num_nodes)
+        .template(node_config);
         let config = SwarmConfig::build(&builder, config_path)?;
 
         Ok(Self {

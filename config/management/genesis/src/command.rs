@@ -22,6 +22,8 @@ pub enum Command {
     OwnerKey(crate::key::OwnerKey),
     #[structopt(about = "Submits a Layout doc to a shared storage")]
     SetLayout(crate::layout::SetLayout),
+    #[structopt(about = "Submits Move module bytecodes to a shared storage")]
+    SetMoveModules(crate::move_modules::SetMoveModules),
     #[structopt(about = "Sets the validator operator chosen by the owner")]
     SetOperator(crate::validator_operator::ValidatorOperator),
     #[structopt(about = "Submits an Ed25519PublicKey for the treasury root")]
@@ -41,6 +43,7 @@ pub enum CommandName {
     OperatorKey,
     OwnerKey,
     SetLayout,
+    SetMoveModules,
     SetOperator,
     TreasuryComplianceKey,
     ValidatorConfig,
@@ -57,6 +60,7 @@ impl From<&Command> for CommandName {
             Command::OperatorKey(_) => CommandName::OperatorKey,
             Command::OwnerKey(_) => CommandName::OwnerKey,
             Command::SetLayout(_) => CommandName::SetLayout,
+            Command::SetMoveModules(_) => CommandName::SetMoveModules,
             Command::SetOperator(_) => CommandName::SetOperator,
             Command::TreasuryComplianceKey(_) => CommandName::TreasuryComplianceKey,
             Command::ValidatorConfig(_) => CommandName::ValidatorConfig,
@@ -75,6 +79,7 @@ impl std::fmt::Display for CommandName {
             CommandName::OperatorKey => "operator-key",
             CommandName::OwnerKey => "owner-key",
             CommandName::SetLayout => "set-layout",
+            CommandName::SetMoveModules => "set-move-modules",
             CommandName::SetOperator => "set-operator",
             CommandName::TreasuryComplianceKey => "treasury-compliance-key",
             CommandName::ValidatorConfig => "validator-config",
@@ -96,6 +101,7 @@ impl Command {
             Command::OperatorKey(_) => self.operator_key().map(|_| "Success!".to_string()),
             Command::OwnerKey(_) => self.owner_key().map(|_| "Success!".to_string()),
             Command::SetLayout(_) => self.set_layout().map(|_| "Success!".to_string()),
+            Command::SetMoveModules(_) => self.set_move_modules().map(|_| "Success!".to_string()),
             Command::SetOperator(_) => self.set_operator().map(|_| "Success!".to_string()),
             Command::TreasuryComplianceKey(_) => self
                 .treasury_compliance_key()
@@ -131,6 +137,10 @@ impl Command {
 
     pub fn set_layout(self) -> Result<crate::layout::Layout, Error> {
         execute_command!(self, Command::SetLayout, CommandName::SetLayout)
+    }
+
+    pub fn set_move_modules(self) -> Result<Vec<Vec<u8>>, Error> {
+        execute_command!(self, Command::SetMoveModules, CommandName::SetMoveModules)
     }
 
     pub fn set_operator(self) -> Result<String, Error> {
@@ -213,7 +223,23 @@ pub mod tests {
             .set_layout(temppath.path().to_str().unwrap())
             .unwrap();
 
-        // Step 2) Upload the root keys:
+        // Step 2) Upload the Move modules
+        let tempdir = diem_temppath::TempPath::new();
+        tempdir.create_as_dir().unwrap();
+        for b in diem_framework_releases::current_module_blobs() {
+            let mut temppath =
+                diem_temppath::TempPath::new_with_temp_dir(tempdir.path().to_path_buf());
+            temppath.create_as_file().unwrap();
+            temppath.persist(); // otherwise, file will disappear before we call set_move_modules
+            let mut file = File::create(temppath.path()).unwrap();
+            file.write_all(b).unwrap();
+            file.sync_all().unwrap();
+        }
+        helper
+            .set_move_modules(tempdir.path().to_str().unwrap())
+            .unwrap();
+
+        // Step 3) Upload the root keys:
         helper.initialize_by_idx(dave_ns.into(), storage_idx);
         helper
             .diem_root_key(dave_ns, &(dave_ns.to_string() + shared))
@@ -222,7 +248,7 @@ pub mod tests {
             .treasury_compliance_key(dave_ns, &(dave_ns.to_string() + shared))
             .unwrap();
 
-        // Step 3) Upload each owner key (except carol, she'll have auth_key [0; 32]):
+        // Step 4) Upload each owner key (except carol, she'll have auth_key [0; 32]):
         for ns in [alice_ns, bob_ns, carol_ns].iter() {
             let ns = (*ns).to_string();
             let ns_shared = (*ns).to_string() + shared;
@@ -234,7 +260,7 @@ pub mod tests {
             }
         }
 
-        // Step 4) Upload each operator key:
+        // Step 5) Upload each operator key:
         for ns in [operator_alice_ns, operator_bob_ns, operator_carol_ns].iter() {
             let ns = (*ns).to_string();
             let ns_shared = (*ns).to_string() + shared;
@@ -244,7 +270,7 @@ pub mod tests {
             helper.operator_key(&ns, &ns_shared).unwrap();
         }
 
-        // Step 5) Set the operator for each owner:
+        // Step 6) Set the operator for each owner:
         for ns in [alice_ns, bob_ns, carol_ns].iter() {
             let ns_shared = (*ns).to_string() + shared;
 
@@ -252,7 +278,7 @@ pub mod tests {
             helper.set_operator(&operator_name, &ns_shared).unwrap();
         }
 
-        // Step 6) Upload a signed validator config transaction for each operator:
+        // Step 7) Upload a signed validator config transaction for each operator:
         for ns in [operator_alice_ns, operator_bob_ns, operator_carol_ns].iter() {
             let ns = (*ns).to_string();
             let ns_shared = (*ns).to_string() + shared;
@@ -271,7 +297,7 @@ pub mod tests {
                 .unwrap();
         }
 
-        // Step 7) Produce genesis
+        // Step 8) Produce genesis
         let genesis_path = diem_temppath::TempPath::new();
         genesis_path.create_as_file().unwrap();
         helper

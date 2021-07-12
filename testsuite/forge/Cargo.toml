@@ -28,6 +28,7 @@ debug-interface = { path = "../../common/debug-interface" }
 diem-logger = { path = "../../common/logger" }
 diem-config = { path = "../../config" }
 diem-workspace-hack = { path = "../../common/workspace-hack" }
+diem-framework-releases = { path = "../../language/diem-framework/releases" }
 diem-genesis-tool = { path = "../../config/management/genesis" }
 diem-retrier = { path = "../../common/retrier" }
 diem-secure-storage = { path = "../../secure/storage" }
