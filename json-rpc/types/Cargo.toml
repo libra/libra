@@ -14,7 +14,7 @@ anyhow = "1.0.38"
 hex = "0.4.3"
 serde = { version = "1.0.124", default-features = false }
 serde_json = "1.0.64"
-prost = "0.7.0"
+prost = "0.8.0"
 
 bcs = "0.1.2"
 diem-types = { path = "../../types", version = "0.0.1" }
@@ -25,4 +25,4 @@ move-core-types = { path = "../../language/move-core/types", version = "0.0.1"  
 diem-workspace-hack = { path = "../../common/workspace-hack" }
 
 [build-dependencies]
-prost-build = "0.7.0"
+prost-build = "0.8.0"
