@@ -13,7 +13,7 @@ edition = "2018"
 anyhow = "1.0.38"
 futures = "0.3.12"
 once_cell = "1.7.2"
-tokio = { version = "1.3.0", features = ["full"] }
+tokio = { version = "1.8.1", features = ["full"] }
 
 channel = {path = "../../common/channel"}
 bcs = "0.1.2"

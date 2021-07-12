@@ -11,5 +11,5 @@ edition = "2018"
 
 [dependencies]
 diem-workspace-hack = { path = "../workspace-hack" }
-tokio = { version = "1.3.0", features = ["time"] }
+tokio = { version = "1.8.1", features = ["time"] }
 diem-logger = { path = "../logger"}
