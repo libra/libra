@@ -299,6 +299,24 @@ impl Options {
                     ),
             )
             .arg(
+                Arg::with_name("mutation")
+                    .long("mutation")
+                    .help(
+                        "Specifies to use the mutation pass",
+                    ),
+            )
+            .arg(
+                Arg::with_name("mutas")
+                    .long("mutas")
+                    .takes_value(true)
+                    .value_name("COUNT")
+                    .validator(is_number)
+                    .help(
+                        "indicates that this program should mutate the indicated plus operation to a minus\
+                        specifically by modifyig the \"nth\" such operation",
+                    ),
+            )
+            .arg(
                 Arg::with_name("dependencies")
                     .long("dependency")
                     .short("d")
@@ -489,6 +507,15 @@ impl Options {
         }
         if matches.occurrences_of("dependencies") > 0 {
             options.move_deps = get_vec("dependencies");
+        }
+        if matches.is_present("mutation") {
+            options.prover.mutation = true;
+        }
+        if matches.is_present("mutas") {
+            options.prover.mutas = matches
+                .value_of("mutas")
+                .unwrap()
+                .parse::<usize>()?;
         }
         if matches.is_present("verify") {
             options.prover.verify_scope = match matches.value_of("verify").unwrap() {

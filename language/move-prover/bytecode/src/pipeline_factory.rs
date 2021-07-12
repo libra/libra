@@ -15,6 +15,7 @@ use crate::{
     memory_instrumentation::MemoryInstrumentationProcessor,
     mono_analysis::MonoAnalysisProcessor,
     mut_ref_instrumentation::MutRefInstrumenter,
+    mutation_tester::MutationTester,
     options::ProverOptions,
     reaching_def_analysis::ReachingDefProcessor,
     spec_instrumentation::SpecInstrumentationProcessor,
@@ -51,6 +52,9 @@ pub fn default_pipeline_with_options(options: &ProverOptions) -> FunctionTargetP
             GlobalInvariantInstrumentationProcessor::new()
         },
     ];
+    if options.mutation {
+        processors.insert(0, MutationTester::new()); // pass which may do nothing
+    }
     if options.run_mono {
         processors.push(MonoAnalysisProcessor::new());
     }

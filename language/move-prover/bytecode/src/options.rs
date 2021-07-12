@@ -49,6 +49,10 @@ pub struct ProverOptions {
     /// Whether to assume wellformedness when elements are read from memory, instead of on
     /// function entry.
     pub assume_wellformed_on_access: bool,
+    /// Indicates that we should do any mutations
+    pub mutation: bool,
+    /// Indicates that we should use the add-subtract mutation on the given block
+    pub mutas: usize,
     /// Whether to assume a global invariant when the related memory
     /// is accessed, instead of on function entry. This is currently known to be slower
     /// if one than off, so off by default.
@@ -90,6 +94,8 @@ impl Default for ProverOptions {
             verify_scope: VerificationScope::All,
             resource_wellformed_axiom: false,
             assume_wellformed_on_access: false,
+            mutation: false,
+            mutas: 0,
             deep_pack_unpack: false,
             auto_trace_level: AutoTraceLevel::Off,
             report_severity: Severity::Warning,
