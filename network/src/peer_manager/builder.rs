@@ -79,8 +79,9 @@ impl TransportContext {
     fn supported_protocols(&self) -> SupportedProtocols {
         self.direct_send_protocols
             .iter()
-            .chain(&self.rpc_protocols)
-            .into()
+            .copied()
+            .chain(self.rpc_protocols.iter().copied())
+            .collect()
     }
 
     fn augment_direct_send_protocols(

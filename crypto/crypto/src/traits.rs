@@ -74,16 +74,15 @@ pub trait ValidCryptoMaterialStringExt: ValidCryptoMaterial {
     /// When trying to convert from bytes, we simply decode the string into
     /// bytes before checking if we can convert.
     fn from_encoded_string(encoded_str: &str) -> std::result::Result<Self, CryptoMaterialError> {
-        let bytes_out = ::hex::decode(encoded_str);
+        // We reinterpret a failure to serialize: key is mangled someway.
+        let bytes =
+            hex::decode(encoded_str).map_err(|_| CryptoMaterialError::DeserializationError)?;
         // We defer to `try_from` to make sure we only produce valid crypto materials.
-        bytes_out
-            // We reinterpret a failure to serialize: key is mangled someway.
-            .or(Err(CryptoMaterialError::DeserializationError))
-            .and_then(|ref bytes| Self::try_from(bytes))
+        Self::try_from(&bytes)
     }
     /// A function to encode into hex-string after serializing.
     fn to_encoded_string(&self) -> Result<String> {
-        Ok(::hex::encode(&self.to_bytes()))
+        Ok(hex::encode(&self.to_bytes()))
     }
 }
 

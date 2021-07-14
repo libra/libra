@@ -150,7 +150,7 @@ impl ConnectionMetadata {
             connection_id: ConnectionId::default(),
             addr: NetworkAddress::mock(),
             messaging_protocol: MessagingProtocolVersion::V1,
-            application_protocols: [].iter().into(),
+            application_protocols: SupportedProtocols::empty(),
         }
     }
 }

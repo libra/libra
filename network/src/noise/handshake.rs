@@ -193,14 +193,14 @@ impl NoiseUpgrader {
     }
 
     /// The prologue is the client's peer_id and the remote's expected public key.
-    const PROLOGUE_SIZE: usize = PeerId::LENGTH + x25519::PUBLIC_KEY_SIZE;
+    pub const PROLOGUE_SIZE: usize = PeerId::LENGTH + x25519::PUBLIC_KEY_SIZE;
 
     /// The client message consist of the prologue + a noise message with a timestamp as payload.
-    const CLIENT_MESSAGE_SIZE: usize =
+    pub const CLIENT_MESSAGE_SIZE: usize =
         Self::PROLOGUE_SIZE + noise::handshake_init_msg_len(AntiReplayTimestamps::TIMESTAMP_SIZE);
 
     /// The server's message contains no payload.
-    const SERVER_MESSAGE_SIZE: usize = noise::handshake_resp_msg_len(0);
+    pub const SERVER_MESSAGE_SIZE: usize = noise::handshake_resp_msg_len(0);
 
     /// Perform an outbound protocol upgrade on this connection.
     ///

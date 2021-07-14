@@ -73,7 +73,7 @@ mod tests {
                 ProtocolId::MempoolDirectSend,
             ]
             .iter()
-            .into(),
+            .collect(),
         );
         let server_handshake = HandshakeMsg {
             chain_id,
@@ -85,7 +85,7 @@ mod tests {
             MessagingProtocolVersion::V1,
             [ProtocolId::ConsensusRpc, ProtocolId::ConsensusDirectSend]
                 .iter()
-                .into(),
+                .collect(),
         );
         let client_handshake = HandshakeMsg {
             supported_protocols,

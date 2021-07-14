@@ -16,14 +16,13 @@ fn protocols_to_from_vec() {
     let supported_protocols: SupportedProtocols =
         [ProtocolId::ConsensusRpc, ProtocolId::MempoolDirectSend]
             .iter()
-            .into();
+            .collect();
     assert_eq!(
-        SupportedProtocols::from(
-            (supported_protocols.clone().try_into() as Result<Vec<ProtocolId>, _>)
-                .unwrap()
-                .iter()
-        ),
-        supported_protocols
+        supported_protocols,
+        (supported_protocols.clone().try_into() as Result<Vec<ProtocolId>, _>)
+            .unwrap()
+            .into_iter()
+            .collect(),
     );
 }
 
@@ -62,7 +61,7 @@ fn common_protocols() {
         MessagingProtocolVersion::V1,
         [ProtocolId::ConsensusRpc, ProtocolId::DiscoveryDirectSend]
             .iter()
-            .into(),
+            .collect(),
     );
 
     let h1 = HandshakeMsg {
@@ -77,7 +76,7 @@ fn common_protocols() {
         MessagingProtocolVersion::V1,
         [ProtocolId::ConsensusRpc, ProtocolId::MempoolDirectSend]
             .iter()
-            .into(),
+            .collect(),
     );
     let h2 = HandshakeMsg {
         chain_id,
@@ -88,7 +87,7 @@ fn common_protocols() {
     assert_eq!(
         (
             MessagingProtocolVersion::V1,
-            [ProtocolId::ConsensusRpc].iter().into()
+            [ProtocolId::ConsensusRpc].iter().collect()
         ),
         h1.perform_handshake(&h2).unwrap()
     );
@@ -103,7 +102,7 @@ fn common_protocols() {
 
     // Case 3: Intersecting messaging protocol version is present, but no intersecting protocols.
     let mut supported_protocols = BTreeMap::new();
-    supported_protocols.insert(MessagingProtocolVersion::V1, SupportedProtocols::default());
+    supported_protocols.insert(MessagingProtocolVersion::V1, SupportedProtocols::empty());
     let h2 = HandshakeMsg {
         supported_protocols,
         chain_id,
@@ -111,7 +110,7 @@ fn common_protocols() {
     };
 
     assert_eq!(
-        (MessagingProtocolVersion::V1, [].iter().into()),
+        (MessagingProtocolVersion::V1, SupportedProtocols::empty()),
         h1.perform_handshake(&h2).unwrap()
     );
 }

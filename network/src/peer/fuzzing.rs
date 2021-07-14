@@ -10,7 +10,6 @@ use crate::{
     },
     testutils::fake_socket::ReadOnlyTestSocketVec,
     transport::{Connection, ConnectionId, ConnectionMetadata},
-    ProtocolId,
 };
 use channel::{diem_channel, message_queues::QueueStyle};
 use diem_config::{config::PeerRole, network_id::NetworkContext};
@@ -83,7 +82,7 @@ pub fn fuzz(data: &[u8]) {
         NetworkAddress::mock(),
         ConnectionOrigin::Inbound,
         MessagingProtocolVersion::V1,
-        SupportedProtocols::from(ProtocolId::all().iter()),
+        SupportedProtocols::all(),
         PeerRole::Unknown,
     );
     let connection = Connection { socket, metadata };

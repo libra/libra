@@ -34,6 +34,7 @@ diem-infallible = { path = "../../../common/infallible" }
 diem-management = { path = ".." }
 diem-network-address-encryption = {path = "../network-address-encryption"}
 diem-secure-storage = { path = "../../../secure/storage" }
+diem-time-service = { path = "../../../common/time-service", features = ["async"] }
 diem-types = { path = "../../../types" }
 diem-workspace-hack = { path = "../../../common/workspace-hack" }
 diem-temppath = { path = "../../../common/temppath" }

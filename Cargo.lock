@@ -2206,6 +2206,7 @@ dependencies = [
  "diem-network-address-encryption",
  "diem-secure-storage",
  "diem-temppath",
+ "diem-time-service",
  "diem-transaction-builder",
  "diem-types",
  "diem-workspace-hack",

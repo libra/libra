@@ -12,7 +12,7 @@ use crate::{
         direct_send::Message,
         rpc::{error::RpcError, InboundRpcRequest, OutboundRpcRequest},
         wire::{
-            handshake::v1::MessagingProtocolVersion,
+            handshake::v1::{MessagingProtocolVersion, SupportedProtocols},
             messaging::v1::{
                 DirectSendMsg, NetworkMessage, NetworkMessageSink, NetworkMessageStream,
                 RpcRequest, RpcResponse,
@@ -64,7 +64,7 @@ fn build_test_peer(
             NetworkAddress::from_str("/ip4/127.0.0.1/tcp/8081").unwrap(),
             origin,
             MessagingProtocolVersion::V1,
-            [].iter().into(),
+            SupportedProtocols::empty(),
             PeerRole::Unknown,
         ),
         socket: a,
