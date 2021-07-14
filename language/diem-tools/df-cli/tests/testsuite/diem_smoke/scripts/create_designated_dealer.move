@@ -45,7 +45,7 @@ use DiemFramework::SlidingNonce;
 /// * `Script::peer_to_peer_with_metadata`
 /// * `Script::rotate_dual_attestation_info`
 
-fun create_designated_dealer<Currency: store>(
+fun create_designated_dealer<Currency>(
     tc_account: signer,
     sliding_nonce: u64,
     addr: address,

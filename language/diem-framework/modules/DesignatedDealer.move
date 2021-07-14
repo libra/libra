@@ -24,7 +24,7 @@ module DiemFramework::DesignatedDealer {
     /// tier a mint to a DD needs to be in.
     /// DEPRECATED: This resource is no longer used and will be removed from the system
     // PreburnQueue published at top level in Diem.move
-    struct TierInfo<CoinType> has key {
+    struct TierInfo<phantom CoinType> has key {
         /// Time window start in microseconds
         window_start: u64,
         /// The minted inflow during this time window
@@ -59,7 +59,7 @@ module DiemFramework::DesignatedDealer {
     /// Publishes a `Dealer` resource under `dd` with a `PreburnQueue`.
     /// If `add_all_currencies = true` this will add a `PreburnQueue`,
     /// for each known currency at launch.
-    public fun publish_designated_dealer_credential<CoinType: store>(
+    public fun publish_designated_dealer_credential<CoinType>(
         dd: &signer,
         tc_account: &signer,
         add_all_currencies: bool,
@@ -99,7 +99,7 @@ module DiemFramework::DesignatedDealer {
     /// Adds the needed resources to the DD account `dd` in order to work with `CoinType`.
     /// Public so that a currency can be added to a DD later on. Will require
     /// multi-signer transactions in order to add a new currency to an existing DD.
-    public fun add_currency<CoinType: store>(dd: &signer, tc_account: &signer) {
+    public fun add_currency<CoinType>(dd: &signer, tc_account: &signer) {
         Roles::assert_treasury_compliance(tc_account);
         let dd_addr = Signer::address_of(dd);
         assert(exists_at(dd_addr), Errors::not_published(EDEALER));
@@ -125,7 +125,7 @@ module DiemFramework::DesignatedDealer {
         aborts_if exists<Diem::Preburn<CoinType>>(dd_addr) with Errors::INVALID_STATE;
     }
 
-    public fun tiered_mint<CoinType: store>(
+    public fun tiered_mint<CoinType>(
         tc_account: &signer,
         amount: u64,
         dd_addr: address,

@@ -56,7 +56,7 @@ use DiemFramework::DiemAccount;
 /// * `Script::add_recovery_rotation_capability`
 /// * `Script::create_recovery_address`
 
-fun create_child_vasp_account<CoinType: store>(
+fun create_child_vasp_account<CoinType>(
     parent_vasp: signer,
     child_address: address,
     auth_key_prefix: vector<u8>,

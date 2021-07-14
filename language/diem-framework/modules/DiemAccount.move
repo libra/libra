@@ -61,7 +61,7 @@ module DiemFramework::DiemAccount {
 
     /// A resource that holds the total value of currency of type `Token`
     /// currently held by the account.
-    struct Balance<Token> has key {
+    struct Balance<phantom Token> has key {
         /// Stores the value of the balance in its balance field. A coin has
         /// a `value` field. The amount of money in the balance is changed
         /// by modifying this field.
@@ -231,7 +231,7 @@ module DiemFramework::DiemAccount {
     }
 
     /// Return `true` if `addr` has already published account limits for `Token`
-    fun has_published_account_limits<Token: store>(addr: address): bool {
+    fun has_published_account_limits<Token>(addr: address): bool {
         if (VASP::is_vasp(addr)) {
             VASP::has_account_limits<Token>(addr)
         }
@@ -248,7 +248,7 @@ module DiemFramework::DiemAccount {
     /// Depending on the `is_withdrawal` flag passed in we determine whether the
     /// `payer` or `payee` account is being queried. `VASP->any` and
     /// `any->VASP` transfers are tracked in the VASP.
-    fun should_track_limits_for_account<Token: store>(
+    fun should_track_limits_for_account<Token>(
         payer: address, payee: address, is_withdrawal: bool
     ): bool {
         if (is_withdrawal) {
@@ -281,7 +281,7 @@ module DiemFramework::DiemAccount {
     }
 
     /// Record a payment of `to_deposit` from `payer` to `payee` with the attached `metadata`
-    fun deposit<Token: store>(
+    fun deposit<Token>(
         payer: address,
         payee: address,
         to_deposit: Diem<Token>,
@@ -416,7 +416,7 @@ module DiemFramework::DiemAccount {
     /// Mint 'mint_amount' to 'designated_dealer_address' for 'tier_index' tier.
     /// Max valid tier index is 3 since there are max 4 tiers per DD.
     /// Sender should be treasury compliance account and receiver authorized DD.
-    public fun tiered_mint<Token: store>(
+    public fun tiered_mint<Token>(
         tc_account: &signer,
         designated_dealer_address: address,
         mint_amount: u64,
@@ -480,7 +480,7 @@ module DiemFramework::DiemAccount {
 
     // Cancel the burn request from `preburn_address` and return the funds.
     // Fails if the sender does not have a published MintCapability.
-    public fun cancel_burn<Token: store>(
+    public fun cancel_burn<Token>(
         account: &signer,
         preburn_address: address,
         amount: u64,
@@ -517,7 +517,7 @@ module DiemFramework::DiemAccount {
     }
 
     /// Helper to withdraw `amount` from the given account balance and return the withdrawn Diem<Token>
-    fun withdraw_from_balance<Token: store>(
+    fun withdraw_from_balance<Token>(
         payer: address,
         payee: address,
         balance: &mut Balance<Token>,
@@ -582,7 +582,7 @@ module DiemFramework::DiemAccount {
 
     /// Withdraw `amount` `Diem<Token>`'s from the account balance under
     /// `cap.account_address`
-    fun withdraw_from<Token: store>(
+    fun withdraw_from<Token>(
         cap: &WithdrawCapability,
         payee: address,
         amount: u64,
@@ -658,7 +658,7 @@ module DiemFramework::DiemAccount {
 
     /// Withdraw `amount` `Diem<Token>`'s from `cap.address` and send them to the `Preburn`
     /// resource under `dd`.
-    public fun preburn<Token: store>(
+    public fun preburn<Token>(
         dd: &signer,
         cap: &WithdrawCapability,
         amount: u64
@@ -780,7 +780,7 @@ module DiemFramework::DiemAccount {
     /// The included `metadata` will appear in the `SentPaymentEvent` and `ReceivedPaymentEvent`.
     /// The `metadata_signature` will only be checked if this payment is subject to the dual
     /// attestation protocol
-    public fun pay_from<Token: store>(
+    public fun pay_from<Token>(
         cap: &WithdrawCapability,
         payee: address,
         amount: u64,
@@ -801,7 +801,7 @@ module DiemFramework::DiemAccount {
     /// deposits it into the `payee`'s account balance.
     /// The included `metadata` will appear in the `SentPaymentEvent` and `ReceivedPaymentEvent`.
     /// As `payee` is also signer of the transaction, no metadata signature is required for dual attestation.
-    public fun pay_by_signers<Token: store>(
+    public fun pay_by_signers<Token>(
         cap: &WithdrawCapability,
         payee: &signer,
         amount: u64,
@@ -997,7 +997,7 @@ module DiemFramework::DiemAccount {
 
     /// Add balances for `Token` to `new_account`.  If `add_all_currencies` is true,
     /// then add for both token types.
-    fun add_currencies_for_account<Token: store>(
+    fun add_currencies_for_account<Token>(
         new_account: &signer,
         add_all_currencies: bool,
     ) {
@@ -1327,7 +1327,7 @@ module DiemFramework::DiemAccount {
     /// Create a designated dealer account at `new_account_address` with authentication key
     /// `auth_key_prefix` | `new_account_address`, for non synthetic CoinType.
     /// Creates Preburn resource under account 'new_account_address'
-    public fun create_designated_dealer<CoinType: store>(
+    public fun create_designated_dealer<CoinType>(
         creator_account: &signer,
         new_account_address: address,
         auth_key_prefix: vector<u8>,
@@ -1378,7 +1378,7 @@ module DiemFramework::DiemAccount {
     /// Create an account with the ParentVASP role at `new_account_address` with authentication key
     /// `auth_key_prefix` | `new_account_address`.  If `add_all_currencies` is true, 0 balances for
     /// all available currencies in the system will also be added.
-    public fun create_parent_vasp_account<Token: store>(
+    public fun create_parent_vasp_account<Token>(
         creator_account: &signer,  // TreasuryCompliance
         new_account_address: address,
         auth_key_prefix: vector<u8>,
@@ -1429,7 +1429,7 @@ module DiemFramework::DiemAccount {
     /// `auth_key_prefix` | `new_account_address` and a 0 balance of type `Token`. If
     /// `add_all_currencies` is true, 0 balances for all avaialable currencies in the system will
     /// also be added. This account will be a child of `creator`, which must be a ParentVASP.
-    public fun create_child_vasp_account<Token: store>(
+    public fun create_child_vasp_account<Token>(
         parent: &signer,
         new_account_address: address,
         auth_key_prefix: vector<u8>,
@@ -1482,12 +1482,12 @@ module DiemFramework::DiemAccount {
     native fun create_signer(addr: address): signer;
 
     /// Helper to return the u64 value of the `balance` for `account`
-    fun balance_for<Token: store>(balance: &Balance<Token>): u64 {
+    fun balance_for<Token>(balance: &Balance<Token>): u64 {
         Diem::value<Token>(&balance.coin)
     }
 
     /// Return the current balance of the account at `addr`.
-    public fun balance<Token: store>(addr: address): u64 acquires Balance {
+    public fun balance<Token>(addr: address): u64 acquires Balance {
         assert(exists<Balance<Token>>(addr), Errors::not_published(EPAYER_DOESNT_HOLD_CURRENCY));
         balance_for(borrow_global<Balance<Token>>(addr))
     }
@@ -1496,7 +1496,7 @@ module DiemFramework::DiemAccount {
     }
 
     /// Add a balance of `Token` type to the sending account
-    public fun add_currency<Token: store>(account: &signer) {
+    public fun add_currency<Token>(account: &signer) {
         let addr = Signer::address_of(account);
         // aborts if `Token` is not a currency type in the system
         Diem::assert_is_currency<Token>();
@@ -1544,7 +1544,7 @@ module DiemFramework::DiemAccount {
     }
 
     /// Return whether the account at `addr` accepts `Token` type coins
-    public fun accepts_currency<Token: store>(addr: address): bool {
+    public fun accepts_currency<Token>(addr: address): bool {
         exists<Balance<Token>>(addr)
     }
 
@@ -1599,7 +1599,7 @@ module DiemFramework::DiemAccount {
     ///////////////////////////////////////////////////////////////////////////
 
     /// The prologue for module transaction
-    fun module_prologue<Token: store>(
+    fun module_prologue<Token>(
         sender: signer,
         txn_sequence_number: u64,
         txn_public_key: vector<u8>,
@@ -1655,7 +1655,7 @@ module DiemFramework::DiemAccount {
     }
 
     /// The prologue for script transaction
-    fun script_prologue<Token: store>(
+    fun script_prologue<Token>(
         sender: signer,
         txn_sequence_number: u64,
         txn_public_key: vector<u8>,
@@ -1756,7 +1756,7 @@ module DiemFramework::DiemAccount {
     }
 
     /// The prologue for multi-agent user transactions
-    fun multi_agent_script_prologue<Token: store>(
+    fun multi_agent_script_prologue<Token>(
         sender: signer,
         txn_sequence_number: u64,
         txn_sender_public_key: vector<u8>,
@@ -1854,7 +1854,7 @@ module DiemFramework::DiemAccount {
     /// - The account's auth key matches the transaction's public key
     /// - That the account has enough balance to pay for all of the gas
     /// - That the sequence number matches the transaction's sequence key
-    fun prologue_common<Token: store>(
+    fun prologue_common<Token>(
         sender: &signer,
         txn_sequence_number: u64,
         txn_public_key: vector<u8>,
@@ -1949,7 +1949,7 @@ module DiemFramework::DiemAccount {
             max_transaction_fee,
         };
     }
-    spec schema PrologueCommonAbortsIf<Token: store> {
+    spec schema PrologueCommonAbortsIf<Token> {
         transaction_sender: address;
         txn_sequence_number: u64;
         txn_public_key: vector<u8>;
@@ -1988,7 +1988,7 @@ module DiemFramework::DiemAccount {
     /// The epilogue is invoked at the end of the transaction.
     /// If the exection of the epilogue fails, it is re-invoked with different arguments, and
     /// based on the conditions checked in the prologue, should never fail.
-    fun epilogue<Token: store>(
+    fun epilogue<Token>(
         account: signer,
         txn_sequence_number: u64,
         txn_gas_price: u64,
@@ -2004,7 +2004,7 @@ module DiemFramework::DiemAccount {
         )
     }
 
-    fun epilogue_common<Token: store>(
+    fun epilogue_common<Token>(
         account: &signer,
         txn_sequence_number: u64,
         txn_gas_price: u64,

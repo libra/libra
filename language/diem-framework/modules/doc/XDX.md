@@ -37,7 +37,7 @@ Once the component makeup of the XDX has been chosen the
 The type tag representing the <code><a href="XDX.md#0x1_XDX">XDX</a></code> currency on-chain.
 
 
-<pre><code><b>struct</b> <a href="XDX.md#0x1_XDX">XDX</a> has store
+<pre><code><b>struct</b> <a href="XDX.md#0x1_XDX">XDX</a>
 </code></pre>
 
 
@@ -223,7 +223,7 @@ Moreover, only the TreasuryCompliance role can create Preburn.
 Returns true if <code>CoinType</code> is <code><a href="XDX.md#0x1_XDX_XDX">XDX::XDX</a></code>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="XDX.md#0x1_XDX_is_xdx">is_xdx</a>&lt;CoinType: store&gt;(): bool
+<pre><code><b>public</b> <b>fun</b> <a href="XDX.md#0x1_XDX_is_xdx">is_xdx</a>&lt;CoinType&gt;(): bool
 </code></pre>
 
 
@@ -232,7 +232,7 @@ Returns true if <code>CoinType</code> is <code><a href="XDX.md#0x1_XDX_XDX">XDX:
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="XDX.md#0x1_XDX_is_xdx">is_xdx</a>&lt;CoinType: store&gt;(): bool {
+<pre><code><b>public</b> <b>fun</b> <a href="XDX.md#0x1_XDX_is_xdx">is_xdx</a>&lt;CoinType&gt;(): bool {
     <a href="Diem.md#0x1_Diem_is_currency">Diem::is_currency</a>&lt;CoinType&gt;() &&
         <a href="Diem.md#0x1_Diem_currency_code">Diem::currency_code</a>&lt;CoinType&gt;() == <a href="Diem.md#0x1_Diem_currency_code">Diem::currency_code</a>&lt;<a href="XDX.md#0x1_XDX">XDX</a>&gt;()
 }

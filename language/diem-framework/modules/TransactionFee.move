@@ -10,7 +10,7 @@ module DiemFramework::TransactionFee {
 
     /// The `TransactionFee` resource holds a preburn resource for each
     /// fiat `CoinType` that can be collected as a transaction fee.
-    struct TransactionFee<CoinType> has key {
+    struct TransactionFee<phantom CoinType> has key {
         balance: Diem<CoinType>,
         preburn: Preburn<CoinType>,
     }
@@ -41,7 +41,7 @@ module DiemFramework::TransactionFee {
             with Errors::ALREADY_PUBLISHED;
     }
 
-    public fun is_coin_initialized<CoinType: store>(): bool {
+    public fun is_coin_initialized<CoinType>(): bool {
         exists<TransactionFee<CoinType>>(@TreasuryCompliance)
     }
 
@@ -52,7 +52,7 @@ module DiemFramework::TransactionFee {
     /// Sets up the needed transaction fee state for a given `CoinType` currency by
     /// (1) configuring `tc_account` to accept `CoinType`
     /// (2) publishing a wrapper of the `Preburn<CoinType>` resource under `tc_account`
-    public fun add_txn_fee_currency<CoinType: store>(tc_account: &signer) {
+    public fun add_txn_fee_currency<CoinType>(tc_account: &signer) {
         Roles::assert_treasury_compliance(tc_account);
         Diem::assert_is_currency<CoinType>();
         assert(
@@ -69,7 +69,7 @@ module DiemFramework::TransactionFee {
     }
 
     /// Deposit `coin` into the transaction fees bucket
-    public fun pay_fee<CoinType: store>(coin: Diem<CoinType>) acquires TransactionFee {
+    public fun pay_fee<CoinType>(coin: Diem<CoinType>) acquires TransactionFee {
         DiemTimestamp::assert_operating();
         assert(is_coin_initialized<CoinType>(), Errors::not_published(ETRANSACTION_FEE));
         let fees = borrow_global_mut<TransactionFee<CoinType>>(@TreasuryCompliance);
@@ -88,7 +88,7 @@ module DiemFramework::TransactionFee {
     /// Preburns the transaction fees collected in the `CoinType` currency.
     /// If the `CoinType` is XDX, it unpacks the coin and preburns the
     /// underlying fiat.
-    public fun burn_fees<CoinType: store>(
+    public fun burn_fees<CoinType>(
         tc_account: &signer,
     ) acquires TransactionFee {
         DiemTimestamp::assert_operating();
