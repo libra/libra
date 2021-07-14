@@ -994,8 +994,9 @@ impl<'env> SpecTranslator<'env> {
                     emit!(self.writer, "(var {} := {};\n", var_name, quant_var);
                 }
                 Type::ResourceDomain(mid, sid, inst_opt) => {
-                    let memory =
-                        &mid.qualified_inst(*sid, inst_opt.to_owned().unwrap_or_else(Vec::new));
+                    let memory = &mid
+                        .qualified_inst(*sid, inst_opt.to_owned().unwrap_or_else(Vec::new))
+                        .instantiate(&self.type_inst);
                     let addr_var = resource_vars.get(&var.name).unwrap();
                     let resource_name = boogie_resource_memory_name(self.env, memory, &None);
                     emit!(

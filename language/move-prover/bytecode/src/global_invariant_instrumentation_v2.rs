@@ -347,7 +347,7 @@ impl<'a> Instrumenter<'a> {
             let modified_invariants = self
                 .builder
                 .global_env()
-                .get_subset_invariants_for_memory(mem.clone(), target_invariants);
+                .get_subset_invariants_for_memory(&mem, target_invariants);
             self.emit_assumes_and_saves_before_bytecode(modified_invariants, entrypoint_invariants);
             // put out the modifying instruction byte code.
             self.builder.emit(bc.clone());

@@ -5,17 +5,19 @@
 //! computes the distinct type instantiations in the model for structs and inlined functions.
 //! It also eliminates type quantification (`forall coin_type: type:: P`).
 
+use crate::verification_analysis_v2::InvariantAnalysisData;
 use crate::{
     function_data_builder::FunctionDataBuilder,
     function_target::{FunctionData, FunctionTarget},
     function_target_pipeline::{FunctionTargetProcessor, FunctionTargetsHolder, FunctionVariant},
     mono_analysis,
     mut_ref_instrumentation::{FunctionEnv, Loc},
-    options::ProverOptions,
     stackless_bytecode::{Bytecode, Bytecode::SaveMem, Operation},
-    verification_analysis, verification_analysis_v2,
+    usage_analysis,
 };
 use itertools::Itertools;
+use move_model::pragmas::DISABLE_INVARIANTS_IN_BODY_PRAGMA;
+use move_model::ty::{Substitution, Variance};
 use move_model::{
     ast,
     ast::{Condition, ConditionKind, Exp, ExpData, LocalVarDecl, MemoryLabel, QuantKind},
@@ -38,7 +40,8 @@ use std::{
 #[derive(Clone, Default, Debug)]
 pub struct MonoInfo {
     pub structs: BTreeMap<QualifiedId<StructId>, BTreeSet<Vec<Type>>>,
-    pub funs: BTreeMap<QualifiedId<FunId>, BTreeSet<Vec<Type>>>,
+    pub verified_funs: BTreeMap<QualifiedId<FunId>, BTreeSet<Vec<Type>>>,
+    pub inlined_funs: BTreeMap<QualifiedId<FunId>, BTreeSet<Vec<Type>>>,
     pub spec_funs: BTreeMap<QualifiedId<SpecFunId>, BTreeSet<Vec<Type>>>,
     pub spec_vars: BTreeMap<QualifiedId<SpecVarId>, BTreeSet<Vec<Type>>>,
     pub type_params: BTreeSet<u16>,
@@ -210,7 +213,7 @@ impl FunctionTargetProcessor for MonoAnalysisProcessor {
             }
             writeln!(f, "}}")?;
         }
-        for (fid, insts) in &info.funs {
+        for (fid, insts) in &info.inlined_funs {
             let fname = env.get_function(*fid).get_full_name_str();
             writeln!(f, "fun {} = {{", fname)?;
             for inst in insts {
@@ -289,25 +292,30 @@ struct Analyzer<'a> {
 impl<'a> Analyzer<'a> {
     fn analyze_funs(&mut self) {
         // Analyze top-level, verified functions. Any functions they call will be queued
-        // in self.todo_targets for later analysis. During this phase, self.inst_opt is None.
+        // in self.todo_targets for later analysis.
         for module in self.env.get_modules() {
             for fun in module.get_functions() {
-                for (_, target) in self.targets.get_targets(&fun) {
-                    let is_verified: bool;
-                    let options = ProverOptions::get(self.env);
-                    if options.invariants_v2 {
-                        is_verified = verification_analysis_v2::get_info(&target).verified;
-                    } else {
-                        is_verified = verification_analysis::get_info(&target).verified;
-                    }
-                    if is_verified {
-                        self.analyze_fun(target.clone());
+                for (variant, ref target) in self.targets.get_targets(&fun) {
+                    if variant.is_primary_verified() {
+                        // Analyze for all instantiations which need verification.
+                        for inst in self.compute_verification_instances(target) {
+                            // Add instantiation.
+                            self.info
+                                .verified_funs
+                                .entry(target.func_env.get_qualified_id())
+                                .or_default()
+                                .insert(inst.clone());
 
-                        // We also need to analyze all modify targets because they are not
-                        // included in the bytecode.
-                        for (_, exps) in target.get_modify_ids_and_exps() {
-                            for exp in exps {
-                                self.analyze_exp(exp);
+                            // Analyze.
+                            self.inst_opt = Some(inst);
+                            self.analyze_fun(target.clone());
+
+                            // We also need to analyze all modify targets because they are not
+                            // included in the bytecode.
+                            for (_, exps) in target.get_modify_ids_and_exps() {
+                                for exp in exps {
+                                    self.analyze_exp(exp);
+                                }
                             }
                         }
                     }
@@ -326,7 +334,11 @@ impl<'a> Analyzer<'a> {
             );
             let inst = std::mem::take(&mut self.inst_opt).unwrap();
             // Insert it into final analysis result.
-            self.info.funs.entry(fun).or_default().insert(inst.clone());
+            self.info
+                .inlined_funs
+                .entry(fun)
+                .or_default()
+                .insert(inst.clone());
             self.done_funs.insert((fun, inst));
         }
         while !self.todo_spec_funs.is_empty() {
@@ -342,6 +354,97 @@ impl<'a> Analyzer<'a> {
                 .insert(inst.clone());
             self.done_spec_funs.insert((fun, inst));
         }
+    }
+
+    /// Computes the type instantiations which need to be verified for the given function.
+    /// By default, the uninstantiated function is included. We also must include
+    /// all instantiations which update memory which is constraint by global invariants. Suppose
+    /// we have a function `f<T>(a: address) { modify<R<T>>(a) }` and an invariant
+    /// `invariant forall a: address where exists<R<u64>>: global<R<u64>>.value > 0`.
+    /// We need to verify `f<u64>` so the given invariant is verified for this instance.
+    /// Note that in this example, the function `f<u64>` has no way to satisfy the invariant
+    /// as it does not known about it's type instantiations. In such a case, the user will
+    /// have to mark this function as having invariants disabled, and they will be verified at
+    /// caller side. In other cases, verification may succeed, so disabling invariants
+    /// for generic functions is a user choice.
+    fn compute_verification_instances(&self, target: &FunctionTarget<'_>) -> BTreeSet<Vec<Type>> {
+        let mut result = BTreeSet::new();
+        result.insert(vec![]);
+        let type_params = target
+            .get_type_parameters()
+            .into_iter()
+            .map(|p| p.0)
+            .collect_vec();
+        if type_params.is_empty() {
+            // Shortcut
+            return result;
+        }
+        if target
+            .func_env
+            .is_pragma_true(DISABLE_INVARIANTS_IN_BODY_PRAGMA, || false)
+        {
+            // No invariant verification for this function.
+            return result;
+        }
+
+        let invariant_data = match self.env.get_extension::<InvariantAnalysisData>() {
+            Some(data) => data,
+            None => {
+                // We need verification_analysis_v2, so need to bail out if it is not available.
+                return result;
+            }
+        };
+
+        // All the memory accessed by global invariants which are target of verification.
+        let invariant_memory = &invariant_data.target_memory;
+
+        // All the memory  modified transitively by this function.
+        let modified_memory_inst = usage_analysis::get_modified_memory_inst(target);
+
+        for inv_mem in invariant_memory {
+            let inv_mem_ty = inv_mem.to_type();
+            for mod_memory in modified_memory_inst.iter() {
+                if inv_mem.to_qualified_id() != mod_memory.to_qualified_id() {
+                    // Distinct memory.
+                    continue;
+                }
+                // We are going to type-unify the modified memory (e.g. `R<T>`) with invariant memory
+                // (e.g. `R<u64>`). The resulting substitution is than applied to create an
+                // instantiation of the function (e.g. `f<T>` is instantiated as `f<u64>`).
+
+                // First create type variables for function's type parameters and use them to
+                // instantiate the modified memory,
+                let inst = (0..type_params.len())
+                    .map(|i| Type::Var(i as u16))
+                    .collect_vec();
+                let mod_memory = mod_memory.to_owned().instantiate(&inst);
+
+                // Now unify mod_memory with inv_mem
+                let mod_memory_ty = mod_memory.to_type();
+                let mut subs = Substitution::new();
+                match subs.unify(
+                    &self.env.type_display_context(),
+                    Variance::Disallow,
+                    &inv_mem_ty,
+                    &mod_memory_ty,
+                ) {
+                    Ok(_) => {
+                        // Compute the unified instantiation and collect it in the result.
+                        let unified_inst = inst
+                            .into_iter()
+                            .map(|ty| subs.specialize(&ty))
+                            .collect_vec();
+                        result.insert(unified_inst);
+                    }
+                    Err(_) => {
+                        // Unification did not succeed implies this modified memory cannot depend
+                        // on this invariant. For example, an invariant over `R<u64>` cannot
+                        // have an effect on a modified memory `R<S<u64>>`,
+                    }
+                }
+            }
+        }
+        result
     }
 
     fn analyze_fun(&mut self, target: FunctionTarget<'_>) {

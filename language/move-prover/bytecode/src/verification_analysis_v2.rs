@@ -4,13 +4,13 @@
 //! Analysis which computes an annotation for each function whether
 
 use crate::{
-    dataflow_domains::SetDomain,
     function_target::{FunctionData, FunctionTarget},
     function_target_pipeline::{FunctionTargetProcessor, FunctionTargetsHolder, FunctionVariant},
     options::ProverOptions,
     usage_analysis,
 };
 use log::debug;
+use move_model::model::{QualifiedInstId, StructId};
 use move_model::{
     model::{FunId, FunctionEnv, GlobalEnv, GlobalId, ModuleEnv, QualifiedId, VerificationScope},
     pragmas::{
@@ -42,6 +42,8 @@ pub fn get_info(target: &FunctionTarget<'_>) -> VerificationInfoV2 {
 pub struct InvariantAnalysisData {
     /// global invariants in the target module
     pub target_invariants: BTreeSet<GlobalId>,
+    /// The set of all memory which is referred to by target_invariants.
+    pub target_memory: BTreeSet<QualifiedInstId<StructId>>,
     /// Invariants that appear in target module (?) or dependencies
     /// Functions where invariants are disabled in body
     pub disabled_inv_fun_set: BTreeSet<QualifiedId<FunId>>,
@@ -75,6 +77,21 @@ fn get_target_invariants(
         .flat_map(|target_mod_id| global_env.get_global_invariants_by_module(target_mod_id))
         .collect();
     target_mod_ids
+}
+
+/// Get all memory effected by target invariants
+fn get_target_memory(
+    global_env: &GlobalEnv,
+    target_invariants: &BTreeSet<GlobalId>,
+) -> BTreeSet<QualifiedInstId<StructId>> {
+    target_invariants
+        .iter()
+        .map(|id| {
+            let inv = global_env.get_global_invariant(*id).expect("invariant");
+            inv.mem_usage.clone()
+        })
+        .flatten()
+        .collect()
 }
 
 /// Return the set of all functions that have a pragma
@@ -200,14 +217,6 @@ fn compute_funs_that_modify_inv(
         BTreeMap::new();
     let mut funs_that_modify_some_inv: BTreeSet<QualifiedId<FunId>> = BTreeSet::new();
     for inv_id in target_invariants {
-        // Collect the global state used by inv_id (this is computed in usage_analysis.rs)
-        let inv_mem_use: SetDomain<_> = global_env
-            .get_global_invariant(*inv_id)
-            .unwrap()
-            .mem_usage
-            .iter()
-            .cloned()
-            .collect();
         // set of functions that modify state in inv_id that we are building
         let mut fun_id_set: BTreeSet<QualifiedId<FunId>> = BTreeSet::new();
         // Iterate over all functions in the module cluster
@@ -218,7 +227,10 @@ fn compute_funs_that_modify_inv(
                 let modified_memory =
                     usage_analysis::get_directly_modified_memory_inst(&fun_target);
                 // Add functions to set if it modifies mem used in invariant
-                if !modified_memory.is_disjoint(&inv_mem_use) {
+                let modifies = modified_memory
+                    .iter()
+                    .any(|mem| global_env.invariant_applies_to_mem(mem, inv_id));
+                if modifies {
                     let fun_id = fun_env.get_qualified_id();
                     fun_id_set.insert(fun_id);
                     funs_that_modify_some_inv.insert(fun_id);
@@ -270,54 +282,6 @@ fn compute_friend_fun_ids(
         }
     }
     friend_fun_set
-}
-
-/// Debugging function to print a set of function id's using their
-/// symbolic function names.
-#[allow(dead_code)]
-fn debug_print_fun_id_set(
-    global_env: &GlobalEnv,
-    fun_ids: &BTreeSet<QualifiedId<FunId>>,
-    set_name: &str,
-) {
-    debug!(
-        "{}: {:?}",
-        set_name,
-        fun_ids
-            .iter()
-            .map(|fun_id| global_env.get_function(*fun_id).get_name_string())
-            .collect::<Vec<_>>()
-    );
-}
-
-/// Print sets and maps computed during verification analysis
-/// TODO: Complete this and write it properly as Display
-#[allow(dead_code)]
-fn debug_print_invariant_analysis_data(
-    global_env: &GlobalEnv,
-    inv_ana_data: &InvariantAnalysisData,
-) {
-    debug!("target_invariants <can't print yet>");
-    debug_print_fun_id_set(
-        global_env,
-        &inv_ana_data.disabled_inv_fun_set,
-        "disabled_inv_fun_set",
-    );
-    debug_print_fun_id_set(global_env, &inv_ana_data.non_inv_fun_set, "non_inv_fun_set");
-    debug_print_fun_id_set(global_env, &inv_ana_data.target_fun_ids, "target_fun_ids");
-    //    debug_print_fun_id_set(global_env, inv_ana_data.funs_that_modify_inv, "funs_that_modify_inv");
-    debug!("funs_that_modify_inv <can't print yet>");
-    debug_print_fun_id_set(
-        global_env,
-        &inv_ana_data.funs_that_modify_some_inv,
-        "funs_that_modify_some_inv",
-    );
-    debug_print_fun_id_set(
-        global_env,
-        &inv_ana_data.funs_that_delegate_to_caller,
-        "funs_that_delegate_to_caller",
-    );
-    debug_print_fun_id_set(global_env, &inv_ana_data.friend_fun_ids, "friend_fun_ids");
 }
 
 pub struct VerificationAnalysisProcessorV2();
@@ -422,6 +386,7 @@ impl FunctionTargetProcessor for VerificationAnalysisProcessorV2 {
 
         let target_modules = global_env.get_target_modules();
         let target_invariants = get_target_invariants(global_env, &target_modules);
+        let target_memory = get_target_memory(global_env, &target_invariants);
         let disabled_inv_fun_set = compute_disabled_inv_fun_set(global_env);
         let (funs_that_modify_inv, funs_that_modify_some_inv) = compute_funs_that_modify_inv(
             global_env,
@@ -460,6 +425,7 @@ impl FunctionTargetProcessor for VerificationAnalysisProcessorV2 {
 
         let inv_ana_data = InvariantAnalysisData {
             target_invariants,
+            target_memory,
             disabled_inv_fun_set,
             non_inv_fun_set,
             target_fun_ids,
@@ -471,6 +437,82 @@ impl FunctionTargetProcessor for VerificationAnalysisProcessorV2 {
         };
 
         global_env.set_extension(inv_ana_data);
+    }
+
+    fn dump_result(
+        &self,
+        f: &mut std::fmt::Formatter,
+        env: &GlobalEnv,
+        targets: &FunctionTargetsHolder,
+    ) -> std::fmt::Result {
+        // Print verification data for each function target.
+        for fid in targets.get_funs() {
+            for (variant, ref target) in targets.get_targets(&env.get_function(fid)) {
+                let info = get_info(target);
+                if info.inlined || info.verified {
+                    writeln!(
+                        f,
+                        "{}[{}] verified={}, inlined={}",
+                        target.func_env.get_full_name_str(),
+                        variant,
+                        info.verified,
+                        info.inlined
+                    )?
+                }
+            }
+        }
+        // Print invariant analysis data.
+        let inv_ana_data = env.get_extension::<InvariantAnalysisData>().unwrap();
+        let display_fun_set = |f: &mut std::fmt::Formatter,
+                               indent: &str,
+                               name: &str,
+                               set: &BTreeSet<QualifiedId<FunId>>|
+         -> std::fmt::Result {
+            writeln!(f, "{}{} {{", indent, name)?;
+            for fun in set {
+                writeln!(f, "{}  {}", indent, env.display(fun))?;
+            }
+            writeln!(f, "{}}}", indent)?;
+            Ok(())
+        };
+
+        writeln!(f, "target_invariants {{")?;
+        for inv_id in &inv_ana_data.target_invariants {
+            let inv = env.get_global_invariant(*inv_id).expect("invariant");
+            writeln!(f, "  {}: {}", inv.loc.display(env), inv.cond.display(env))?;
+            if let Some(set) = inv_ana_data.funs_that_modify_inv.get(inv_id) {
+                display_fun_set(f, "  ", "modified_by", set)?;
+            }
+        }
+        writeln!(f, "}}")?;
+        writeln!(f, "target_memory {{")?;
+        for mem in &inv_ana_data.target_memory {
+            writeln!(f, "{}", env.display(mem))?
+        }
+        writeln!(f, "}})")?;
+        display_fun_set(
+            f,
+            "",
+            "disabled_inv_fun_set",
+            &inv_ana_data.disabled_inv_fun_set,
+        )?;
+        display_fun_set(f, "", "non_inv_fun_set", &inv_ana_data.non_inv_fun_set)?;
+        display_fun_set(f, "", "target_fun_ids", &inv_ana_data.target_fun_ids)?;
+        display_fun_set(f, "", "dep_fun_ids", &inv_ana_data.dep_fun_ids)?;
+        display_fun_set(
+            f,
+            "",
+            "funs_that_modify_some_inv",
+            &inv_ana_data.funs_that_modify_some_inv,
+        )?;
+        display_fun_set(
+            f,
+            "",
+            "funs_that_delegate_to_caller",
+            &inv_ana_data.funs_that_delegate_to_caller,
+        )?;
+        display_fun_set(f, "", "friend_fun_ids", &inv_ana_data.friend_fun_ids)?;
+        Ok(())
     }
 }
 

@@ -890,20 +890,37 @@ impl GlobalEnv {
             .unwrap_or_else(Default::default)
     }
 
-    /// Given a set of invariants, find the subset that refer to the type in mem.
+    /// Given a set of invariants, find the subset apply to the type in mem.
     pub fn get_subset_invariants_for_memory(
         &self,
-        mem: QualifiedInstId<StructId>,
+        mem: &QualifiedInstId<StructId>,
         inv_set_id: &BTreeSet<GlobalId>,
     ) -> BTreeSet<GlobalId> {
-        if let Some(modifies_inv_id_set) = self.global_invariants_for_memory.get(&mem) {
-            modifies_inv_id_set
-                .intersection(inv_set_id)
-                .cloned()
-                .collect()
-        } else {
-            BTreeSet::<GlobalId>::new()
-        }
+        inv_set_id
+            .iter()
+            .cloned()
+            .filter(|id| self.invariant_applies_to_mem(mem, id))
+            .collect()
+    }
+
+    /// Returns true if the invariant applies to the memory. If `mem` is generic, it will apply
+    /// if it's type subsumes some memory used by the invariant. For example, if `mem` is `R<T>`
+    /// and the invariant touches `R<u64>`, it applies to `R<T>`.
+    pub fn invariant_applies_to_mem(
+        &self,
+        mem: &QualifiedInstId<StructId>,
+        inv_id: &GlobalId,
+    ) -> bool {
+        self.get_global_invariant(*inv_id)
+            .unwrap()
+            .mem_usage
+            .iter()
+            .any(|inv_mem| {
+                // If memory subsumes the invariant memory, there is
+                // an overlap.
+                mem.to_qualified_id() == inv_mem.to_qualified_id()
+                    && Type::subsumes(self, &mem.inst, &inv_mem.inst).is_some()
+            })
     }
 
     pub fn get_global_invariants_by_module(&self, module_id: ModuleId) -> BTreeSet<GlobalId> {
@@ -1405,6 +1422,14 @@ impl GlobalEnv {
     /// Gets the type parameter instantiation associated with the given node, if it is available.
     pub fn get_node_instantiation_opt(&self, node_id: NodeId) -> Option<Vec<Type>> {
         self.instantiation_map.borrow().get(&node_id).cloned()
+    }
+
+    /// Returns a type display context which can be used in formatting types.
+    pub fn type_display_context(&self) -> TypeDisplayContext {
+        TypeDisplayContext::WithEnv {
+            env: self,
+            type_param_names: None,
+        }
     }
 }
 

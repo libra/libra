@@ -8,6 +8,7 @@ use crate::{
     model::{GlobalEnv, ModuleId, StructEnv, StructId},
     symbol::{Symbol, SymbolPool},
 };
+use itertools::Itertools;
 use move_core_types::language_storage::{StructTag, TypeTag};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -243,6 +244,34 @@ impl Type {
         }
     }
 
+    /// Returns some value if the left slice of types has a unifier which makes it equal to the
+    /// right slice of types. For example, `R<T>` subsumes `R<u64>`. Returns the smallest unifier
+    /// which makes them equal.
+    pub fn subsumes(env: &GlobalEnv, left: &[Type], right: &[Type]) -> Option<Substitution> {
+        if left.len() != right.len() {
+            return None;
+        }
+        let mut param_max: u16 = 0;
+        let mut collect_param_max = |ty: &Type| {
+            if let Type::TypeParameter(n) = ty {
+                param_max = param_max.max(*n);
+            }
+        };
+        left.iter().for_each(|ty| ty.visit(&mut collect_param_max));
+        let left_vars = (0..param_max + 1).map(|i| Type::Var(i)).collect_vec();
+        let mut subs = Substitution::new();
+        let tctx = env.type_display_context();
+        for (i, l) in left.iter().map(|l| l.instantiate(&left_vars)).enumerate() {
+            if subs
+                .unify(&tctx, Variance::Disallow, &l, &right[i])
+                .is_err()
+            {
+                return None;
+            }
+        }
+        Some(subs)
+    }
+
     /// Instantiate type parameters in the slice of types.
     pub fn instantiate_slice(slice: &[Type], params: &[Type]) -> Vec<Type> {
         if params.is_empty() {
@@ -283,7 +312,7 @@ impl Type {
             Type::Var(i) => {
                 if let Some(s) = subs {
                     if let Some(t) = s.subs.get(i) {
-                        // Recursively call replacement again here, in case the substitution s
+                        // Recursively call replacement again here, in case the substitution
                         // refers to type variables.
                         // TODO: a more efficient approach is to maintain that type assignments
                         // are always fully specialized w.r.t. to the substitution.
@@ -401,15 +430,15 @@ impl Type {
         if self.is_open() {
             None
         } else {
-            Some (
+            Some(
                 match self {
-		    Struct(mid, sid, ts) =>
+                    Struct(mid, sid, ts) =>
                         env.get_struct_tag(mid, sid, &ts)
                             .expect("Invariant violation: struct type argument contains incomplete, tuple, reference, or spec type"),
 
                     _ => return None
-		}
-	    )
+                }
+            )
         }
     }
 

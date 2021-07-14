@@ -163,33 +163,27 @@ impl<'env> BoogieTranslator<'env> {
                     continue;
                 }
                 for (variant, ref fun_target) in self.targets.get_targets(fun_env) {
-                    if variant.is_verified() {
-                        // Verified functions are translated with an empty instantiation, as they
-                        // are the top-level entry points for a VC.
+                    // This variant is inlined, so translate for all type instantiations.
+                    let fid = fun_target.func_env.get_qualified_id();
+                    let insts = if variant.is_verified() {
+                        mono_info
+                            .verified_funs
+                            .get(&fid)
+                            .expect("at least one instance")
+                    } else {
+                        mono_info.inlined_funs.get(&fid).unwrap_or(empty)
+                    };
+                    for type_inst in insts.iter() {
+                        let fun_name = boogie_function_name(fun_env, type_inst);
+                        if !translated_funs.insert(fun_name) {
+                            continue;
+                        }
                         FunctionTranslator {
                             parent: self,
                             fun_target,
-                            type_inst: &[],
+                            type_inst,
                         }
                         .translate();
-                    } else {
-                        // This variant is inlined, so translate for all type instantiations.
-                        for type_inst in mono_info
-                            .funs
-                            .get(&fun_target.func_env.get_qualified_id())
-                            .unwrap_or(empty)
-                        {
-                            let fun_name = boogie_function_name(fun_env, type_inst);
-                            if !translated_funs.insert(fun_name) {
-                                continue;
-                            }
-                            FunctionTranslator {
-                                parent: self,
-                                fun_target,
-                                type_inst,
-                            }
-                            .translate();
-                        }
                     }
                 }
             }
@@ -407,10 +401,6 @@ impl<'env> FunctionTranslator<'env> {
         let (suffix, attribs) = match &fun_target.data.variant {
             FunctionVariant::Baseline => ("".to_string(), "{:inline 1} ".to_string()),
             FunctionVariant::Verification(flavor) => {
-                assert!(
-                    self.type_inst.is_empty(),
-                    "verification variant cannot have an instantiation"
-                );
                 let timeout = fun_target
                     .func_env
                     .get_num_pragma(TIMEOUT_PRAGMA, || options.vc_timeout);
