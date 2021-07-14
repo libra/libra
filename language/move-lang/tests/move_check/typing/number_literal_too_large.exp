@@ -1,98 +1,64 @@
-error: 
+error[E04021]: invalid number after type inference
+  ┌─ tests/move_check/typing/number_literal_too_large.move:3:9
+  │
+3 │         340282366920938463463374607431768211455;
+  │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │         │
+  │         Invalid numerical literal
+  │         Annotating the literal might help inference: '340282366920938463463374607431768211455u128'
+  │         Expected a literal of type 'u64', but the value is too large.
 
-   ┌── tests/move_check/typing/number_literal_too_large.move:3:9 ───
+error[E04021]: invalid number after type inference
+  ┌─ tests/move_check/typing/number_literal_too_large.move:5:10
+  │
+5 │         (340282366920938463463374607431768211454: u64);
+  │          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  --- Expected a literal of type 'u64', but the value is too large.
+  │          │                                         
+  │          Invalid numerical literal
+  │          Annotating the literal might help inference: '340282366920938463463374607431768211454u128'
+
+error[E04021]: invalid number after type inference
+  ┌─ tests/move_check/typing/number_literal_too_large.move:6:10
+  │
+6 │         (340282366920938463463374607431768211454: u8);
+  │          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  -- Expected a literal of type 'u8', but the value is too large.
+  │          │                                         
+  │          Invalid numerical literal
+  │          Annotating the literal might help inference: '340282366920938463463374607431768211454u128'
+
+error[E04021]: invalid number after type inference
+  ┌─ tests/move_check/typing/number_literal_too_large.move:8:10
+  │
+8 │         (18446744073709551616: u64);
+  │          ^^^^^^^^^^^^^^^^^^^^  --- Expected a literal of type 'u64', but the value is too large.
+  │          │                      
+  │          Invalid numerical literal
+  │          Annotating the literal might help inference: '18446744073709551616u128'
+
+error[E04021]: invalid number after type inference
+  ┌─ tests/move_check/typing/number_literal_too_large.move:9:10
+  │
+9 │         (18446744073709551616: u8);
+  │          ^^^^^^^^^^^^^^^^^^^^  -- Expected a literal of type 'u8', but the value is too large.
+  │          │                      
+  │          Invalid numerical literal
+  │          Annotating the literal might help inference: '18446744073709551616u128'
+
+error[E04021]: invalid number after type inference
+   ┌─ tests/move_check/typing/number_literal_too_large.move:11:10
    │
- 3 │         340282366920938463463374607431768211455;
-   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid numerical literal
-   ·
- 3 │         340282366920938463463374607431768211455;
-   │         --------------------------------------- Expected a literal of type 'u64', but the value is too large.
-   ·
- 3 │         340282366920938463463374607431768211455;
-   │         --------------------------------------- Annotating the literal might help inference: '340282366920938463463374607431768211455u128'
+11 │         (18446744073709551615: u8);
+   │          ^^^^^^^^^^^^^^^^^^^^  -- Expected a literal of type 'u8', but the value is too large.
+   │          │                      
+   │          Invalid numerical literal
+   │          Annotating the literal might help inference: '18446744073709551615u64'
+
+error[E04021]: invalid number after type inference
+   ┌─ tests/move_check/typing/number_literal_too_large.move:13:10
    │
-
-error: 
-
-   ┌── tests/move_check/typing/number_literal_too_large.move:5:10 ───
-   │
- 5 │         (340282366920938463463374607431768211454: u64);
-   │          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid numerical literal
-   ·
- 5 │         (340282366920938463463374607431768211454: u64);
-   │                                                   --- Expected a literal of type 'u64', but the value is too large.
-   ·
- 5 │         (340282366920938463463374607431768211454: u64);
-   │          --------------------------------------- Annotating the literal might help inference: '340282366920938463463374607431768211454u128'
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/number_literal_too_large.move:6:10 ───
-   │
- 6 │         (340282366920938463463374607431768211454: u8);
-   │          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid numerical literal
-   ·
- 6 │         (340282366920938463463374607431768211454: u8);
-   │                                                   -- Expected a literal of type 'u8', but the value is too large.
-   ·
- 6 │         (340282366920938463463374607431768211454: u8);
-   │          --------------------------------------- Annotating the literal might help inference: '340282366920938463463374607431768211454u128'
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/number_literal_too_large.move:8:10 ───
-   │
- 8 │         (18446744073709551616: u64);
-   │          ^^^^^^^^^^^^^^^^^^^^ Invalid numerical literal
-   ·
- 8 │         (18446744073709551616: u64);
-   │                                --- Expected a literal of type 'u64', but the value is too large.
-   ·
- 8 │         (18446744073709551616: u64);
-   │          -------------------- Annotating the literal might help inference: '18446744073709551616u128'
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/number_literal_too_large.move:9:10 ───
-   │
- 9 │         (18446744073709551616: u8);
-   │          ^^^^^^^^^^^^^^^^^^^^ Invalid numerical literal
-   ·
- 9 │         (18446744073709551616: u8);
-   │                                -- Expected a literal of type 'u8', but the value is too large.
-   ·
- 9 │         (18446744073709551616: u8);
-   │          -------------------- Annotating the literal might help inference: '18446744073709551616u128'
-   │
-
-error: 
-
-    ┌── tests/move_check/typing/number_literal_too_large.move:11:10 ───
-    │
- 11 │         (18446744073709551615: u8);
-    │          ^^^^^^^^^^^^^^^^^^^^ Invalid numerical literal
-    ·
- 11 │         (18446744073709551615: u8);
-    │                                -- Expected a literal of type 'u8', but the value is too large.
-    ·
- 11 │         (18446744073709551615: u8);
-    │          -------------------- Annotating the literal might help inference: '18446744073709551615u64'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/number_literal_too_large.move:13:10 ───
-    │
- 13 │         (256: u8);
-    │          ^^^ Invalid numerical literal
-    ·
- 13 │         (256: u8);
-    │               -- Expected a literal of type 'u8', but the value is too large.
-    ·
- 13 │         (256: u8);
-    │          --- Annotating the literal might help inference: '256u64'
-    │
+13 │         (256: u8);
+   │          ^^^  -- Expected a literal of type 'u8', but the value is too large.
+   │          │     
+   │          Invalid numerical literal
+   │          Annotating the literal might help inference: '256u64'
 

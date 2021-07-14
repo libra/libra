@@ -3,10 +3,7 @@
 
 use crate::{
     diag,
-    errors::{
-        diagnostic_codes::*,
-        new::{Diagnostic, Diagnostics},
-    },
+    errors::new::{Diagnostic, Diagnostics},
     parser::syntax::make_loc,
     FileCommentMap, MatchedFileCommentMap,
 };

@@ -1,99 +1,80 @@
-error: 
+error[E04011]: invalid script signature
+   ┌─ tests/move_check/typing/main_arguments_invalid.move:16:5
+   │
+16 │ fun main<T: drop>(
+   │     ^^^^ Invalid parameter for script function 'main'
+17 │     s: &signer,
+   │        ------- Found: '&signer'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
 
-    ┌── tests/move_check/typing/main_arguments_invalid.move:16:5 ───
-    │
- 16 │ fun main<T: drop>(
-    │     ^^^^ Invalid parameter for script function 'main'
-    ·
- 17 │     s: &signer,
-    │        ------- Found: '&signer'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-    │
+error[E04011]: invalid script signature
+   ┌─ tests/move_check/typing/main_arguments_invalid.move:16:5
+   │
+16 │ fun main<T: drop>(
+   │     ^^^^ Invalid parameter for script function 'main'
+17 │     s: &signer,
+18 │     a0: T,
+   │         - Found: 'T'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
 
-error: 
+error[E04011]: invalid script signature
+   ┌─ tests/move_check/typing/main_arguments_invalid.move:16:5
+   │
+16 │ fun main<T: drop>(
+   │     ^^^^ Invalid parameter for script function 'main'
+   ·
+19 │     a1: vector<T>,
+   │                - Found: 'T'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
 
-    ┌── tests/move_check/typing/main_arguments_invalid.move:16:5 ───
-    │
- 16 │ fun main<T: drop>(
-    │     ^^^^ Invalid parameter for script function 'main'
-    ·
- 18 │     a0: T,
-    │         - Found: 'T'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-    │
+error[E04011]: invalid script signature
+   ┌─ tests/move_check/typing/main_arguments_invalid.move:16:5
+   │
+16 │ fun main<T: drop>(
+   │     ^^^^ Invalid parameter for script function 'main'
+   ·
+20 │     a2: vector<vector<T>>,
+   │                       - Found: 'T'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
 
-error: 
+error[E04011]: invalid script signature
+   ┌─ tests/move_check/typing/main_arguments_invalid.move:16:5
+   │
+16 │ fun main<T: drop>(
+   │     ^^^^ Invalid parameter for script function 'main'
+   ·
+21 │     a3: S,
+   │         - Found: '0x42::M::S'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
 
-    ┌── tests/move_check/typing/main_arguments_invalid.move:16:5 ───
-    │
- 16 │ fun main<T: drop>(
-    │     ^^^^ Invalid parameter for script function 'main'
-    ·
- 19 │     a1: vector<T>,
-    │                - Found: 'T'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-    │
+error[E04011]: invalid script signature
+   ┌─ tests/move_check/typing/main_arguments_invalid.move:16:5
+   │
+16 │ fun main<T: drop>(
+   │     ^^^^ Invalid parameter for script function 'main'
+   ·
+22 │     a4: R,
+   │         - Found: '0x42::M::R'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
 
-error: 
+error[E04011]: invalid script signature
+   ┌─ tests/move_check/typing/main_arguments_invalid.move:16:5
+   │
+16 │ fun main<T: drop>(
+   │     ^^^^ Invalid parameter for script function 'main'
+   ·
+23 │     a5: Cup<u8>,
+   │         ------- Found: '0x42::M::Cup<u8>'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
 
-    ┌── tests/move_check/typing/main_arguments_invalid.move:16:5 ───
-    │
- 16 │ fun main<T: drop>(
-    │     ^^^^ Invalid parameter for script function 'main'
-    ·
- 20 │     a2: vector<vector<T>>,
-    │                       - Found: 'T'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-    │
+error[E04011]: invalid script signature
+   ┌─ tests/move_check/typing/main_arguments_invalid.move:16:5
+   │
+16 │ fun main<T: drop>(
+   │     ^^^^ Invalid parameter for script function 'main'
+   ·
+24 │     a6: Cup<T>,
+   │         ------ Found: '0x42::M::Cup<T>'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
 
-error: 
-
-    ┌── tests/move_check/typing/main_arguments_invalid.move:16:5 ───
-    │
- 16 │ fun main<T: drop>(
-    │     ^^^^ Invalid parameter for script function 'main'
-    ·
- 21 │     a3: S,
-    │         - Found: '0x42::M::S'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/main_arguments_invalid.move:16:5 ───
-    │
- 16 │ fun main<T: drop>(
-    │     ^^^^ Invalid parameter for script function 'main'
-    ·
- 22 │     a4: R,
-    │         - Found: '0x42::M::R'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/main_arguments_invalid.move:16:5 ───
-    │
- 16 │ fun main<T: drop>(
-    │     ^^^^ Invalid parameter for script function 'main'
-    ·
- 23 │     a5: Cup<u8>,
-    │         ------- Found: '0x42::M::Cup<u8>'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/main_arguments_invalid.move:16:5 ───
-    │
- 16 │ fun main<T: drop>(
-    │     ^^^^ Invalid parameter for script function 'main'
-    ·
- 24 │     a6: Cup<T>,
-    │         ------ Found: '0x42::M::Cup<T>'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/main_arguments_invalid.move:16:5 ───
-    │
- 16 │ fun main<T: drop>(
-    │     ^^^^ Invalid parameter for script function 'main'
-    ·
- 25 │     a7: vector<S>,
-    │                - Found: '0x42::M::S'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-    │
+error[E04011]: invalid script signature
+   ┌─ tests/move_check/typing/main_arguments_invalid.move:16:5
+   │
+16 │ fun main<T: drop>(
+   │     ^^^^ Invalid parameter for script function 'main'
+   ·
+25 │     a7: vector<S>,
+   │                - Found: '0x42::M::S'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
 

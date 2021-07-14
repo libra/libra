@@ -1,3 +1,57 @@
+error[E04009]: expected specific type
+  ┌─ tests/move_check/typing/borrow_field_from_non_struct.move:6:10
+  │
+6 │         &0.f;
+  │          ^^^
+  │          │
+  │          Unbound field 'f'
+  │          Expected a struct type in the current module but got: integer
+
+error[E04009]: expected specific type
+  ┌─ tests/move_check/typing/borrow_field_from_non_struct.move:7:10
+  │
+7 │         &0.g;
+  │          ^^^
+  │          │
+  │          Unbound field 'g'
+  │          Expected a struct type in the current module but got: integer
+
+error[E04009]: expected specific type
+  ┌─ tests/move_check/typing/borrow_field_from_non_struct.move:8:10
+  │
+5 │     fun t0(u: u64, cond: bool, addr: address) {
+  │               --- Expected a struct type in the current module but got: 'u64'
+  ·
+8 │         &u.value;
+  │          ^^^^^^^ Unbound field 'value'
+
+error[E04009]: expected specific type
+  ┌─ tests/move_check/typing/borrow_field_from_non_struct.move:9:10
+  │
+5 │     fun t0(u: u64, cond: bool, addr: address) {
+  │                          ---- Expected a struct type in the current module but got: 'bool'
+  ·
+9 │         &cond.value;
+  │          ^^^^^^^^^^ Unbound field 'value'
+
+error[E04009]: expected specific type
+   ┌─ tests/move_check/typing/borrow_field_from_non_struct.move:10:10
+   │
+ 5 │     fun t0(u: u64, cond: bool, addr: address) {
+   │                                      ------- Expected a struct type in the current module but got: 'address'
+   ·
+10 │         &addr.R;
+   │          ^^^^^^ Unbound field 'R'
+
+error[E04009]: expected specific type
+   ┌─ tests/move_check/typing/borrow_field_from_non_struct.move:11:10
+   │
+ 5 │     fun t0(u: u64, cond: bool, addr: address) {
+   │                                      ------- Expected a struct type in the current module but got: 'address'
+   ·
+11 │         &addr.f;
+   │          ^^^^^^ Unbound field 'f'
+
 error[E04005]: expected a single type
    ┌─ tests/move_check/typing/borrow_field_from_non_struct.move:12:10
    │
@@ -6,6 +60,15 @@ error[E04005]: expected a single type
    │          │
    │          Invalid dot access
    │          Expected a single type, but found expression list type: '()'
+
+error[E04009]: expected specific type
+   ┌─ tests/move_check/typing/borrow_field_from_non_struct.move:12:10
+   │
+12 │         &().R;
+   │          ^^^^
+   │          │
+   │          Unbound field 'R'
+   │          Expected a struct type in the current module but got: '()'
 
 error[E04005]: expected a single type
    ┌─ tests/move_check/typing/borrow_field_from_non_struct.move:13:10
@@ -16,91 +79,12 @@ error[E04005]: expected a single type
    │          Invalid dot access
    │          Expected a single type, but found expression list type: '(&0x8675309::M::S, &0x8675309::M::S)'
 
-error: 
-
-   ┌── tests/move_check/typing/borrow_field_from_non_struct.move:6:10 ───
+error[E04009]: expected specific type
+   ┌─ tests/move_check/typing/borrow_field_from_non_struct.move:13:10
    │
- 6 │         &0.f;
-   │          ^^^ Unbound field 'f'
-   ·
- 6 │         &0.f;
-   │          - Could not infer the type. Try annotating here
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/borrow_field_from_non_struct.move:7:10 ───
-   │
- 7 │         &0.g;
-   │          ^^^ Unbound field 'g'
-   ·
- 7 │         &0.g;
-   │          - Could not infer the type. Try annotating here
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/borrow_field_from_non_struct.move:8:10 ───
-   │
- 8 │         &u.value;
-   │          ^^^^^^^ Unbound field 'value'
-   ·
- 5 │     fun t0(u: u64, cond: bool, addr: address) {
-   │               --- Expected a struct type in the current module but got: 'u64'
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/borrow_field_from_non_struct.move:9:10 ───
-   │
- 9 │         &cond.value;
-   │          ^^^^^^^^^^ Unbound field 'value'
-   ·
- 5 │     fun t0(u: u64, cond: bool, addr: address) {
-   │                          ---- Expected a struct type in the current module but got: 'bool'
-   │
-
-error: 
-
-    ┌── tests/move_check/typing/borrow_field_from_non_struct.move:10:10 ───
-    │
- 10 │         &addr.R;
-    │          ^^^^^^ Unbound field 'R'
-    ·
-  5 │     fun t0(u: u64, cond: bool, addr: address) {
-    │                                      ------- Expected a struct type in the current module but got: 'address'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/borrow_field_from_non_struct.move:11:10 ───
-    │
- 11 │         &addr.f;
-    │          ^^^^^^ Unbound field 'f'
-    ·
-  5 │     fun t0(u: u64, cond: bool, addr: address) {
-    │                                      ------- Expected a struct type in the current module but got: 'address'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/borrow_field_from_non_struct.move:12:10 ───
-    │
- 12 │         &().R;
-    │          ^^^^ Unbound field 'R'
-    ·
- 12 │         &().R;
-    │          -- Expected a struct type in the current module but got: '()'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/borrow_field_from_non_struct.move:13:10 ───
-    │
- 13 │         &(&S{f: 0}, &S{f:0}).f;
-    │          ^^^^^^^^^^^^^^^^^^^^^ Unbound field 'f'
-    ·
- 13 │         &(&S{f: 0}, &S{f:0}).f;
-    │          ------------------- Expected a struct type in the current module but got: '(&0x8675309::M::S, &0x8675309::M::S)'
-    │
+13 │         &(&S{f: 0}, &S{f:0}).f;
+   │          ^^^^^^^^^^^^^^^^^^^^^
+   │          │
+   │          Unbound field 'f'
+   │          Expected a struct type in the current module but got: '(&0x8675309::M::S, &0x8675309::M::S)'
 

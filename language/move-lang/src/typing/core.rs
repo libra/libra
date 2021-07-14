@@ -4,7 +4,7 @@
 use crate::{
     diag,
     errors::{
-        diagnostic_codes::{AbilitySafety, NameResolution, TypeSafety},
+        diagnostic_codes::{AbilitySafety, NameResolution},
         new::Diagnostic,
         *,
     },

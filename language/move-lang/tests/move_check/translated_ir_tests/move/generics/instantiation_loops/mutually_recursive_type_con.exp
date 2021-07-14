@@ -1,17 +1,13 @@
-error: 
-
-    ┌── tests/move_check/translated_ir_tests/move/generics/instantiation_loops/mutually_recursive_type_con.move:8:9 ───
-    │
-  8 │         g<S<T>>()
-    │         ^^^^^^^^^ Invalid call to '0x8675309::M::g'
-    ·
-  8 │         g<S<T>>()
-    │           ---- The type parameter 'f::T' was instantiated with the type '0x8675309::M::S<T>', which contains the type parameter 'g::T'. These mutually recursive calls causes the instantiation to recurse infinitely
-    ·
- 12 │         f<T>()
-    │         ------ 'g<g::T>' calls 'f<g::T>'
-    ·
-  8 │         g<S<T>>()
-    │         --------- 'f<g::T>' calls 'g<0x8675309::M::S<g::T>>'
-    │
+error[E04019]: cyclic type instantiation
+   ┌─ tests/move_check/translated_ir_tests/move/generics/instantiation_loops/mutually_recursive_type_con.move:8:9
+   │
+ 8 │         g<S<T>>()
+   │         ^^^^^^^^^
+   │         │ │
+   │         │ The type parameter 'f::T' was instantiated with the type '0x8675309::M::S<T>', which contains the type parameter 'g::T'. These mutually recursive calls causes the instantiation to recurse infinitely
+   │         Invalid call to '0x8675309::M::g'
+   │         'f<g::T>' calls 'g<0x8675309::M::S<g::T>>'
+   ·
+12 │         f<T>()
+   │         ------ 'g<g::T>' calls 'f<g::T>'
 

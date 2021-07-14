@@ -1,3 +1,21 @@
+error[E04017]: too many arguments
+  ┌─ tests/move_check/translated_ir_tests/move/signer/move_to_extra_arg.move:5:9
+  │
+5 │         move_to<R>(s, R { f: false }, a);
+  │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │         │         │
+  │         │         Found 3 argument(s) here
+  │         Invalid call of 'move_to'. The call expected 2 argument(s) but got 3
+
+error[E04017]: too many arguments
+   ┌─ tests/move_check/translated_ir_tests/move/signer/move_to_extra_arg.move:15:9
+   │
+15 │         move_to<R<bool>>(a, s, a, R<bool> { f: false });
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │         │               │
+   │         │               Found 4 argument(s) here
+   │         Invalid call of 'move_to'. The call expected 2 argument(s) but got 4
+
 error[E04007]: incompatible types
    ┌─ tests/move_check/translated_ir_tests/move/signer/move_to_extra_arg.move:15:9
    │
@@ -19,26 +37,4 @@ error[E04007]: incompatible types
    │         │       │
    │         │       Expected: '0x8675309::N::R<bool>'
    │         Invalid call of 'move_to'. Invalid argument for parameter '1'
-
-error: 
-
-   ┌── tests/move_check/translated_ir_tests/move/signer/move_to_extra_arg.move:5:9 ───
-   │
- 5 │         move_to<R>(s, R { f: false }, a);
-   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of 'move_to'. The call expected 2 argument(s) but got 3
-   ·
- 5 │         move_to<R>(s, R { f: false }, a);
-   │                   ---------------------- Found 3 argument(s) here
-   │
-
-error: 
-
-    ┌── tests/move_check/translated_ir_tests/move/signer/move_to_extra_arg.move:15:9 ───
-    │
- 15 │         move_to<R<bool>>(a, s, a, R<bool> { f: false });
-    │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of 'move_to'. The call expected 2 argument(s) but got 4
-    ·
- 15 │         move_to<R<bool>>(a, s, a, R<bool> { f: false });
-    │                         ------------------------------- Found 4 argument(s) here
-    │
 

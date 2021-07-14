@@ -1,8 +1,6 @@
-error: 
-
-   ┌── tests/move_check/translated_ir_tests/move/borrow_tests/borrow_global_acquires_extraneous_annotation.move:4:32 ───
-   │
- 4 │     public fun test() acquires T1 {
-   │                                ^^ Invalid 'acquires' list. The struct '0x8675309::A::T1' was never acquired by 'move_from', 'borrow_global', 'borrow_global_mut', or a transitive call
-   │
+error[E02002]: unnecessary or extraneous item
+  ┌─ tests/move_check/translated_ir_tests/move/borrow_tests/borrow_global_acquires_extraneous_annotation.move:4:32
+  │
+4 │     public fun test() acquires T1 {
+  │                                ^^ Invalid 'acquires' list. The struct '0x8675309::A::T1' was never acquired by 'move_from', 'borrow_global', 'borrow_global_mut', or a transitive call
 

@@ -1,8 +1,6 @@
-error: 
-
-   ┌── tests/move_check/typing/uninferred_type_pack.move:5:9 ───
-   │
- 5 │         S{};
-   │         ^^^ Could not infer this type. Try adding an annotation
-   │
+error[E04010]: cannot infer type
+  ┌─ tests/move_check/typing/uninferred_type_pack.move:5:9
+  │
+5 │         S{};
+  │         ^^^ Could not infer this type. Try adding an annotation
 

@@ -1,49 +1,36 @@
-error: 
+error[E04010]: cannot infer type
+  ┌─ tests/move_check/typing/declare_duplicate_binding.move:5:14
+  │
+5 │         let (x, x);
+  │              ^ Could not infer this type. Try adding an annotation
 
-   ┌── tests/move_check/typing/declare_duplicate_binding.move:5:14 ───
-   │
- 5 │         let (x, x);
-   │              ^ Could not infer this type. Try adding an annotation
-   │
+error[E02001]: duplicate declaration, item, or annotation
+  ┌─ tests/move_check/typing/declare_duplicate_binding.move:5:17
+  │
+5 │         let (x, x);
+  │              -  ^ Duplicate declaration for local 'x' in a given 'let'
+  │              │   
+  │              Previously declared here
 
-error: 
+error[E04010]: cannot infer type
+  ┌─ tests/move_check/typing/declare_duplicate_binding.move:6:14
+  │
+6 │         let (f, R{f}, f);
+  │              ^ Could not infer this type. Try adding an annotation
 
-   ┌── tests/move_check/typing/declare_duplicate_binding.move:5:17 ───
-   │
- 5 │         let (x, x);
-   │                 ^ Duplicate declaration for local 'x' in a given 'let'
-   ·
- 5 │         let (x, x);
-   │              - Previously declared here
-   │
+error[E02001]: duplicate declaration, item, or annotation
+  ┌─ tests/move_check/typing/declare_duplicate_binding.move:6:19
+  │
+6 │         let (f, R{f}, f);
+  │              -    ^ Duplicate declaration for local 'f' in a given 'let'
+  │              │     
+  │              Previously declared here
 
-error: 
-
-   ┌── tests/move_check/typing/declare_duplicate_binding.move:6:14 ───
-   │
- 6 │         let (f, R{f}, f);
-   │              ^ Could not infer this type. Try adding an annotation
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/declare_duplicate_binding.move:6:19 ───
-   │
- 6 │         let (f, R{f}, f);
-   │                   ^ Duplicate declaration for local 'f' in a given 'let'
-   ·
- 6 │         let (f, R{f}, f);
-   │              - Previously declared here
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/declare_duplicate_binding.move:6:23 ───
-   │
- 6 │         let (f, R{f}, f);
-   │                       ^ Duplicate declaration for local 'f' in a given 'let'
-   ·
- 6 │         let (f, R{f}, f);
-   │              - Previously declared here
-   │
+error[E02001]: duplicate declaration, item, or annotation
+  ┌─ tests/move_check/typing/declare_duplicate_binding.move:6:23
+  │
+6 │         let (f, R{f}, f);
+  │              -        ^ Duplicate declaration for local 'f' in a given 'let'
+  │              │         
+  │              Previously declared here
 

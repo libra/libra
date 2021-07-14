@@ -18,11 +18,9 @@ error[E04005]: expected a single type
   │         │   Expected a single type, but found expression list type: '(0x8675309::M::S, 0x8675309::M::R<_>)'
   │         Invalid expression list type argument
 
-error: 
-
-   ┌── tests/move_check/typing/exp_list_nested.move:6:19 ───
-   │
- 6 │         (0, (S{}, R{}))
-   │                   ^^^ Could not infer this type. Try adding an annotation
-   │
+error[E04010]: cannot infer type
+  ┌─ tests/move_check/typing/exp_list_nested.move:6:19
+  │
+6 │         (0, (S{}, R{}))
+  │                   ^^^ Could not infer this type. Try adding an annotation
 

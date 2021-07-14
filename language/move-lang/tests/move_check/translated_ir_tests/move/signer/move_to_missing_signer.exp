@@ -1,3 +1,12 @@
+error[E04016]: too few arguments
+  ┌─ tests/move_check/translated_ir_tests/move/signer/move_to_missing_signer.move:4:9
+  │
+4 │         move_to<R>(R { f: false })
+  │         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │         │         │
+  │         │         Found 1 argument(s) here
+  │         Invalid call of 'move_to'. The call expected 2 argument(s) but got 1
+
 error[E04007]: incompatible types
   ┌─ tests/move_check/translated_ir_tests/move/signer/move_to_missing_signer.move:4:9
   │
@@ -8,6 +17,15 @@ error[E04007]: incompatible types
   │         Invalid call of 'move_to'. Invalid argument for parameter '0'
   │         Expected: '&signer'
 
+error[E04016]: too few arguments
+   ┌─ tests/move_check/translated_ir_tests/move/signer/move_to_missing_signer.move:14:14
+   │
+14 │         () = move_to<R<bool>>(R<bool> { f: false });
+   │              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │              │               │
+   │              │               Found 1 argument(s) here
+   │              Invalid call of 'move_to'. The call expected 2 argument(s) but got 1
+
 error[E04007]: incompatible types
    ┌─ tests/move_check/translated_ir_tests/move/signer/move_to_missing_signer.move:14:14
    │
@@ -17,26 +35,4 @@ error[E04007]: incompatible types
    │              │                Given: '0x8675309::N::R<bool>'
    │              Invalid call of 'move_to'. Invalid argument for parameter '0'
    │              Expected: '&signer'
-
-error: 
-
-   ┌── tests/move_check/translated_ir_tests/move/signer/move_to_missing_signer.move:4:9 ───
-   │
- 4 │         move_to<R>(R { f: false })
-   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of 'move_to'. The call expected 2 argument(s) but got 1
-   ·
- 4 │         move_to<R>(R { f: false })
-   │                   ---------------- Found 1 argument(s) here
-   │
-
-error: 
-
-    ┌── tests/move_check/translated_ir_tests/move/signer/move_to_missing_signer.move:14:14 ───
-    │
- 14 │         () = move_to<R<bool>>(R<bool> { f: false });
-    │              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of 'move_to'. The call expected 2 argument(s) but got 1
-    ·
- 14 │         () = move_to<R<bool>>(R<bool> { f: false });
-    │                              ---------------------- Found 1 argument(s) here
-    │
 

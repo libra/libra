@@ -102,6 +102,18 @@ error[E05001]: ability constraint not satisfied
 22 │         r != r;
    │              ^ '!=' requires the 'drop' ability as the value is consumed. Try borrowing the values with '&' first.'
 
+error[E04010]: cannot infer type
+   ┌─ tests/move_check/typing/neq_invalid.move:26:9
+   │
+26 │         G0{} != G0{};
+   │         ^^^^ Could not infer this type. Try adding an annotation
+
+error[E04010]: cannot infer type
+   ┌─ tests/move_check/typing/neq_invalid.move:26:17
+   │
+26 │         G0{} != G0{};
+   │                 ^^^^ Could not infer this type. Try adding an annotation
+
 error[E05001]: ability constraint not satisfied
    ┌─ tests/move_check/typing/neq_invalid.move:27:9
    │
@@ -113,6 +125,12 @@ error[E05001]: ability constraint not satisfied
    │         │
    │         '!=' requires the 'drop' ability as the value is consumed. Try borrowing the values with '&' first.'
    │         The type '0x8675309::M::G1<_>' does not have the ability 'drop'
+
+error[E04010]: cannot infer type
+   ┌─ tests/move_check/typing/neq_invalid.move:27:9
+   │
+27 │         G1{} != G1{};
+   │         ^^^^ Could not infer this type. Try adding an annotation
 
 error[E05001]: ability constraint not satisfied
    ┌─ tests/move_check/typing/neq_invalid.move:27:17
@@ -126,6 +144,12 @@ error[E05001]: ability constraint not satisfied
    │                 '!=' requires the 'drop' ability as the value is consumed. Try borrowing the values with '&' first.'
    │                 The type '0x8675309::M::G1<_>' does not have the ability 'drop'
 
+error[E04010]: cannot infer type
+   ┌─ tests/move_check/typing/neq_invalid.move:27:17
+   │
+27 │         G1{} != G1{};
+   │                 ^^^^ Could not infer this type. Try adding an annotation
+
 error[E05001]: ability constraint not satisfied
    ┌─ tests/move_check/typing/neq_invalid.move:28:9
    │
@@ -138,6 +162,12 @@ error[E05001]: ability constraint not satisfied
    │         '!=' requires the 'drop' ability as the value is consumed. Try borrowing the values with '&' first.'
    │         The type '0x8675309::M::G2<_>' does not have the ability 'drop'
 
+error[E04010]: cannot infer type
+   ┌─ tests/move_check/typing/neq_invalid.move:28:9
+   │
+28 │         G2{} != G2{};
+   │         ^^^^ Could not infer this type. Try adding an annotation
+
 error[E05001]: ability constraint not satisfied
    ┌─ tests/move_check/typing/neq_invalid.move:28:17
    │
@@ -149,6 +179,12 @@ error[E05001]: ability constraint not satisfied
    │                 │
    │                 '!=' requires the 'drop' ability as the value is consumed. Try borrowing the values with '&' first.'
    │                 The type '0x8675309::M::G2<_>' does not have the ability 'drop'
+
+error[E04010]: cannot infer type
+   ┌─ tests/move_check/typing/neq_invalid.move:28:17
+   │
+28 │         G2{} != G2{};
+   │                 ^^^^ Could not infer this type. Try adding an annotation
 
 error[E04005]: expected a single type
    ┌─ tests/move_check/typing/neq_invalid.move:32:9
@@ -185,52 +221,4 @@ error[E04007]: incompatible types
    │         │      │   
    │         │      Incompatible arguments to '!='
    │         Found expression list of length 2: '({integer}, {integer})'. It is not compatible with the other type of length 3.
-
-error: 
-
-    ┌── tests/move_check/typing/neq_invalid.move:26:9 ───
-    │
- 26 │         G0{} != G0{};
-    │         ^^^^ Could not infer this type. Try adding an annotation
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/neq_invalid.move:26:17 ───
-    │
- 26 │         G0{} != G0{};
-    │                 ^^^^ Could not infer this type. Try adding an annotation
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/neq_invalid.move:27:9 ───
-    │
- 27 │         G1{} != G1{};
-    │         ^^^^ Could not infer this type. Try adding an annotation
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/neq_invalid.move:27:17 ───
-    │
- 27 │         G1{} != G1{};
-    │                 ^^^^ Could not infer this type. Try adding an annotation
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/neq_invalid.move:28:9 ───
-    │
- 28 │         G2{} != G2{};
-    │         ^^^^ Could not infer this type. Try adding an annotation
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/neq_invalid.move:28:17 ───
-    │
- 28 │         G2{} != G2{};
-    │                 ^^^^ Could not infer this type. Try adding an annotation
-    │
 

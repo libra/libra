@@ -1,102 +1,82 @@
-error: 
+error[E04019]: cyclic type instantiation
+  ┌─ tests/move_check/typing/infinite_instantiations_invalid.move:7:9
+  │
+7 │         t<Box<T>>()
+  │         ^^^^^^^^^^^
+  │         │ │
+  │         │ The type parameter 't::T' was instantiated with the type '0x42::X::Box<T>', which contains the type parameter 't::T'. This recursive call causes the instantiation to recurse infinitely
+  │         Invalid call to '0x42::X::t'
 
-   ┌── tests/move_check/typing/infinite_instantiations_invalid.move:7:9 ───
+error[E04019]: cyclic type instantiation
+   ┌─ tests/move_check/typing/infinite_instantiations_invalid.move:14:9
    │
- 7 │         t<Box<T>>()
-   │         ^^^^^^^^^^^ Invalid call to '0x42::X::t'
+11 │         y<Box<T>>()
+   │         ----------- 'x<x::T>' calls 'y<0x42::X::Box<x::T>>'
    ·
- 7 │         t<Box<T>>()
-   │           ------ The type parameter 't::T' was instantiated with the type '0x42::X::Box<T>', which contains the type parameter 't::T'. This recursive call causes the instantiation to recurse infinitely
+14 │         x<Box<T>>()
+   │         ^^^^^^^^^^^
+   │         │ │
+   │         │ The type parameter 'y::T' was instantiated with the type '0x42::X::Box<T>', which contains the type parameter 'x::T'. These mutually recursive calls causes the instantiation to recurse infinitely
+   │         Invalid call to '0x42::X::x'
+   │         'y<0x42::X::Box<x::T>>' calls 'x<0x42::X::Box<0x42::X::Box<x::T>>>'
+
+error[E04019]: cyclic type instantiation
+   ┌─ tests/move_check/typing/infinite_instantiations_invalid.move:24:9
    │
+18 │         b<A>()
+   │         ------ 'a<a::A>' calls 'b<a::A>'
+   ·
+21 │         c<B>()
+   │         ------ 'b<a::A>' calls 'c<a::A>'
+   ·
+24 │         a<Box<C>>()
+   │         ^^^^^^^^^^^
+   │         │ │
+   │         │ The type parameter 'b::A' was instantiated with the type '0x42::X::Box<C>', which contains the type parameter 'a::C'. A cycle of recursive calls causes the instantiation to recurse infinitely
+   │         Invalid call to '0x42::X::a'
+   │         'c<a::A>' calls 'a<0x42::X::Box<a::A>>'
 
-error: 
+error[E04019]: cyclic type instantiation
+   ┌─ tests/move_check/typing/infinite_instantiations_invalid.move:38:9
+   │
+38 │         z<Box<T>>()
+   │         ^^^^^^^^^^^
+   │         │ │
+   │         │ The type parameter 'z::T' was instantiated with the type '0x42::Y::Box<T>', which contains the type parameter 'z::T'. This recursive call causes the instantiation to recurse infinitely
+   │         Invalid call to '0x42::Y::z'
 
-    ┌── tests/move_check/typing/infinite_instantiations_invalid.move:14:9 ───
-    │
- 14 │         x<Box<T>>()
-    │         ^^^^^^^^^^^ Invalid call to '0x42::X::x'
-    ·
- 14 │         x<Box<T>>()
-    │           ------ The type parameter 'y::T' was instantiated with the type '0x42::X::Box<T>', which contains the type parameter 'x::T'. These mutually recursive calls causes the instantiation to recurse infinitely
-    ·
- 11 │         y<Box<T>>()
-    │         ----------- 'x<x::T>' calls 'y<0x42::X::Box<x::T>>'
-    ·
- 14 │         x<Box<T>>()
-    │         ----------- 'y<0x42::X::Box<x::T>>' calls 'x<0x42::X::Box<0x42::X::Box<x::T>>>'
-    │
+error[E04019]: cyclic type instantiation
+   ┌─ tests/move_check/typing/infinite_instantiations_invalid.move:48:9
+   │
+42 │         b<A>()
+   │         ------ 'a<d::D>' calls 'b<d::D>'
+   ·
+45 │         c<B>()
+   │         ------ 'b<d::D>' calls 'c<d::D>'
+   ·
+48 │         d<Box<C>>()
+   │         ^^^^^^^^^^^
+   │         │ │
+   │         │ The type parameter 'a::D' was instantiated with the type '0x42::Y::Box<C>', which contains the type parameter 'd::C'. A cycle of recursive calls causes the instantiation to recurse infinitely
+   │         Invalid call to '0x42::Y::d'
+   │         'c<d::D>' calls 'd<0x42::Y::Box<d::D>>'
+   ·
+51 │         a<D>()
+   │         ------ 'd<d::D>' calls 'a<d::D>'
 
-error: 
-
-    ┌── tests/move_check/typing/infinite_instantiations_invalid.move:24:9 ───
-    │
- 24 │         a<Box<C>>()
-    │         ^^^^^^^^^^^ Invalid call to '0x42::X::a'
-    ·
- 24 │         a<Box<C>>()
-    │           ------ The type parameter 'b::A' was instantiated with the type '0x42::X::Box<C>', which contains the type parameter 'a::C'. A cycle of recursive calls causes the instantiation to recurse infinitely
-    ·
- 18 │         b<A>()
-    │         ------ 'a<a::A>' calls 'b<a::A>'
-    ·
- 21 │         c<B>()
-    │         ------ 'b<a::A>' calls 'c<a::A>'
-    ·
- 24 │         a<Box<C>>()
-    │         ----------- 'c<a::A>' calls 'a<0x42::X::Box<a::A>>'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/infinite_instantiations_invalid.move:38:9 ───
-    │
- 38 │         z<Box<T>>()
-    │         ^^^^^^^^^^^ Invalid call to '0x42::Y::z'
-    ·
- 38 │         z<Box<T>>()
-    │           ------ The type parameter 'z::T' was instantiated with the type '0x42::Y::Box<T>', which contains the type parameter 'z::T'. This recursive call causes the instantiation to recurse infinitely
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/infinite_instantiations_invalid.move:48:9 ───
-    │
- 48 │         d<Box<C>>()
-    │         ^^^^^^^^^^^ Invalid call to '0x42::Y::d'
-    ·
- 48 │         d<Box<C>>()
-    │           ------ The type parameter 'a::D' was instantiated with the type '0x42::Y::Box<C>', which contains the type parameter 'd::C'. A cycle of recursive calls causes the instantiation to recurse infinitely
-    ·
- 51 │         a<D>()
-    │         ------ 'd<d::D>' calls 'a<d::D>'
-    ·
- 42 │         b<A>()
-    │         ------ 'a<d::D>' calls 'b<d::D>'
-    ·
- 45 │         c<B>()
-    │         ------ 'b<d::D>' calls 'c<d::D>'
-    ·
- 48 │         d<Box<C>>()
-    │         ----------- 'c<d::D>' calls 'd<0x42::Y::Box<d::D>>'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/infinite_instantiations_invalid.move:62:9 ───
-    │
- 62 │         bl<Box<TR>>();
-    │         ^^^^^^^^^^^^^ Invalid call to '0x42::Z::bl'
-    ·
- 62 │         bl<Box<TR>>();
-    │            ------- The type parameter 'tl::BL' was instantiated with the type '0x42::Z::Box<TR>', which contains the type parameter 'bl::TR'. A cycle of recursive calls causes the instantiation to recurse infinitely
-    ·
- 69 │         tl<BL>()
-    │         -------- 'bl<bl::BL>' calls 'tl<bl::BL>'
-    ·
- 59 │         tr<TL>()
-    │         -------- 'tl<bl::BL>' calls 'tr<bl::BL>'
-    ·
- 62 │         bl<Box<TR>>();
-    │         ------------- 'tr<bl::BL>' calls 'bl<0x42::Z::Box<bl::BL>>'
-    │
+error[E04019]: cyclic type instantiation
+   ┌─ tests/move_check/typing/infinite_instantiations_invalid.move:62:9
+   │
+59 │         tr<TL>()
+   │         -------- 'tl<bl::BL>' calls 'tr<bl::BL>'
+   ·
+62 │         bl<Box<TR>>();
+   │         ^^^^^^^^^^^^^
+   │         │  │
+   │         │  The type parameter 'tl::BL' was instantiated with the type '0x42::Z::Box<TR>', which contains the type parameter 'bl::TR'. A cycle of recursive calls causes the instantiation to recurse infinitely
+   │         Invalid call to '0x42::Z::bl'
+   │         'tr<bl::BL>' calls 'bl<0x42::Z::Box<bl::BL>>'
+   ·
+69 │         tl<BL>()
+   │         -------- 'bl<bl::BL>' calls 'tl<bl::BL>'
 

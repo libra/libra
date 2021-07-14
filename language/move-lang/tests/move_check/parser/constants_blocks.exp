@@ -1,67 +1,51 @@
-error: 
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/parser/constants_blocks.move:5:23
+  │
+5 │     const C1: u64 = { u() };
+  │                       ^^^ Module calls are not supported in constants
 
-   ┌── tests/move_check/parser/constants_blocks.move:5:23 ───
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/parser/constants_blocks.move:7:24
+  │
+7 │     const C3: bool = { loop () };
+  │                        ^^^^^^^ 'loop' expressions are not supported in constants
+
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/parser/constants_blocks.move:8:22
+  │
+8 │     const C4: u8 = { if (false) 0 else 1 };
+  │                      ^^^^^^^^^^^^^^^^^^^ 'if' expressions are not supported in constants
+
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/parser/constants_blocks.move:9:40
+  │
+9 │     const C5: vector<vector<bool>> = { abort 0 };
+  │                                        ^^^^^^^ 'abort' expressions are not supported in constants
+
+error[E04012]: invalid type for constant
+   ┌─ tests/move_check/parser/constants_blocks.move:11:15
    │
- 5 │     const C1: u64 = { u() };
-   │                       ^^^ Module calls are not supported in constants
+11 │     const C7: () = {
+   │               ^^
+   │               │
+   │               Unpermitted constant type
+   │               Found: '()'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
+
+error[E04013]: invalid statement or expression in constant
+   ┌─ tests/move_check/parser/constants_blocks.move:12:9
    │
+12 │         let x = 0;
+   │         ^^^^^^^^^ 'let' declarations are not supported in constants
 
-error: 
-
-   ┌── tests/move_check/parser/constants_blocks.move:7:24 ───
+error[E04013]: invalid statement or expression in constant
+   ┌─ tests/move_check/parser/constants_blocks.move:13:9
    │
- 7 │     const C3: bool = { loop () };
-   │                        ^^^^^^^ 'loop' expressions are not supported in constants
+13 │         let y = 1;
+   │         ^^^^^^^^^ 'let' declarations are not supported in constants
+
+error[E04013]: invalid statement or expression in constant
+   ┌─ tests/move_check/parser/constants_blocks.move:19:9
    │
-
-error: 
-
-   ┌── tests/move_check/parser/constants_blocks.move:8:22 ───
-   │
- 8 │     const C4: u8 = { if (false) 0 else 1 };
-   │                      ^^^^^^^^^^^^^^^^^^^ 'if' expressions are not supported in constants
-   │
-
-error: 
-
-   ┌── tests/move_check/parser/constants_blocks.move:9:40 ───
-   │
- 9 │     const C5: vector<vector<bool>> = { abort 0 };
-   │                                        ^^^^^^^ 'abort' expressions are not supported in constants
-   │
-
-error: 
-
-    ┌── tests/move_check/parser/constants_blocks.move:11:15 ───
-    │
- 11 │     const C7: () = {
-    │               ^^ Unpermitted constant type
-    ·
- 11 │     const C7: () = {
-    │               -- Found: '()'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-    │
-
-error: 
-
-    ┌── tests/move_check/parser/constants_blocks.move:12:9 ───
-    │
- 12 │         let x = 0;
-    │         ^^^^^^^^^ 'let' declarations are not supported in constants
-    │
-
-error: 
-
-    ┌── tests/move_check/parser/constants_blocks.move:13:9 ───
-    │
- 13 │         let y = 1;
-    │         ^^^^^^^^^ 'let' declarations are not supported in constants
-    │
-
-error: 
-
-    ┌── tests/move_check/parser/constants_blocks.move:19:9 ───
-    │
- 19 │         u();
-    │         ^^^ Module calls are not supported in constants
-    │
+19 │         u();
+   │         ^^^ Module calls are not supported in constants
 

@@ -1,33 +1,24 @@
-error: 
+error[E02001]: duplicate declaration, item, or annotation
+  ┌─ tests/move_check/typing/bind_duplicate_binding.move:5:17
+  │
+5 │         let (x, x) = (0, 0);
+  │              -  ^ Duplicate declaration for local 'x' in a given 'let'
+  │              │   
+  │              Previously declared here
 
-   ┌── tests/move_check/typing/bind_duplicate_binding.move:5:17 ───
-   │
- 5 │         let (x, x) = (0, 0);
-   │                 ^ Duplicate declaration for local 'x' in a given 'let'
-   ·
- 5 │         let (x, x) = (0, 0);
-   │              - Previously declared here
-   │
+error[E02001]: duplicate declaration, item, or annotation
+  ┌─ tests/move_check/typing/bind_duplicate_binding.move:6:19
+  │
+6 │         let (f, R{f}, f) = (0, R { f: 0 }, 0);
+  │              -    ^ Duplicate declaration for local 'f' in a given 'let'
+  │              │     
+  │              Previously declared here
 
-error: 
-
-   ┌── tests/move_check/typing/bind_duplicate_binding.move:6:19 ───
-   │
- 6 │         let (f, R{f}, f) = (0, R { f: 0 }, 0);
-   │                   ^ Duplicate declaration for local 'f' in a given 'let'
-   ·
- 6 │         let (f, R{f}, f) = (0, R { f: 0 }, 0);
-   │              - Previously declared here
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/bind_duplicate_binding.move:6:23 ───
-   │
- 6 │         let (f, R{f}, f) = (0, R { f: 0 }, 0);
-   │                       ^ Duplicate declaration for local 'f' in a given 'let'
-   ·
- 6 │         let (f, R{f}, f) = (0, R { f: 0 }, 0);
-   │              - Previously declared here
-   │
+error[E02001]: duplicate declaration, item, or annotation
+  ┌─ tests/move_check/typing/bind_duplicate_binding.move:6:23
+  │
+6 │         let (f, R{f}, f) = (0, R { f: 0 }, 0);
+  │              -        ^ Duplicate declaration for local 'f' in a given 'let'
+  │              │         
+  │              Previously declared here
 

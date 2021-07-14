@@ -1,11 +1,9 @@
-error: 
-
-   ┌── tests/move_check/translated_ir_tests/move/generics/instantiation_loops/recursive_one_arg_type_con.move:7:9 ───
-   │
- 7 │         f<S<T>>(S<T> { b: true })
-   │         ^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call to '0x8675309::M::f'
-   ·
- 7 │         f<S<T>>(S<T> { b: true })
-   │           ---- The type parameter 'f::T' was instantiated with the type '0x8675309::M::S<T>', which contains the type parameter 'f::T'. This recursive call causes the instantiation to recurse infinitely
-   │
+error[E04019]: cyclic type instantiation
+  ┌─ tests/move_check/translated_ir_tests/move/generics/instantiation_loops/recursive_one_arg_type_con.move:7:9
+  │
+7 │         f<S<T>>(S<T> { b: true })
+  │         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  │         │ │
+  │         │ The type parameter 'f::T' was instantiated with the type '0x8675309::M::S<T>', which contains the type parameter 'f::T'. This recursive call causes the instantiation to recurse infinitely
+  │         Invalid call to '0x8675309::M::f'
 

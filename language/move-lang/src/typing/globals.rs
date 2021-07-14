@@ -3,6 +3,7 @@
 
 use super::core::{self, Context, Subst};
 use crate::{
+    diag,
     naming::ast::{self as N, Type, TypeName_, Type_},
     parser::ast::{Ability_, StructName},
     typing::ast as T,
@@ -40,7 +41,7 @@ pub fn function_body_(
             );
             context
                 .env
-                .add_error_deprecated(vec![(*annotated_loc, msg)])
+                .add_diag(diag!(Declarations::UnnecessaryItem, (*annotated_loc, msg)))
         }
     }
 }
@@ -228,9 +229,11 @@ fn check_acquire_listed<F>(
             context.current_module.as_ref().unwrap(),
             global_type_name
         );
-        context
-            .env
-            .add_error_deprecated(vec![(loc, msg()), (global_type_loc, tmsg)]);
+        context.env.add_diag(diag!(
+            TypeSafety::MissingAcquires,
+            (loc, msg()),
+            (global_type_loc, tmsg)
+        ));
     }
 }
 
@@ -283,9 +286,11 @@ where
                 ty_debug
             );
 
-            context
-                .env
-                .add_error_deprecated(vec![(*loc, msg()), (*tloc, tmsg)]);
+            context.env.add_diag(diag!(
+                TypeSafety::ExpectedSpecificType,
+                (*loc, msg()),
+                (*tloc, tmsg)
+            ));
             return None;
         }
 
@@ -302,14 +307,14 @@ where
             );
             context
                 .env
-                .add_error_deprecated(vec![(*loc, msg()), (*tloc, tmsg)]);
+                .add_diag(diag!(TypeSafety::Visibility, (*loc, msg()), (*tloc, tmsg)));
             return None;
         }
         None => {
-            context.env.add_error_deprecated(vec![(
-                *loc,
-                "Global storage operator cannot be used from a 'script' function",
-            )]);
+            let msg = "Global storage operator cannot be used from a 'script' function";
+            context
+                .env
+                .add_diag(diag!(TypeSafety::Visibility, (*loc, msg)));
             return None;
         }
         _ => (),

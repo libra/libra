@@ -1,3 +1,48 @@
+error[E04016]: too few arguments
+  ┌─ tests/move_check/typing/global_builtins_invalid.move:5:24
+  │
+5 │         let _ : bool = exists<R>();
+  │                        ^^^^^^^^^^^
+  │                        │        │
+  │                        │        Found 0 argument(s) here
+  │                        Invalid call of 'exists'. The call expected 1 argument(s) but got 0
+
+error[E04016]: too few arguments
+  ┌─ tests/move_check/typing/global_builtins_invalid.move:6:18
+  │
+6 │         let () = move_to<R>();
+  │                  ^^^^^^^^^^^^
+  │                  │         │
+  │                  │         Found 0 argument(s) here
+  │                  Invalid call of 'move_to'. The call expected 2 argument(s) but got 0
+
+error[E04016]: too few arguments
+  ┌─ tests/move_check/typing/global_builtins_invalid.move:7:22
+  │
+7 │         let _ : &R = borrow_global<R>();
+  │                      ^^^^^^^^^^^^^^^^^^
+  │                      │               │
+  │                      │               Found 0 argument(s) here
+  │                      Invalid call of 'borrow_global'. The call expected 1 argument(s) but got 0
+
+error[E04016]: too few arguments
+  ┌─ tests/move_check/typing/global_builtins_invalid.move:8:26
+  │
+8 │         let _ : &mut R = borrow_global_mut<R>();
+  │                          ^^^^^^^^^^^^^^^^^^^^^^
+  │                          │                   │
+  │                          │                   Found 0 argument(s) here
+  │                          Invalid call of 'borrow_global_mut'. The call expected 1 argument(s) but got 0
+
+error[E04016]: too few arguments
+  ┌─ tests/move_check/typing/global_builtins_invalid.move:9:20
+  │
+9 │         let R {} = move_from<R>();
+  │                    ^^^^^^^^^^^^^^
+  │                    │           │
+  │                    │           Found 0 argument(s) here
+  │                    Invalid call of 'move_from'. The call expected 1 argument(s) but got 0
+
 error[E04007]: incompatible types
    ┌─ tests/move_check/typing/global_builtins_invalid.move:13:24
    │
@@ -57,124 +102,57 @@ error[E04007]: incompatible types
    │                    Invalid call of 'move_from'. Invalid argument for parameter '0'
    │                    Expected: 'address'
 
-error: 
-
-   ┌── tests/move_check/typing/global_builtins_invalid.move:5:24 ───
+error[E04017]: too many arguments
+   ┌─ tests/move_check/typing/global_builtins_invalid.move:22:24
    │
- 5 │         let _ : bool = exists<R>();
-   │                        ^^^^^^^^^^^ Invalid call of 'exists'. The call expected 1 argument(s) but got 0
-   ·
- 5 │         let _ : bool = exists<R>();
-   │                                 -- Found 0 argument(s) here
+22 │         let _ : bool = exists<R>(@0x0, 0);
+   │                        ^^^^^^^^^^^^^^^^^^
+   │                        │        │
+   │                        │        Found 2 argument(s) here
+   │                        Invalid call of 'exists'. The call expected 1 argument(s) but got 2
+
+error[E04017]: too many arguments
+   ┌─ tests/move_check/typing/global_builtins_invalid.move:23:18
    │
+23 │         let () = move_to<R>(a, R{}, 0);
+   │                  ^^^^^^^^^^^^^^^^^^^^^
+   │                  │         │
+   │                  │         Found 3 argument(s) here
+   │                  Invalid call of 'move_to'. The call expected 2 argument(s) but got 3
 
-error: 
-
-   ┌── tests/move_check/typing/global_builtins_invalid.move:6:18 ───
+error[E04017]: too many arguments
+   ┌─ tests/move_check/typing/global_builtins_invalid.move:24:18
    │
- 6 │         let () = move_to<R>();
-   │                  ^^^^^^^^^^^^ Invalid call of 'move_to'. The call expected 2 argument(s) but got 0
-   ·
- 6 │         let () = move_to<R>();
-   │                            -- Found 0 argument(s) here
+24 │         let () = move_to(a, R{}, 0);
+   │                  ^^^^^^^^^^^^^^^^^^
+   │                  │      │
+   │                  │      Found 3 argument(s) here
+   │                  Invalid call of 'move_to'. The call expected 2 argument(s) but got 3
+
+error[E04017]: too many arguments
+   ┌─ tests/move_check/typing/global_builtins_invalid.move:25:22
    │
+25 │         let _ : &R = borrow_global<R>(@0x0, false);
+   │                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │                      │               │
+   │                      │               Found 2 argument(s) here
+   │                      Invalid call of 'borrow_global'. The call expected 1 argument(s) but got 2
 
-error: 
-
-   ┌── tests/move_check/typing/global_builtins_invalid.move:7:22 ───
+error[E04017]: too many arguments
+   ┌─ tests/move_check/typing/global_builtins_invalid.move:26:26
    │
- 7 │         let _ : &R = borrow_global<R>();
-   │                      ^^^^^^^^^^^^^^^^^^ Invalid call of 'borrow_global'. The call expected 1 argument(s) but got 0
-   ·
- 7 │         let _ : &R = borrow_global<R>();
-   │                                      -- Found 0 argument(s) here
+26 │         let _ : &mut R = borrow_global_mut<R>(@0x0, true);
+   │                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │                          │                   │
+   │                          │                   Found 2 argument(s) here
+   │                          Invalid call of 'borrow_global_mut'. The call expected 1 argument(s) but got 2
+
+error[E04017]: too many arguments
+   ┌─ tests/move_check/typing/global_builtins_invalid.move:27:20
    │
-
-error: 
-
-   ┌── tests/move_check/typing/global_builtins_invalid.move:8:26 ───
-   │
- 8 │         let _ : &mut R = borrow_global_mut<R>();
-   │                          ^^^^^^^^^^^^^^^^^^^^^^ Invalid call of 'borrow_global_mut'. The call expected 1 argument(s) but got 0
-   ·
- 8 │         let _ : &mut R = borrow_global_mut<R>();
-   │                                              -- Found 0 argument(s) here
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/global_builtins_invalid.move:9:20 ───
-   │
- 9 │         let R {} = move_from<R>();
-   │                    ^^^^^^^^^^^^^^ Invalid call of 'move_from'. The call expected 1 argument(s) but got 0
-   ·
- 9 │         let R {} = move_from<R>();
-   │                                -- Found 0 argument(s) here
-   │
-
-error: 
-
-    ┌── tests/move_check/typing/global_builtins_invalid.move:22:24 ───
-    │
- 22 │         let _ : bool = exists<R>(@0x0, 0);
-    │                        ^^^^^^^^^^^^^^^^^^ Invalid call of 'exists'. The call expected 1 argument(s) but got 2
-    ·
- 22 │         let _ : bool = exists<R>(@0x0, 0);
-    │                                 --------- Found 2 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/global_builtins_invalid.move:23:18 ───
-    │
- 23 │         let () = move_to<R>(a, R{}, 0);
-    │                  ^^^^^^^^^^^^^^^^^^^^^ Invalid call of 'move_to'. The call expected 2 argument(s) but got 3
-    ·
- 23 │         let () = move_to<R>(a, R{}, 0);
-    │                            ----------- Found 3 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/global_builtins_invalid.move:24:18 ───
-    │
- 24 │         let () = move_to(a, R{}, 0);
-    │                  ^^^^^^^^^^^^^^^^^^ Invalid call of 'move_to'. The call expected 2 argument(s) but got 3
-    ·
- 24 │         let () = move_to(a, R{}, 0);
-    │                         ----------- Found 3 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/global_builtins_invalid.move:25:22 ───
-    │
- 25 │         let _ : &R = borrow_global<R>(@0x0, false);
-    │                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of 'borrow_global'. The call expected 1 argument(s) but got 2
-    ·
- 25 │         let _ : &R = borrow_global<R>(@0x0, false);
-    │                                      ------------- Found 2 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/global_builtins_invalid.move:26:26 ───
-    │
- 26 │         let _ : &mut R = borrow_global_mut<R>(@0x0, true);
-    │                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of 'borrow_global_mut'. The call expected 1 argument(s) but got 2
-    ·
- 26 │         let _ : &mut R = borrow_global_mut<R>(@0x0, true);
-    │                                              ------------ Found 2 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/global_builtins_invalid.move:27:20 ───
-    │
- 27 │         let R {} = move_from<R>(@0x0, 0);
-    │                    ^^^^^^^^^^^^^^^^^^^^^ Invalid call of 'move_from'. The call expected 1 argument(s) but got 2
-    ·
- 27 │         let R {} = move_from<R>(@0x0, 0);
-    │                                --------- Found 2 argument(s) here
-    │
+27 │         let R {} = move_from<R>(@0x0, 0);
+   │                    ^^^^^^^^^^^^^^^^^^^^^
+   │                    │           │
+   │                    │           Found 2 argument(s) here
+   │                    Invalid call of 'move_from'. The call expected 1 argument(s) but got 2
 

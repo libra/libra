@@ -2,4 +2,4 @@
 [1] Move VM Status: EXECUTED
 [2] Transaction Status: Keep(EXECUTED)
 [3] Transaction(1)
-[4] "\n\nerror: \n\n   ┌── (file):4:9 ───\n   │\n 4 │         C::T {}\n   │         ^^^^^^^ Invalid instantiation of \'0xD98F86E3303C97B00313854B8314F51B::C::T\'.\nAll structs can only be constructed in the module in which they are declared\n   │\n\nerror: \n\n   ┌── (file):7:13 ───\n   │\n 7 │         let C::T {} = c;\n   │             ^^^^^^^ Invalid deconstruction binding of \'0xD98F86E3303C97B00313854B8314F51B::C::T\'.\n All structs can only be deconstructed in the module in which they are declared\n   │\n\n\n"
+[4] "\n\nerror[E04001]: restricted visibility\n  ┌─ (file):4:9\n  │\n4 │         C::T {}\n  │         ^^^^^^^ Invalid instantiation of \'0xD98F86E3303C97B00313854B8314F51B::C::T\'.\nAll structs can only be constructed in the module in which they are declared\n\nerror[E04001]: restricted visibility\n  ┌─ (file):7:13\n  │\n7 │         let C::T {} = c;\n  │             ^^^^^^^ Invalid deconstruction binding of \'0xD98F86E3303C97B00313854B8314F51B::C::T\'.\n All structs can only be deconstructed in the module in which they are declared\n\n\n"

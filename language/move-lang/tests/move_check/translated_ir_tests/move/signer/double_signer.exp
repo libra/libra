@@ -1,11 +1,8 @@
-error: 
-
-    ┌── tests/move_check/translated_ir_tests/move/signer/double_signer.move:15:9 ───
-    │
- 15 │     fun t2(_s: signer, _u: u64, _s2: signer) {
-    │         ^^ Invalid parameter for script function 't2'
-    ·
- 15 │     fun t2(_s: signer, _u: u64, _s2: signer) {
-    │                                      ------ 'signer's must be a prefix of the arguments to a script--they must come before any non-signer types
-    │
+error[E04011]: invalid script signature
+   ┌─ tests/move_check/translated_ir_tests/move/signer/double_signer.move:15:9
+   │
+15 │     fun t2(_s: signer, _u: u64, _s2: signer) {
+   │         ^^                           ------ 'signer's must be a prefix of the arguments to a script--they must come before any non-signer types
+   │         │                             
+   │         Invalid parameter for script function 't2'
 

@@ -150,7 +150,21 @@ codes!(
         SubtypeError: { msg: "invalid subtype", severity: BlockingError },
         JoinError: { msg: "incompatible types", severity: BlockingError },
         RecursiveType: { msg: "invalid type. recursive type found", severity: BlockingError },
-
+        ExpectedSpecificType: { msg: "expected specific type", severity: BlockingError },
+        UninferredType: { msg: "cannot infer type", severity: BlockingError },
+        ScriptSignature: { msg: "invalid script signature", severity: NonblockingError },
+        TypeForConstant: { msg: "invalid type for constant", severity: BlockingError },
+        UnsupportedConstant:
+            { msg: "invalid statement or expression in constant", severity: BlockingError },
+        InvalidLoopControl: { msg: "invalid loop control", severity: BlockingError },
+        InvalidNativeUsage: { msg: "invalid use of native item", severity: BlockingError },
+        TooFewArguments: { msg: "too few arguments", severity: NonblockingError },
+        TooManyArguments: { msg: "too many arguments", severity: NonblockingError },
+        CyclicData: { msg: "cyclic data", severity: NonblockingError },
+        CyclicInstantiation:
+            { msg: "cyclic type instantiation", severity: NonblockingError },
+        MissingAcquires: { msg: "missing acquires annotation", severity: NonblockingError },
+        InvalidNum: { msg: "invalid number after type inference", severity: NonblockingError },
     ],
     // errors for ability rules. mostly typing/translate
     AbilitySafety: [
@@ -160,7 +174,9 @@ codes!(
     // errors for move rules. mostly cfgir/locals
     MoveSafety: [],
     // errors for move rules. mostly cfgir/borrows
-    ReferenceSafety: [],
+    ReferenceSafety: [
+        RefTrans: { msg: "referential transparency violated", severity: BlockingError },
+    ],
     // errors for any unused code or items
     UnusedItem: [
         Alias: { msg: "unused alias", severity: Warning },

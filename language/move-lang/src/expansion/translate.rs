@@ -3,7 +3,7 @@
 
 use crate::{
     diag,
-    errors::{diagnostic_codes::*, new::Diagnostic},
+    errors::new::Diagnostic,
     expansion::{
         address_map::build_address_map,
         aliases::{AliasMap, AliasSet},

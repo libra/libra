@@ -1,11 +1,7 @@
 // Copyright (c) The Diem Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{
-    diag,
-    errors::{diagnostic_codes::*, new::Diagnostics},
-    parser::syntax::make_loc,
-};
+use crate::{diag, errors::new::Diagnostics, parser::syntax::make_loc};
 use move_ir_types::location::*;
 
 #[derive(Default)]

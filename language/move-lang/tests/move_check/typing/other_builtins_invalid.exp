@@ -29,6 +29,12 @@ error[E04006]: invalid subtype
   │          Invalid call of 'freeze'. Invalid argument for parameter '0'
   │          Expected: '&mut vector<bool>'
 
+error[E04010]: cannot infer type
+  ┌─ tests/move_check/typing/other_builtins_invalid.move:5:32
+  │
+5 │         (freeze<vector<bool>>(&any()): &mut vector<bool>);
+  │                                ^^^^^ Could not infer this type. Try adding an annotation
+
 error[E04006]: invalid subtype
   ┌─ tests/move_check/typing/other_builtins_invalid.move:5:40
   │
@@ -78,12 +84,4 @@ error[E04007]: incompatible types
   │         │                     Given: 'u8'
   │         Invalid call of 'assert'. Invalid argument for parameter '1'
   │         Expected: 'u64'
-
-error: 
-
-   ┌── tests/move_check/typing/other_builtins_invalid.move:5:32 ───
-   │
- 5 │         (freeze<vector<bool>>(&any()): &mut vector<bool>);
-   │                                ^^^^^ Could not infer this type. Try adding an annotation
-   │
 

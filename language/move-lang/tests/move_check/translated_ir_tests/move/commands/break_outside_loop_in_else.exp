@@ -1,8 +1,6 @@
-error: 
-
-   ┌── tests/move_check/translated_ir_tests/move/commands/break_outside_loop_in_else.move:3:24 ───
-   │
- 3 │     if (false) () else break;
-   │                        ^^^^^ Invalid usage of 'break'. 'break' can only be used inside a loop body
-   │
+error[E04014]: invalid loop control
+  ┌─ tests/move_check/translated_ir_tests/move/commands/break_outside_loop_in_else.move:3:24
+  │
+3 │     if (false) () else break;
+  │                        ^^^^^ Invalid usage of 'break'. 'break' can only be used inside a loop body
 

@@ -1,133 +1,105 @@
-error: 
+error[E04012]: invalid type for constant
+  ┌─ tests/move_check/typing/constant_invalid_base_type.move:6:15
+  │
+6 │     const C1: signer = abort 0;
+  │               ^^^^^^
+  │               │
+  │               Unpermitted constant type
+  │               Found: 'signer'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
 
-   ┌── tests/move_check/typing/constant_invalid_base_type.move:6:15 ───
-   │
- 6 │     const C1: signer = abort 0;
-   │               ^^^^^^ Unpermitted constant type
-   ·
- 6 │     const C1: signer = abort 0;
-   │               ------ Found: 'signer'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-   │
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/typing/constant_invalid_base_type.move:6:24
+  │
+6 │     const C1: signer = abort 0;
+  │                        ^^^^^^^ 'abort' expressions are not supported in constants
 
-error: 
+error[E04012]: invalid type for constant
+  ┌─ tests/move_check/typing/constant_invalid_base_type.move:7:15
+  │
+7 │     const C2: S = S{};
+  │               ^
+  │               │
+  │               Unpermitted constant type
+  │               Found: '0x42::M::S'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
 
-   ┌── tests/move_check/typing/constant_invalid_base_type.move:6:24 ───
-   │
- 6 │     const C1: signer = abort 0;
-   │                        ^^^^^^^ 'abort' expressions are not supported in constants
-   │
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/typing/constant_invalid_base_type.move:7:19
+  │
+7 │     const C2: S = S{};
+  │                   ^^^ Structs are not supported in constants
 
-error: 
+error[E04012]: invalid type for constant
+  ┌─ tests/move_check/typing/constant_invalid_base_type.move:8:15
+  │
+8 │     const C3: R = R{};
+  │               ^
+  │               │
+  │               Unpermitted constant type
+  │               Found: '0x42::M::R'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
 
-   ┌── tests/move_check/typing/constant_invalid_base_type.move:7:15 ───
-   │
- 7 │     const C2: S = S{};
-   │               ^ Unpermitted constant type
-   ·
- 7 │     const C2: S = S{};
-   │               - Found: '0x42::M::S'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-   │
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/typing/constant_invalid_base_type.move:8:19
+  │
+8 │     const C3: R = R{};
+  │                   ^^^ Structs are not supported in constants
 
-error: 
+error[E04012]: invalid type for constant
+  ┌─ tests/move_check/typing/constant_invalid_base_type.move:9:15
+  │
+9 │     const C4: vector<S> = abort 0;
+  │               ^^^^^^^^^
+  │               │      │
+  │               │      Found: '0x42::M::S'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
+  │               Unpermitted constant type
 
-   ┌── tests/move_check/typing/constant_invalid_base_type.move:7:19 ───
-   │
- 7 │     const C2: S = S{};
-   │                   ^^^ Structs are not supported in constants
-   │
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/typing/constant_invalid_base_type.move:9:27
+  │
+9 │     const C4: vector<S> = abort 0;
+  │                           ^^^^^^^ 'abort' expressions are not supported in constants
 
-error: 
-
-   ┌── tests/move_check/typing/constant_invalid_base_type.move:8:15 ───
+error[E04012]: invalid type for constant
+   ┌─ tests/move_check/typing/constant_invalid_base_type.move:10:15
    │
- 8 │     const C3: R = R{};
-   │               ^ Unpermitted constant type
-   ·
- 8 │     const C3: R = R{};
-   │               - Found: '0x42::M::R'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-   │
+10 │     const C5: vector<R> = abort 0;
+   │               ^^^^^^^^^
+   │               │      │
+   │               │      Found: '0x42::M::R'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
+   │               Unpermitted constant type
 
-error: 
-
-   ┌── tests/move_check/typing/constant_invalid_base_type.move:8:19 ───
+error[E04013]: invalid statement or expression in constant
+   ┌─ tests/move_check/typing/constant_invalid_base_type.move:10:27
    │
- 8 │     const C3: R = R{};
-   │                   ^^^ Structs are not supported in constants
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/constant_invalid_base_type.move:9:15 ───
-   │
- 9 │     const C4: vector<S> = abort 0;
-   │               ^^^^^^^^^ Unpermitted constant type
-   ·
- 9 │     const C4: vector<S> = abort 0;
-   │                      - Found: '0x42::M::S'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/constant_invalid_base_type.move:9:27 ───
-   │
- 9 │     const C4: vector<S> = abort 0;
+10 │     const C5: vector<R> = abort 0;
    │                           ^^^^^^^ 'abort' expressions are not supported in constants
+
+error[E04012]: invalid type for constant
+   ┌─ tests/move_check/typing/constant_invalid_base_type.move:11:15
    │
+11 │     const C6: vector<vector<S>> = abort 0;
+   │               ^^^^^^^^^^^^^^^^^
+   │               │             │
+   │               │             Found: '0x42::M::S'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
+   │               Unpermitted constant type
 
-error: 
+error[E04013]: invalid statement or expression in constant
+   ┌─ tests/move_check/typing/constant_invalid_base_type.move:11:35
+   │
+11 │     const C6: vector<vector<S>> = abort 0;
+   │                                   ^^^^^^^ 'abort' expressions are not supported in constants
 
-    ┌── tests/move_check/typing/constant_invalid_base_type.move:10:15 ───
-    │
- 10 │     const C5: vector<R> = abort 0;
-    │               ^^^^^^^^^ Unpermitted constant type
-    ·
- 10 │     const C5: vector<R> = abort 0;
-    │                      - Found: '0x42::M::R'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-    │
+error[E04012]: invalid type for constant
+   ┌─ tests/move_check/typing/constant_invalid_base_type.move:12:15
+   │
+12 │     const C7: vector<vector<R>> = abort 0;
+   │               ^^^^^^^^^^^^^^^^^
+   │               │             │
+   │               │             Found: '0x42::M::R'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
+   │               Unpermitted constant type
 
-error: 
-
-    ┌── tests/move_check/typing/constant_invalid_base_type.move:10:27 ───
-    │
- 10 │     const C5: vector<R> = abort 0;
-    │                           ^^^^^^^ 'abort' expressions are not supported in constants
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/constant_invalid_base_type.move:11:15 ───
-    │
- 11 │     const C6: vector<vector<S>> = abort 0;
-    │               ^^^^^^^^^^^^^^^^^ Unpermitted constant type
-    ·
- 11 │     const C6: vector<vector<S>> = abort 0;
-    │                             - Found: '0x42::M::S'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/constant_invalid_base_type.move:11:35 ───
-    │
- 11 │     const C6: vector<vector<S>> = abort 0;
-    │                                   ^^^^^^^ 'abort' expressions are not supported in constants
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/constant_invalid_base_type.move:12:15 ───
-    │
- 12 │     const C7: vector<vector<R>> = abort 0;
-    │               ^^^^^^^^^^^^^^^^^ Unpermitted constant type
-    ·
- 12 │     const C7: vector<vector<R>> = abort 0;
-    │                             - Found: '0x42::M::R'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/constant_invalid_base_type.move:12:35 ───
-    │
- 12 │     const C7: vector<vector<R>> = abort 0;
-    │                                   ^^^^^^^ 'abort' expressions are not supported in constants
-    │
+error[E04013]: invalid statement or expression in constant
+   ┌─ tests/move_check/typing/constant_invalid_base_type.move:12:35
+   │
+12 │     const C7: vector<vector<R>> = abort 0;
+   │                                   ^^^^^^^ 'abort' expressions are not supported in constants
 

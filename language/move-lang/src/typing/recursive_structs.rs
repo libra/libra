@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{
-    errors::*,
+    diag,
+    errors::new::Diagnostic,
     expansion::ast::ModuleIdent,
     naming::ast::{self as N, TypeName_},
     parser::ast::StructName,
@@ -73,7 +74,7 @@ fn module(compilation_env: &mut CompilationEnv, mname: ModuleIdent, module: &T::
     petgraph_scc(&graph)
         .into_iter()
         .filter(|scc| scc.len() > 1 || graph.contains_edge(scc[0], scc[0]))
-        .for_each(|scc| compilation_env.add_error_deprecated(cycle_error(context, &graph, scc[0])))
+        .for_each(|scc| compilation_env.add_diag(cycle_error(context, &graph, scc[0])))
 }
 
 fn struct_def(context: &mut Context, sname: StructName, sdef: &N::StructDefinition) {
@@ -107,7 +108,7 @@ fn cycle_error(
     context: &Context,
     graph: &DiGraphMap<&StructName, ()>,
     cycle_node: &StructName,
-) -> Error {
+) -> Diagnostic {
     let cycle = shortest_cycle(graph, cycle_node);
 
     // For printing uses, sort the cycle by location (earliest first)
@@ -121,7 +122,11 @@ fn cycle_error(
 
     let use_msg = format!("Invalid field containing '{}' in struct '{}'.", used, user);
     let cycle_msg = format!("Using this struct creates a cycle: {}", cycle_strings);
-    vec![(used_loc, use_msg), (used_loc, cycle_msg)]
+    diag!(
+        TypeSafety::CyclicData,
+        (used_loc, use_msg),
+        (used_loc, cycle_msg)
+    )
 }
 
 fn best_cycle_loc<'a>(

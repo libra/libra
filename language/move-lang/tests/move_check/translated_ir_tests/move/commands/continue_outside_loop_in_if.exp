@@ -1,8 +1,6 @@
-error: 
-
-   ┌── tests/move_check/translated_ir_tests/move/commands/continue_outside_loop_in_if.move:3:15 ───
-   │
- 3 │     if (true) continue;
-   │               ^^^^^^^^ Invalid usage of 'continue'. 'continue' can only be used inside a loop body
-   │
+error[E04014]: invalid loop control
+  ┌─ tests/move_check/translated_ir_tests/move/commands/continue_outside_loop_in_if.move:3:15
+  │
+3 │     if (true) continue;
+  │               ^^^^^^^^ Invalid usage of 'continue'. 'continue' can only be used inside a loop body
 

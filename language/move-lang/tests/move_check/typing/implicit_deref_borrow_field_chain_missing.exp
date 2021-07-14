@@ -16,6 +16,15 @@ error[E03010]: unbound field
 9 │         x1.x2.x3.g;
   │         ^^^^^^^^^^ Unbound field 'g' in '0x8675309::M::X3'
 
+error[E04009]: expected specific type
+   ┌─ tests/move_check/typing/implicit_deref_borrow_field_chain_missing.move:10:9
+   │
+ 4 │     struct X3 { f: u64, }
+   │                    --- Expected a struct type in the current module but got: 'u64'
+   ·
+10 │         x1.x2.x3.f.g;
+   │         ^^^^^^^^^^^^ Unbound field 'g'
+
 error[E03010]: unbound field
    ┌─ tests/move_check/typing/implicit_deref_borrow_field_chain_missing.move:11:9
    │
@@ -34,25 +43,12 @@ error[E03010]: unbound field
 13 │         x1_mut.x2.x3.g;
    │         ^^^^^^^^^^^^^^ Unbound field 'g' in '0x8675309::M::X3'
 
-error: 
-
-    ┌── tests/move_check/typing/implicit_deref_borrow_field_chain_missing.move:10:9 ───
-    │
- 10 │         x1.x2.x3.f.g;
-    │         ^^^^^^^^^^^^ Unbound field 'g'
-    ·
-  4 │     struct X3 { f: u64, }
-    │                    --- Expected a struct type in the current module but got: 'u64'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/implicit_deref_borrow_field_chain_missing.move:14:9 ───
-    │
- 14 │         x1_mut.x2.x3.f.g;
-    │         ^^^^^^^^^^^^^^^^ Unbound field 'g'
-    ·
-  4 │     struct X3 { f: u64, }
-    │                    --- Expected a struct type in the current module but got: 'u64'
-    │
+error[E04009]: expected specific type
+   ┌─ tests/move_check/typing/implicit_deref_borrow_field_chain_missing.move:14:9
+   │
+ 4 │     struct X3 { f: u64, }
+   │                    --- Expected a struct type in the current module but got: 'u64'
+   ·
+14 │         x1_mut.x2.x3.f.g;
+   │         ^^^^^^^^^^^^^^^^ Unbound field 'g'
 
