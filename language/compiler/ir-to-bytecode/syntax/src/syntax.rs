@@ -2123,10 +2123,10 @@ pub fn parse_script_string(
 }
 
 pub fn parse_script_or_module_string(
-    file: &str,
+    file: &'static str,
     input: &str,
 ) -> Result<ScriptOrModule, ParseError<Loc, anyhow::Error>> {
-    let mut tokens = Lexer::new(leak_str(file), input);
+    let mut tokens = Lexer::new(file, input);
     tokens.advance()?;
     parse_script_or_module(&mut tokens)
 }
