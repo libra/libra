@@ -3,10 +3,12 @@
 
 #![forbid(unsafe_code)]
 use crate::{account::Account, executor::FakeExecutor, utils};
+use diem_types::on_chain_config::DIEM_MAX_KNOWN_VERSION;
 use diem_writeset_generator::old_releases::release_1_2_0_writeset;
 
 /// The current version numbers that e2e tests should be run against.
-pub const CURRENT_RELEASE_VERSIONS: &[u64] = &[1, 2];
+pub const CURRENT_RELEASE_VERSIONS: std::ops::RangeInclusive<u64> =
+    1..=DIEM_MAX_KNOWN_VERSION.major;
 
 #[derive(Debug)]
 pub struct VersionedTestEnv {
@@ -22,7 +24,7 @@ pub struct VersionedTestEnv {
 
 impl VersionedTestEnv {
     // At each release, this function will need to be updated to handle the release logic
-    pub fn new(version_number: u64) -> Self {
+    pub fn new(version_number: u64) -> Option<Self> {
         let (mut executor, dr_account, tc_account, dd_account) = utils::start_with_released_df();
         let mut dr_sequence_number = 1;
         let tc_sequence_number = 0;
@@ -30,7 +32,7 @@ impl VersionedTestEnv {
 
         // only support up to version 2 for now
         if version_number > 2 {
-            panic!("Unsupported version number {}", version_number)
+            return None;
         }
 
         if version_number > 1 {
@@ -45,8 +47,9 @@ impl VersionedTestEnv {
         }
 
         // Add other future version cases and upgrade paths here.
+        // TODO: add upgrade path to 1.3
 
-        Self {
+        Some(Self {
             executor,
             dr_account,
             tc_account,
@@ -55,7 +58,7 @@ impl VersionedTestEnv {
             tc_sequence_number,
             dd_sequence_number,
             version_number,
-        }
+        })
     }
 }
 
@@ -64,15 +67,21 @@ impl VersionedTestEnv {
 /// the `starting_state` function.
 pub fn run_with_versions<ParamExec, F>(
     test_golden_prefix: &str,
-    versions: &[u64],
+    versions: impl Iterator<Item = u64>,
     starting_state: ParamExec,
     test_func: F,
 ) where
     F: Fn(VersionedTestEnv),
-    ParamExec: Fn(u64) -> VersionedTestEnv,
+    ParamExec: Fn(u64) -> Option<VersionedTestEnv>,
 {
     for version in versions {
-        let mut testing_env = starting_state(*version);
+        let mut testing_env = match starting_state(version) {
+            None => {
+                eprintln!("Unsupported version number {}", version);
+                continue;
+            }
+            Some(env) => env,
+        };
         // Tag each golden file with the version that it's being run with, and should be compared against
         testing_env
             .executor

@@ -4,7 +4,7 @@
 use diem_transaction_builder::stdlib::*;
 use diem_types::{
     account_config::diem_root_address,
-    on_chain_config::new_epoch_event_key,
+    on_chain_config::{new_epoch_event_key, DIEM_MAX_KNOWN_VERSION},
     transaction::{Transaction, TransactionStatus},
     vm_status::KeptVMStatus,
 };
@@ -222,7 +222,7 @@ fn validator_batch_remove() {
 fn halt_network() {
     // This can only run on versions >= 2 since
     // `DiemTransactionPublishingOption::halt_all_transactions` is not available in version 1.
-    test_with_different_versions! {&[2], |test_env| {
+    test_with_different_versions! {2..=DIEM_MAX_KNOWN_VERSION.major, |test_env| {
         let mut executor = test_env.executor;
         let diem_root_account = test_env.dr_account;
         let sender = executor.create_raw_account_data(1_000_000, 10);
