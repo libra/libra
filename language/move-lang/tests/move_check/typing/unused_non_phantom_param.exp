@@ -1,0 +1,6 @@
+warning[W08002]: unused struct type parameter
+  ┌─ tests/move_check/typing/unused_non_phantom_param.move:2:18
+  │
+2 │     struct S<T1, T2> {
+  │                  ^^ Unused type parameter 'T2'. Consider declaring it as phantom
+

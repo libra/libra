@@ -572,94 +572,103 @@ fn struct_def(context: &mut Context, s: &mut N::StructDefinition) {
     }
     core::solve_constraints(context);
 
-    let type_params: BTreeMap<_, _> = s
-        .type_parameters
-        .iter()
-        .map(|sp| {
-            let loc = sp.param.user_specified_name.loc;
-            (sp.param.id, (sp.is_phantom, loc))
-        })
-        .collect();
-
+    let mut params_usage = BTreeMap::new();
     for (_field_loc, _field_, idx_ty) in field_map.iter_mut() {
         expand::type_(context, &mut idx_ty.1);
-        check_phantom_params(
+        extract_type_params_usage(
             context,
-            &type_params,
             &idx_ty.1,
-            Some(NonPhantomPos::FieldType),
-        );
+            ParamPos::NonPhantom(idx_ty.1.loc, NonPhantomPos::FieldType),
+            &mut params_usage,
+        )
+    }
+
+    for ty_param in &s.type_parameters {
+        let param_usage = params_usage.entry(ty_param.param.id).or_default();
+        if ty_param.is_phantom {
+            check_phantom_param_usage(context, &ty_param.param, param_usage);
+        } else {
+            check_non_phantom_param_usage(context, &ty_param.param, param_usage);
+        }
     }
 }
 
+enum ParamPos {
+    Phantom,
+    NonPhantom(Loc, NonPhantomPos),
+}
+
+impl ParamPos {
+    /// Returns `true` if the param_pos is [`Phantom`].
+    fn is_phantom(&self) -> bool {
+        matches!(self, Self::Phantom)
+    }
+}
+
+#[derive(Clone, Copy)]
 enum NonPhantomPos {
     FieldType,
     TypeArg,
 }
 
-fn check_phantom_params(
-    context: &mut Context,
-    type_parameters: &BTreeMap<TParamID, (bool, Loc)>,
+fn extract_type_params_usage(
+    context: &Context,
     ty: &Type,
-    non_phantom_pos: Option<NonPhantomPos>,
+    param_pos: ParamPos,
+    param_usage: &mut BTreeMap<TParamID, Vec<ParamPos>>,
 ) {
-    use NonPhantomPos::*;
-
     match &ty.value {
         Type_::Param(param) => {
-            // Don't bother checking unbound type parameters as it should fail somewhere else
-            match (type_parameters.get(&param.id), non_phantom_pos) {
-                (Some(&(is_phantom, param_decl_loc)), Some(non_phantom_pos)) if is_phantom => {
-                    invalid_phantom_use_error(
-                        context,
-                        non_phantom_pos,
-                        param_decl_loc,
-                        param,
-                        ty.loc,
-                    );
-                }
-                _ => {}
-            }
+            param_usage.entry(param.id).or_default().push(param_pos);
         }
+        Type_::Ref(_, ty) => extract_type_params_usage(
+            context,
+            ty,
+            ParamPos::NonPhantom(ty.loc, NonPhantomPos::TypeArg),
+            param_usage,
+        ),
         Type_::Apply(_, n, ty_args) => match &n.value {
             // Tuples cannot appear in structs, but we still report them as a non-phantom position in
             // case they are ever allowed.
             TypeName_::Builtin(_) | TypeName_::Multiple(_) => {
                 for ty_arg in ty_args {
-                    check_phantom_params(context, type_parameters, ty_arg, Some(TypeArg));
-                }
-            }
-            TypeName_::ModuleType(m, n) => {
-                let param_is_phantom: Vec<_> = context
-                    .struct_tparams(m, n)
-                    .iter()
-                    .map(|param| param.is_phantom)
-                    .collect();
-                // Length of params and args may be different but we can still report errors
-                // for parameters with information
-                for (is_phantom, ty_arg) in param_is_phantom.into_iter().zip(ty_args) {
-                    check_phantom_params(
+                    extract_type_params_usage(
                         context,
-                        type_parameters,
                         ty_arg,
-                        (!is_phantom).then(|| TypeArg),
+                        ParamPos::NonPhantom(ty_arg.loc, NonPhantomPos::TypeArg),
+                        param_usage,
                     );
                 }
             }
+            TypeName_::ModuleType(m, n) => {
+                // Length of params and args may be different but we can still report errors
+                // for parameters with information
+                for (param, ty_arg) in context.struct_tparams(m, n).iter().zip(ty_args) {
+                    let pos = if param.is_phantom {
+                        ParamPos::Phantom
+                    } else {
+                        ParamPos::NonPhantom(ty_arg.loc, NonPhantomPos::TypeArg)
+                    };
+                    extract_type_params_usage(context, ty_arg, pos, param_usage);
+                }
+            }
         },
-        // References cannot appear in structs, but we still report them as a non-phantom position
-        // in case they are ever allowed.
-        Type_::Ref(_, inner) => {
-            check_phantom_params(context, type_parameters, &inner, Some(TypeArg))
+        Type_::Var(_) | Type_::Anything | Type_::UnresolvedError => {}
+        Type_::Unit => {}
+    }
+}
+
+fn check_phantom_param_usage(context: &mut Context, param: &N::TParam, param_usage: &[ParamPos]) {
+    for pos in param_usage {
+        if let ParamPos::NonPhantom(loc, non_phantom_pos) = pos {
+            invalid_phantom_use_error(context, *non_phantom_pos, param, *loc);
         }
-        Type_::Var(_) | Type_::Anything | Type_::Unit | Type_::UnresolvedError => {}
     }
 }
 
 fn invalid_phantom_use_error(
     context: &mut Context,
     non_phantom_pos: NonPhantomPos,
-    param_decl_loc: Loc,
     param: &TParam,
     ty_loc: Loc,
 ) {
@@ -671,8 +680,33 @@ fn invalid_phantom_use_error(
     context.env.add_diag(diag!(
         Declarations::InvalidPhantomUse,
         (ty_loc, msg),
-        (param_decl_loc, decl_msg),
+        (param.user_specified_name.loc, decl_msg),
     ));
+}
+
+fn check_non_phantom_param_usage(
+    context: &mut Context,
+    param: &N::TParam,
+    param_usage: &[ParamPos],
+) {
+    let name = &param.user_specified_name;
+    if param_usage.is_empty() {
+        let msg = format!(
+            "Unused type parameter '{}'. Consider declaring it as phantom",
+            name
+        );
+        context
+            .env
+            .add_diag(diag!(UnusedItem::StructTypeParam, (name.loc, msg)))
+    } else if param_usage.iter().all(|pos| pos.is_phantom()) {
+        let msg = format!(
+            "The parameter '{}' is only used as an argument to parameters declared as phantom. Consider adding a phantom declaration here",
+            name
+        );
+        context
+            .env
+            .add_diag(diag!(Declarations::InvalidNonPhantomUse, (name.loc, msg)))
+    }
 }
 
 //**************************************************************************************************
