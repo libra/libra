@@ -47,7 +47,7 @@ serde = { version = "1.0.124", features = ["alloc", "default", "derive", "rc", "
 serde_json = { version = "1.0.64", features = ["default", "indexmap", "preserve_order", "std"] }
 standback = { version = "0.2.15", default-features = false, features = ["std"] }
 subtle = { version = "2.4.0", default-features = false, features = ["std"] }
-tokio = { version = "1.3.0", features = ["bytes", "default", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "once_cell", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "sync", "test-util", "time", "tokio-macros", "winapi"] }
+tokio = { version = "1.8.1", features = ["bytes", "default", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "once_cell", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "sync", "test-util", "time", "tokio-macros", "winapi"] }
 tokio-util = { version = "0.6.4", features = ["codec", "compat", "default", "futures-io", "io"] }
 toml = { version = "0.5.8", features = ["default"] }
 tracing = { version = "0.1.25", features = ["attributes", "default", "log", "std", "tracing-attributes"] }
@@ -96,7 +96,7 @@ standback = { version = "0.2.15", default-features = false, features = ["std"] }
 subtle = { version = "2.4.0", default-features = false, features = ["std"] }
 syn-3575ec1268b04181 = { package = "syn", version = "0.15.44", features = ["clone-impls", "default", "derive", "extra-traits", "full", "parsing", "printing", "proc-macro", "quote", "visit"] }
 syn-dff4ba8e3ae991db = { package = "syn", version = "1.0.64", features = ["clone-impls", "default", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "quote", "visit", "visit-mut"] }
-tokio = { version = "1.3.0", features = ["bytes", "default", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "once_cell", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "sync", "test-util", "time", "tokio-macros", "winapi"] }
+tokio = { version = "1.8.1", features = ["bytes", "default", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "once_cell", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "sync", "test-util", "time", "tokio-macros", "winapi"] }
 tokio-util = { version = "0.6.4", features = ["codec", "compat", "default", "futures-io", "io"] }
 toml = { version = "0.5.8", features = ["default"] }
 tracing = { version = "0.1.25", features = ["attributes", "default", "log", "std", "tracing-attributes"] }
@@ -140,7 +140,7 @@ serde = { version = "1.0.124", features = ["alloc", "default", "derive", "rc", "
 serde_json = { version = "1.0.64", features = ["default", "indexmap", "preserve_order", "std"] }
 standback = { version = "0.2.15", default-features = false, features = ["std"] }
 subtle = { version = "2.4.0", default-features = false, features = ["std"] }
-tokio = { version = "1.3.0", features = ["bytes", "default", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "once_cell", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "sync", "test-util", "time", "tokio-macros", "winapi"] }
+tokio = { version = "1.8.1", features = ["bytes", "default", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "once_cell", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "sync", "test-util", "time", "tokio-macros", "winapi"] }
 tokio-util = { version = "0.6.4", features = ["codec", "compat", "default", "futures-io", "io"] }
 toml = { version = "0.5.8", features = ["default"] }
 tracing = { version = "0.1.25", features = ["attributes", "default", "log", "std", "tracing-attributes"] }
@@ -189,7 +189,7 @@ standback = { version = "0.2.15", default-features = false, features = ["std"] }
 subtle = { version = "2.4.0", default-features = false, features = ["std"] }
 syn-3575ec1268b04181 = { package = "syn", version = "0.15.44", features = ["clone-impls", "default", "derive", "extra-traits", "full", "parsing", "printing", "proc-macro", "quote", "visit"] }
 syn-dff4ba8e3ae991db = { package = "syn", version = "1.0.64", features = ["clone-impls", "default", "derive", "extra-traits", "fold", "full", "parsing", "printing", "proc-macro", "quote", "visit", "visit-mut"] }
-tokio = { version = "1.3.0", features = ["bytes", "default", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "once_cell", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "sync", "test-util", "time", "tokio-macros", "winapi"] }
+tokio = { version = "1.8.1", features = ["bytes", "default", "fs", "full", "io-std", "io-util", "libc", "macros", "memchr", "mio", "net", "num_cpus", "once_cell", "parking_lot", "process", "rt", "rt-multi-thread", "signal", "signal-hook-registry", "sync", "test-util", "time", "tokio-macros", "winapi"] }
 tokio-util = { version = "0.6.4", features = ["codec", "compat", "default", "futures-io", "io"] }
 toml = { version = "0.5.8", features = ["default"] }
 tracing = { version = "0.1.25", features = ["attributes", "default", "log", "std", "tracing-attributes"] }

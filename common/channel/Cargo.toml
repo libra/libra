@@ -18,4 +18,4 @@ diem-workspace-hack = { path = "../workspace-hack" }
 
 [dev-dependencies]
 diem-types = { path = "../../types"  }
-tokio = { version = "1.3.0", features = ["full"] }
+tokio = { version = "1.8.1", features = ["full"] }
