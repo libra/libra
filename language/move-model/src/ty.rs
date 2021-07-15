@@ -741,6 +741,162 @@ impl Default for Substitution {
     }
 }
 
+pub struct TypeUnifier {
+    type_vars_map: BTreeMap<u16, (bool, Type)>,
+    types_adapted_lhs: Vec<Type>,
+    types_adapted_rhs: Vec<Type>,
+}
+
+impl TypeUnifier {
+    fn new<'a, I>(
+        lhs_types: I,
+        rhs_types: I,
+        treat_type_param_as_var: bool,
+        treat_type_local_as_var: bool,
+    ) -> Self
+    where
+        I: Iterator<Item = &'a Type> + Clone,
+    {
+        // find the starting index for new type vars
+        let mut count = 0;
+        for ty in lhs_types.clone().chain(rhs_types.clone()) {
+            ty.visit(&mut |t| {
+                if let Type::Var(idx) = t {
+                    if idx >= &count {
+                        count = *idx + 1;
+                    }
+                }
+            });
+        }
+
+        // assign indices for type vars
+        let mut type_param_vars = BTreeMap::new();
+        let mut type_local_vars = BTreeMap::new();
+        let mut type_vars_map = BTreeMap::new();
+        for (ty, is_lhs) in lhs_types
+            .clone()
+            .map(|t| (t, true))
+            .chain(rhs_types.clone().map(|t| (t, false)))
+        {
+            ty.visit(&mut |t| {
+                let var_created = match t {
+                    Type::TypeParameter(param_idx) if treat_type_param_as_var => {
+                        type_param_vars.entry(*param_idx).or_insert(count) == &count
+                    }
+                    Type::TypeLocal(local_sym) if treat_type_local_as_var => {
+                        type_local_vars.entry(*local_sym).or_insert(count) == &count
+                    }
+                    _ => false,
+                };
+                if var_created {
+                    type_vars_map.insert(count, (is_lhs, t.clone()));
+                    count += 1;
+                }
+            });
+        }
+
+        // prepare for substitutions
+        let type_param_subst = match type_param_vars.keys().max() {
+            None => vec![],
+            Some(max_param_idx) => (0..=*max_param_idx)
+                .map(|i| match type_param_vars.get(&i) {
+                    None => Type::TypeParameter(i),
+                    Some(var_idx) => Type::Var(*var_idx),
+                })
+                .collect(),
+        };
+        let type_local_subst: BTreeMap<_, _> = type_local_vars
+            .into_iter()
+            .map(|(sym, var_idx)| (sym, Type::Var(var_idx)))
+            .collect();
+
+        // do the final replacement
+        let param_subst_opt = if treat_type_param_as_var {
+            Some(type_param_subst.as_slice())
+        } else {
+            None
+        };
+        let local_subst_opt = if treat_type_local_as_var {
+            Some(&type_local_subst)
+        } else {
+            None
+        };
+        let types_adapted_lhs = lhs_types
+            .map(|t| t.replace(param_subst_opt, None, local_subst_opt))
+            .collect();
+        let types_adapted_rhs = rhs_types
+            .map(|t| t.replace(param_subst_opt, None, local_subst_opt))
+            .collect();
+
+        // done with the initialization
+        Self {
+            type_vars_map,
+            types_adapted_lhs,
+            types_adapted_rhs,
+        }
+    }
+
+    /// Create a TypeUnifier with the goal of unifying one pair of types
+    pub fn new_one(
+        lhs_type: &Type,
+        rhs_type: &Type,
+        treat_type_param_as_var: bool,
+        treat_type_local_as_var: bool,
+    ) -> Self {
+        Self::new(
+            std::iter::once(lhs_type),
+            std::iter::once(rhs_type),
+            treat_type_param_as_var,
+            treat_type_local_as_var,
+        )
+    }
+
+    /// Create a TypeUnifier with the goal of unifying two type tuples
+    pub fn new_vec(
+        lhs_types: &[Type],
+        rhs_types: &[Type],
+        treat_type_param_as_var: bool,
+        treat_type_local_as_var: bool,
+    ) -> Self {
+        Self::new(
+            lhs_types.iter(),
+            rhs_types.iter(),
+            treat_type_param_as_var,
+            treat_type_local_as_var,
+        )
+    }
+
+    /// Consume the TypeUnifier and produce the unification result
+    pub fn unify(self, variance: Variance) -> Option<(BTreeMap<Type, Type>, BTreeMap<Type, Type>)> {
+        let mut subst = Substitution::new();
+        match subst.unify_vec(
+            variance,
+            &self.types_adapted_lhs,
+            &self.types_adapted_rhs,
+            "",
+        ) {
+            Ok(_) => {
+                let mut subst_lhs = BTreeMap::new();
+                let mut subst_rhs = BTreeMap::new();
+                for (var_idx, (is_lhs, ty)) in self.type_vars_map {
+                    match subst.subs.get(&var_idx) {
+                        None => (),
+                        Some(subst_ty) => {
+                            if is_lhs {
+                                subst_lhs.insert(ty, subst_ty.clone());
+                            } else {
+                                subst_rhs.insert(ty, subst_ty.clone());
+                            }
+                        }
+                    }
+                }
+                Some((subst_lhs, subst_rhs))
+            }
+            Err(_) => None,
+        }
+    }
+}
+
 impl TypeUnificationError {
     pub fn message(&self, display_context: &TypeDisplayContext) -> String {
         match self {
