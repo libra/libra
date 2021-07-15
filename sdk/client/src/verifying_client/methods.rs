@@ -201,7 +201,10 @@ impl From<MethodRequest> for VerifyingRequest {
             MethodRequest::GetEvents(key, start_seq, limit) => get_events(key, start_seq, limit),
             MethodRequest::GetCurrencies([]) => get_currencies(),
             MethodRequest::GetNetworkStatus([]) => get_network_status(),
-            _ => todo!(),
+            _ => panic!(
+                "unsupported verifying client method: {:?}",
+                request.method()
+            ),
         }
     }
 }
