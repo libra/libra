@@ -182,49 +182,31 @@ impl VerifyingRequest {
 impl From<MethodRequest> for VerifyingRequest {
     fn from(request: MethodRequest) -> Self {
         match request {
-            MethodRequest::Submit((txn,)) => verifying_submit(txn),
-            MethodRequest::GetMetadata((None,)) => verifying_get_latest_metadata(),
-            MethodRequest::GetMetadata((Some(version),)) => {
-                verifying_get_historical_metadata(version)
-            }
-            MethodRequest::GetAccount(address, version) => verifying_get_account(address, version),
+            MethodRequest::Submit((txn,)) => submit(txn),
+            MethodRequest::GetMetadata((None,)) => get_latest_metadata(),
+            MethodRequest::GetMetadata((Some(version),)) => get_historical_metadata(version),
+            MethodRequest::GetAccount(address, version) => get_account(address, version),
             MethodRequest::GetTransactions(start_version, limit, include_events) => {
-                verifying_get_transactions(start_version, limit, include_events)
+                get_transactions(start_version, limit, include_events)
             }
             MethodRequest::GetAccountTransactions(
                 address,
                 start_seq_num,
                 limit,
                 include_events,
-            ) => verifying_get_account_transactions(address, start_seq_num, limit, include_events),
+            ) => get_account_transactions(address, start_seq_num, limit, include_events),
             MethodRequest::GetAccountTransaction(address, seq_num, include_events) => {
-                verifying_get_account_transaction(address, seq_num, include_events)
+                get_account_transaction(address, seq_num, include_events)
             }
-            MethodRequest::GetEvents(key, start_seq, limit) => {
-                verifying_get_events(key, start_seq, limit)
-            }
-            MethodRequest::GetCurrencies([]) => verifying_get_currencies(),
-            MethodRequest::GetNetworkStatus([]) => verifying_get_network_status(),
+            MethodRequest::GetEvents(key, start_seq, limit) => get_events(key, start_seq, limit),
+            MethodRequest::GetCurrencies([]) => get_currencies(),
+            MethodRequest::GetNetworkStatus([]) => get_network_status(),
             _ => todo!(),
         }
     }
 }
 
-// TODO(philiphayes): add separate type for each MethodRequest? like:
-//
-// ```
-// struct GetAccount((address,));
-//
-// enum MethodRequest {
-//     GetAccount(GetAccount),
-//     // ..
-// }
-// ```
-//
-// would allow the from(MethodRequest) above to call a method on the enum inner
-// instead of these ad-hoc methods i think
-
-fn verifying_submit(txn: String) -> VerifyingRequest {
+fn submit(txn: String) -> VerifyingRequest {
     let request = MethodRequest::Submit((txn,));
     let subrequests = vec![request.clone()];
     let callback: RequestCallback = Box::new(move |_ctxt, subresponses| {
@@ -242,7 +224,7 @@ fn verifying_submit(txn: String) -> VerifyingRequest {
     VerifyingRequest::new(request, subrequests, callback)
 }
 
-fn verifying_get_latest_metadata() -> VerifyingRequest {
+fn get_latest_metadata() -> VerifyingRequest {
     let request = MethodRequest::GetMetadata((None,));
     let subrequests = vec![MethodRequest::GetAccountStateWithProof(
         diem_root_address(),
@@ -280,7 +262,7 @@ fn verifying_get_latest_metadata() -> VerifyingRequest {
     VerifyingRequest::new(request, subrequests, callback)
 }
 
-fn verifying_get_historical_metadata(version: Version) -> VerifyingRequest {
+fn get_historical_metadata(version: Version) -> VerifyingRequest {
     let request = MethodRequest::GetMetadata((Some(version),));
     let subrequests = vec![
         MethodRequest::GetAccumulatorConsistencyProof(None, Some(version)),
@@ -369,7 +351,7 @@ fn verifying_get_historical_metadata(version: Version) -> VerifyingRequest {
     VerifyingRequest::new(request, subrequests, callback)
 }
 
-fn verifying_get_account(address: AccountAddress, version: Option<Version>) -> VerifyingRequest {
+fn get_account(address: AccountAddress, version: Option<Version>) -> VerifyingRequest {
     let request = MethodRequest::GetAccount(address, version);
     let subrequests = vec![MethodRequest::GetAccountStateWithProof(
         address, version, None,
@@ -400,11 +382,7 @@ fn verifying_get_account(address: AccountAddress, version: Option<Version>) -> V
     VerifyingRequest::new(request, subrequests, callback)
 }
 
-fn verifying_get_transactions(
-    start_version: Version,
-    limit: u64,
-    include_events: bool,
-) -> VerifyingRequest {
+fn get_transactions(start_version: Version, limit: u64, include_events: bool) -> VerifyingRequest {
     let request = MethodRequest::GetTransactions(start_version, limit, include_events);
     let subrequests = vec![MethodRequest::GetTransactionsWithProofs(
         start_version,
@@ -462,7 +440,7 @@ fn verifying_get_transactions(
     VerifyingRequest::new(request, subrequests, callback)
 }
 
-fn verifying_get_account_transactions(
+fn get_account_transactions(
     address: AccountAddress,
     start_seq_num: u64,
     limit: u64,
@@ -513,13 +491,13 @@ fn verifying_get_account_transactions(
     VerifyingRequest::new(request, subrequests, callback)
 }
 
-fn verifying_get_account_transaction(
+fn get_account_transaction(
     address: AccountAddress,
     seq_num: u64,
     include_events: bool,
 ) -> VerifyingRequest {
-    verifying_get_account_transactions(address, seq_num, 1, include_events).map(
-        |_ctxt, response| match response {
+    get_account_transactions(address, seq_num, 1, include_events).map(|_ctxt, response| {
+        match response {
             MethodResponse::GetAccountTransactions(txns) => {
                 MethodResponse::GetAccountTransaction(txns.into_iter().next())
             }
@@ -527,11 +505,11 @@ fn verifying_get_account_transaction(
                 "expected GetAccountTransactions response, got: {:?}",
                 response
             ),
-        },
-    )
+        }
+    })
 }
 
-fn verifying_get_events(key: EventKey, start_seq: u64, limit: u64) -> VerifyingRequest {
+fn get_events(key: EventKey, start_seq: u64, limit: u64) -> VerifyingRequest {
     let request = MethodRequest::GetEvents(key, start_seq, limit);
     let subrequests = vec![MethodRequest::GetEventsWithProofs(key, start_seq, limit)];
 
@@ -593,7 +571,7 @@ fn verifying_get_events(key: EventKey, start_seq: u64, limit: u64) -> VerifyingR
     VerifyingRequest::new(request, subrequests, callback)
 }
 
-fn verifying_get_currencies() -> VerifyingRequest {
+fn get_currencies() -> VerifyingRequest {
     let request = MethodRequest::GetCurrencies([]);
     let subrequests = vec![MethodRequest::GetAccountStateWithProof(
         diem_root_address(),
@@ -623,7 +601,7 @@ fn verifying_get_currencies() -> VerifyingRequest {
     VerifyingRequest::new(request, subrequests, callback)
 }
 
-fn verifying_get_network_status() -> VerifyingRequest {
+fn get_network_status() -> VerifyingRequest {
     let request = MethodRequest::get_network_status();
     let subrequests = vec![MethodRequest::get_network_status()];
     let callback: RequestCallback = Box::new(|_ctxt, subresponses| {
