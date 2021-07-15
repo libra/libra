@@ -313,7 +313,10 @@ impl Type {
             Type::TypeDomain(et) => {
                 Type::TypeDomain(Box::new(et.replace(params, subs, type_local_subs)))
             }
-            Type::ResourceDomain(..) | Type::Primitive(..) | Type::Error => self.clone(),
+            Type::ResourceDomain(mid, sid, args_opt) => {
+                Type::ResourceDomain(*mid, *sid, args_opt.as_ref().map(|args| replace_vec(args)))
+            }
+            Type::Primitive(..) | Type::Error => self.clone(),
         }
     }
 
