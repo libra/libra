@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="26px" viewBox="0 0 22 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Icon/Reference</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Documentation---Core-Contributors---Coding-Guidelines-Dark-Mode" transform="translate(-42.000000, -1457.000000)">
+            <g id="Left-Rail" transform="translate(0.000000, 1013.000000)">
+                <g id="Left-TOC" transform="translate(30.000000, 88.000000)">
+                    <g id="Support" transform="translate(0.000000, 314.000000)">
+                        <g id="Icon/Reference" transform="translate(13.000000, 43.000000)">
+                            <g id="Reference">
+                                <path d="M6.00031146,21 L14.8978706,21 L14.8978706,21 L15,24 L3.04322999,24 C3.01969629,22.366849 4.32454892,21.0238407 5.95769992,21.000307 C5.97190285,21.0001023 5.98610706,21 6.00031146,21 Z" id="Rectangle" fill="#A3ACBC" transform="translate(9.000000, 22.500000) rotate(-360.000000) translate(-9.000000, -22.500000) "></path>
+                                <rect id="Rectangle" stroke="#A3ACBB" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" x="0" y="4" width="15" height="20"></rect>
+                                <polyline id="Path" stroke="#A3ACBB" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" points="2 0 20 0 20 22"></polyline>
+                                <line x1="4" y1="17.5" x2="7" y2="17.5" id="Path" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></line>
+                                <line x1="4" y1="13" x2="10" y2="13" id="Path" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></line>
+                                <line x1="4" y1="8.5" x2="10" y2="8.5" id="Path" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></line>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

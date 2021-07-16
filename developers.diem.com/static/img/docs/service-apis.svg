@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>DD9D8A37-D58C-4DE4-8CE8-BE024745AAD0</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Documentation---Wallets" transform="translate(-652.000000, -1661.000000)">
+            <g id="Service-APIs" transform="translate(653.000000, 1662.000000)">
+                <line x1="0" y1="28" x2="3.286" y2="24.714" id="Path" stroke="#402B91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="11.3333" y1="12.6667" x2="8.6667" y2="15.3333" id="Path" stroke="#736DB1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="15.3333" y1="16.6667" x2="12.6667" y2="19.3333" id="Path" stroke="#736DB1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <path d="M7.5,22.5 C2.286,21.5 1.345,15.8923 1.3539364,19.994 C1.3578,21.757 2.0599,23.4467 3.3066,24.6934 C4.5532,25.9401 6.243,26.6421 8.006,26.6460163 C9.7691,26.6499 11.4619,25.9552 12.714,24.714 L15.3806,22.0473 C15.3806,22.0473 12.714,23.5 7.5,22.5 Z" id="Path" fill="#92B5D8" fill-rule="nonzero"></path>
+                <path d="M5.9527,12.6193 L3.286,15.286 C2.0448,16.5381 1.3501,18.2309 1.35398367,19.9939 C1.3579,21.757 2.0599,23.4467 3.3066,24.6934 C4.5533,25.9401 6.243,26.6421 8.006,26.6460163 C9.7691,26.6499 11.4619,25.9552 12.714,24.714 L15.3807,22.0473 L5.9527,12.6193 Z" id="Path" stroke="#402B91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <line x1="28" y1="0" x2="24.714" y2="3.286" id="Path" stroke="#074957" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <path d="M22.0473,15.3807 L24.714,12.714 C25.9552,11.4619 26.6499,9.7691 26.6460163,8.006 C26.6421,6.243 25.9401,4.5533 24.6934,3.3066 C23.4467,2.0599 21.757,1.3579 19.9939,1.35398367 C18.2309,1.3501 16.5381,2.0448 15.286,3.286 L12.6193,5.9527 L22.0473,15.3807 Z" id="Path" stroke="#074957" stroke-width="2" fill="#94D1BE" fill-rule="nonzero" stroke-linecap="round" stroke-linejoin="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>

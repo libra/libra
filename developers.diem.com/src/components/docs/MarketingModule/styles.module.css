@@ -1,0 +1,147 @@
+@value small-tablet-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value small-tablet-breakpoint-max-query from '~diem-docusaurus-components/src/variables.module.css';
+@value medium-tablet-breakpoint-max-query from '~diem-docusaurus-components/src/variables.module.css';
+@value large-tablet-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value large-desktop-breakpoint-max-query from '~diem-docusaurus-components/src/variables.module.css';
+
+/*
+ * The nature of this component is that, due to how it is designed,
+ * it is very fragile. For this reason, we've added a couple of extra
+ * breakpoints for more precise styling
+ */
+@value custom-bp-small: 900px;
+@value custom-bp-large: 1200px;
+
+
+.root {
+  --root-horizontal-padding: 60px;
+  --content-font-size: 18px;
+  --content-width: 231px;
+  --content-horizontal-padding: 0;
+  --width-variant: 100vw;
+  box-shadow: 0 2px 24px 0 rgba(0,0,0,0.1);
+  display: flex;
+  margin: 60px 0;
+}
+
+.content {
+  background-color: white;
+  color: black;
+  padding: 0 var(--content-horizontal-padding);
+  display: flex;
+  font-size: var(--content-font-size);
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+  padding-top: 5px;
+}
+
+.content p {
+  margin: 0 auto;
+  width: var(--content-width);
+}
+
+.cta {
+  align-items: center;
+  display: flex;
+  margin: 20px auto 0;
+  transition: .2s;
+}
+
+.cta:hover .arrow {
+  background-color: white;
+  border: 1px solid var(--brand-color);
+}
+
+.cta:hover g {
+  stroke: var(--brand-color);
+}
+
+.content > * {
+    width: var(--content-width);
+}
+
+.join {
+  color: black;
+  margin-right: auto;
+}
+
+.arrow {
+  --size: 53px;
+  align-items: center;
+  background-color: var(--brand-color);
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  width: var(--size);
+  height: var(--size);
+}
+
+.root img {
+  width: 60%;
+}
+
+@media medium-tablet-breakpoint-max-query {
+  .root {
+    --root-horizontal-padding: 20px;
+  }
+}
+
+@media
+small-tablet-breakpoint-max-query,
+large-tablet-breakpoint-query and (max-width: calc(custom-bp-large - 1px)) {
+  .root {
+    --content-width: auto;
+    flex-direction: column-reverse;
+  }
+}
+
+@media
+small-tablet-breakpoint-query and (max-width: calc(custom-bp-small - 1px)) {
+  .root {
+    --width-variant: calc(100vw + 570px);
+  }
+}
+
+@media
+small-tablet-breakpoint-query and (max-width: calc( custom-bp-small - 1px)),
+(min-width: custom-bp-large) and large-desktop-breakpoint-max-query {
+  .root {
+    --content-font-size: calc(var(--width-variant)/60 - 6px);
+    --content-width: calc(200px + (var(--width-variant) - 1200px)/8);
+    --content-horizontal-padding: calc(15px - (var(--width-variant) - 1200px)/16);
+    --root-horizontal-padding: calc(var(--width-variant)/8 - 117px);
+  }
+}
+
+@media
+small-tablet-breakpoint-max-query,
+large-tablet-breakpoint-query and (max-width: calc( custom-bp-large - 1px )) {
+  .content {
+    padding-top: 10px;
+  }
+
+  .content > * {
+    padding: 5px 25px;
+  }
+
+  .cta {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    width: 100%;
+  }
+}
+
+@media
+small-tablet-breakpoint-max-query,
+large-tablet-breakpoint-query and (max-width: calc( custom-bp-large - 1px )) {
+  .root img {
+    width: 100%;
+  }
+}
+
+html[data-theme="dark"] .root {
+  background-color: var(--default-background-color);
+}

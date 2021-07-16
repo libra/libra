@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="34px" height="34px" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Compliance</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-693.000000, -1980.000000)">
+            <g id="Compliance" transform="translate(694.000000, 1981.000000)">
+                <path d="M9,26 C15.5,26 16.5,26 23,26 C29.5,26 31,31 31,31 L1,31 C1,31 2.5,26 9,26 Z" id="Path" fill="#FFFFFF" fill-rule="nonzero"></path>
+                <polyline id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="6.0833 31.5833 0.41666 31.5833 0.41666 22.375 4.6667 22.375"></polyline>
+                <polyline id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="25.9167 31.5833 31.5833 31.5833 31.5833 22.375 27.3333 22.375"></polyline>
+                <line x1="16" y1="7.5" x2="16" y2="0.41666" id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <polyline id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="16 4.6666 20.25 4.6666 20.25 1.8333 16 1.8333"></polyline>
+                <polyline id="Path" fill="#FFFFFF" fill-rule="nonzero" points="18.125 31.5833 18.125 25.9167 13.875 25.9167 13.875 31.5833"></polyline>
+                <polyline id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="18.125 31.5833 18.125 25.9167 13.875 25.9167 13.875 31.5833"></polyline>
+                <line x1="13.875" y1="22.375" x2="18.125" y2="22.375" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="8.9167" y1="31.5833" x2="8.9167" y2="18.8333" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="23.0833" y1="31.5833" x2="23.0833" y2="18.8333" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="4.6667" y1="14.5833" x2="27.3333" y2="14.5833" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <polygon id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="27.3333 14.5833 27.3333 31.5833 4.6667 31.5833 4.6667 14.5833 16 7.5"></polygon>
+                <line x1="4.6667" y1="18.8333" x2="27.3333" y2="18.8333" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

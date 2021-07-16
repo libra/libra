@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="25px" height="28px" viewBox="0 0 25 28" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group 17</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Documentation---Core-Contributors---Coding-Guidelines-Dark-Mode" transform="translate(-105.000000, -1267.000000)">
+            <g id="Group-17" transform="translate(105.000000, 1267.000000)">
+                <path d="M8.0069,24.1203 C8.6829,23.2143 10.2899,22.5773 12.1649,22.5773 C14.0289,22.5773 15.6279,23.2073 16.3119,24.1043 L12.6649,26.5773 L10.6649,25.5773" id="Fill-1" fill="#A3ACB9"></path>
+                <path d="M16.3116,3.0349 C15.6346,3.9409 14.0286,4.5769 12.1536,4.5769 C10.2896,4.5769 8.6896,3.9479 8.0066,3.0509 L11.6536,0.5769 L13.6536,1.5769" id="Fill-3" fill="#A3ACB9"></path>
+                <polygon id="Stroke-5" stroke="#A3ACB9" points="7.5 3.3274 7.5 8.8274 12.263 11.5774 17.026 8.8274 17.026 3.3274 12.263 0.5774"></polygon>
+                <polygon id="Stroke-7" stroke="#A3ACB9" points="0.5 7.3274 0.5 12.8274 5.263 15.5774 10.026 12.8274 10.026 7.3274 5.263 4.5774"></polygon>
+                <polygon id="Stroke-9" stroke="#EEEFF0" points="14.5 7.3274 14.5 12.8274 19.263 15.5774 24.026 12.8274 24.026 7.3274 19.263 4.5774"></polygon>
+                <polygon id="Stroke-11" stroke="#EEEFF0" points="0.5 15.3274 0.5 20.8274 5.263 23.5774 10.026 20.8274 10.026 15.3274 5.263 12.5774"></polygon>
+                <polygon id="Stroke-13" stroke="#A3ACB9" points="14.5 15.3274 14.5 20.8274 19.263 23.5774 24.026 20.8274 24.026 15.3274 19.263 12.5774"></polygon>
+                <polygon id="Stroke-15" stroke="#A3ACB9" points="7.5 18.3274 7.5 23.8274 12.263 26.5774 17.026 23.8274 17.026 18.3274 12.263 15.5774"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

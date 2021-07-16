@@ -1,0 +1,248 @@
+@value mobile-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value small-tablet-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value small-tablet-breakpoint-max-query from '~diem-docusaurus-components/src/variables.module.css';
+@value medium-tablet-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value large-tablet-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value large-tablet-breakpoint-max-query from '~diem-docusaurus-components/src/variables.module.css';
+@value desktop-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value desktop-breakpoint-max-query from '~diem-docusaurus-components/src/variables.module.css';
+
+.root {
+  align-items: center;
+  background-color: var(--background-color);
+  display: inline-flex;
+  flex-direction: column;
+  padding:
+    calc( var(--border-width) + 29px )
+    30px
+    calc( var(--border-width) + 38px );
+  text-align: center;
+}
+
+:global(.tab-item--active) .root:after {
+  border-style: solid;
+  border-width: 7px 0 7px 7px;
+  border-color: transparent transparent transparent var(--carot-background-color);
+  content: '';
+  position: absolute;
+  right: 1px;
+  top: 50%;
+  transform: translate(100%, -50%);
+  width: 0;
+  height: 0;
+  z-index: 9;
+}
+
+.image {
+  --size: 100px;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: var(--size) var(--size);
+  height: var(--size);
+  margin-bottom: 20px;
+  width: var(--size);
+}
+
+.title {
+  color: white;
+  font-size: 18px;
+  line-height: 20px;
+}
+
+/* colors  */
+.aqua {
+  --background-color: #1E4855;
+}
+
+.purpleDark {
+  --background-color: #15132C
+}
+
+.purpleLight {
+  --background-color: #42318C;
+}
+
+/* SnippetTab */
+.root.snippetTab {
+  --border-width: 0;
+  --carot-background-color: var(--background-color);
+  overflow: hidden;
+  outline: none;
+  padding: 0 3px;
+}
+
+.root * {
+  word-break: inherit;
+}
+
+:global(.tab-item--active) .root.snippetTab {
+  box-shadow: none;
+  border: 0;
+}
+
+.overlay {
+  background-color: var(--background-color);
+  color: white;
+  display: flex;
+  flex-shrink: 0;
+  font-size: 10px;
+  height: 100%;
+  line-height: 12px;
+  margin-left: calc( ( var(--doc-card-size) + var(--snippet-horizontal-padding) ) * -1 );
+  margin-right: var(--snippet-horizontal-padding);
+  padding: 3px;
+  width: var(--doc-card-size);
+  z-index: 10;
+}
+
+.overlay span {
+  align-self: center;
+}
+
+:global(.tab-item--active) .overlay {
+  margin-left: calc( var(--snippet-horizontal-padding) * -1 );
+}
+
+:global(.tab-item--active) .overlay span {
+  width: 100%;
+}
+
+.root.snippetTab .title {
+  font-weight: normal;
+}
+
+@media small-tablet-breakpoint-max-query,
+large-tablet-breakpoint-query and desktop-breakpoint-max-query {
+  .root.snippetTab {
+    height: 100%;
+    outline: none;
+    overflow: visible;
+    position: relative;
+    width: 100%;
+  }
+
+  :global(.tab-item--active) .root.snippetTab.withOverlay {
+    flex-direction: row;
+  }
+
+  .overlay {
+    border-radius: var(--snippet-border-radius);
+    display: none;
+  }
+
+  :global(.tab-item--active) .overlay {
+    display: flex;
+    margin-right: 10px;
+    width: 100%;
+  }
+
+  :global(.tab-item--active) .root.snippetTab.withOverlay .image {
+    margin-left: 30px; /* Somewhat arbitrary. Just clears the image away from the overlay when not shown */
+  }
+
+  .root.snippetTab .image {
+    background-size: contain;
+    margin-top: calc( 5px + 5% );
+    margin-bottom: 5%;
+    padding-top: 55%;
+    width: 100%;
+    height: unset;
+  }
+
+  .root.snippetTab .title {
+    font-size: 10px;
+    line-height: 11px;
+    margin-bottom: 10px;
+  }
+
+  :global(.tab-item--active) .root:after {
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid var(--carot-background-color);
+    right: 50%;
+    top: calc( 100% + 0px );
+    transform: translate(50%);
+  }
+}
+
+@media mobile-breakpoint-query and small-tablet-breakpoint-max-query,
+large-tablet-breakpoint-query and desktop-breakpoint-max-query {
+  .root.snippetTab {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .root.snippetTab .image {
+    margin-top: calc( 10px + 5% );
+  }
+
+  .root.snippetTab .title {
+    font-size: 13px;
+    line-height: 15px;
+    margin-bottom: 12px;
+  }
+}
+
+@media mobile-breakpoint-query {
+  .overlay {
+    font-size: 12px;
+    line-height: 18px;
+    padding: 10px;
+  }
+}
+
+@media small-tablet-breakpoint-query and large-tablet-breakpoint-max-query,
+desktop-breakpoint-query {
+  .root.snippetTab {
+    --snippet-horizontal-padding: 25px;
+    flex-direction: row !important;
+    padding: 15px var(--snippet-horizontal-padding);
+  }
+
+  .root.snippetTab .title {
+    font-size: 18px;
+    line-height: 20px;
+  }
+
+  .root.snippetTab .image {
+    --size: 60px;
+    flex-shrink: 0;
+    margin-bottom: 0;
+  }
+
+  .root.snippetTab .title {
+    flex: 1 0 115px;
+    margin-left: 20px;
+    margin-top: 0;
+    text-align: left;
+  }
+}
+
+@media mobile-breakpoint-query and small-tablet-breakpoint-max-query,
+large-tablet-breakpoint-query and desktop-breakpoint-max-query {
+  .root.snippetTab .image {
+    margin-bottom: calc( 5px + 5% );
+  }
+
+  .root.snippetTab .title {
+    font-size: 15px;
+    line-height: 17px;
+    margin-bottom: 15px;
+  }
+}
+
+@media large-tablet-breakpoint-query {
+  /* Only show overlay on hover above tablet size */
+  :global(.tab-item--active) .root.snippetTab.withOverlay:not(:hover) {
+    flex-direction: column;
+  }
+
+  :global(.tab-item--active) .root.snippetTab:not(:hover) .overlay {
+    display: none;
+  }
+
+  :global(.tab-item--active) .root.snippetTab:not(:hover) .image {
+    margin-left: 0px;
+  }
+}
+/* End SnippetTab */

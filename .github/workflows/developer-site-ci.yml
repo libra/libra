@@ -1,0 +1,45 @@
+name: Diem Developers Website CI
+
+on:
+  push:
+    branches: [ auto ]
+    # would have had
+    # paths: [ 'developers.diem.com/**' ]
+    # but want to build rustdocs on main Diem code changes outside of the website too
+  pull_request:
+    branches: [ main ]
+    # would have had
+    # paths: [ 'developers.diem.com/**' ]
+    # but want to build rustdocs on main Diem code changes outside of the website too
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checks-out the Diem website repository under $GITHUB_WORKSPACE, so job can access it
+    - uses: actions/checkout@v2
+    # Installs node and yarn
+    - name: Use Node.js 12
+      uses: actions/setup-node@v2.1.5
+      with:
+        node-version: '12.x'
+    # Install git
+    - name: Install git
+      run: |
+        sudo apt --assume-yes update
+        sudo apt --assume-yes install git
+    # Install Python 3.8
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    # Test that building the site is successful
+    - name: Build Site
+      run: |
+        cd developers.diem.com
+        # Only build the straight Docusaurus site now. Do not build rust `-r`
+        # or python docs `-p` on CI checks until we resolve the best way to
+        # build them for deployment
+        ./scripts/build_docs.sh -b

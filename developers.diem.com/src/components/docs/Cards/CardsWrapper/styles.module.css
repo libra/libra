@@ -1,0 +1,44 @@
+@value large-tablet-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value mobile-breakpoint-max-query from '~diem-docusaurus-components/src/variables.module.css';
+
+.root {
+  --horizontal-spacing: 15px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.root > * {
+  margin-right: var(--horizontal-spacing);
+  margin-bottom: 15px;
+}
+
+
+.root.rowOf2 {
+  --grid-column-spacing: 10px;
+  --doc-card-size: calc( 100% - var(--grid-column-spacing) );
+  display: grid;
+  grid-column-gap: var(--grid-column-spacing);
+  grid-template-columns: 50% 50%;
+  width: 100%;
+}
+
+.root.rowOf3 {
+  --doc-card-size: var(--doc-card-3-per-row);
+}
+
+.root.rowOf4 {
+  --doc-card-size: var(--doc-card-4-per-row);
+}
+
+@media mobile-breakpoint-max-query {
+  .root.rowOf2 {
+    grid-template-columns: 100%;
+  }
+}
+
+@media large-tablet-breakpoint-query {
+  .root {
+    /* Account for the margin of the final card on a line */
+    width: calc(100% + calc( var(--horizontal-spacing) * 2 ));
+  }
+}

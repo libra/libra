@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="15px" height="16px" viewBox="0 0 15 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group</title>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="square">
+        <g id="Button-Circle-Purple-Small" transform="translate(-18.000000, -17.000000)" stroke="#FFFFFF" stroke-width="1.5">
+            <g id="Group" transform="translate(25.000000, 25.000000) rotate(-180.000000) translate(-25.000000, -25.000000) translate(18.500000, 18.500000)">
+                <polyline id="Stroke-1" points="6.64091967 0 0 6.5 6.64091967 13"></polyline>
+                <line x1="0.555918864" y1="6.41297653" x2="12.7259205" y2="6.41297653" id="Stroke-3"></line>
+            </g>
+        </g>
+    </g>
+</svg>

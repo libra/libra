@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="50px" height="50px" viewBox="0 0 50 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Tutorial Icons/Diem Reference Wallet/Web</title>
+    <g id="Tutorial-Icons/Diem-Reference-Wallet/Web" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-13" transform="translate(6.351351, 10.000000)">
+            <path d="M5.20427404,5.47309945e-14 L17.8378378,5.47309945e-14 L17.8378378,5.47309945e-14 L17.8378378,5.20427404 L0,5.20427404 C-3.51993027e-16,2.33003285 2.33003285,5.43708056e-14 5.20427404,5.47309945e-14 Z" id="Rectangle" fill="#92B5D8" transform="translate(8.918919, 2.602137) rotate(-180.000000) translate(-8.918919, -2.602137) "></path>
+            <rect id="Rectangle" stroke="#402B91" stroke-width="2" x="0" y="3.16863652e-14" width="37.2972973" height="29.3617021" rx="1"></rect>
+            <line x1="0" y1="4.82588595" x2="37.2972973" y2="4.82588595" id="Path-6" stroke="#402B91" stroke-width="2"></line>
+        </g>
+        <g id="wallet-43" transform="translate(16.902218, 19.680498)" stroke="#94D1BE" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+            <path d="M15.0494674,7.52435745 L15.0494674,3.00989347 L1.50494674,3.00989347 C0.673839901,3.00989347 0,2.33605357 0,1.50494674 L0,12.7920473 C0,14.0388956 1.01057173,15.0494674 2.2574201,15.0494674 L15.0494674,15.0494674 L15.0494674,10.5346272 L15.0494674,7.52435745 Z" id="Path"></path>
+            <path d="M12.0395739,1.12871005 L12.0395739,0 L1.50494674,0 C0.673839901,0 0,0.673839901 0,1.50494674 L0,1.50494674 C0,2.33605357 0.673839901,3.00989347 1.50494674,3.00989347" id="Path"></path>
+        </g>
+    </g>
+</svg>

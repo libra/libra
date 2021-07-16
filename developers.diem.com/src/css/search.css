@@ -1,0 +1,45 @@
+/* Search bar overrides */
+.reactNavSearchWrapper input#search_input_react {
+  background-color: white;
+  color: #444444;
+  border: 1px solid #706AAF;
+  /*
+   * This is a hack. We can't figure out  why line-height and font-size
+   * aren't fixing the issue. The defaults are top/bottom = 8px;
+   */
+  padding-top: 7px;
+  padding-bottom: 9px;
+}
+
+/* Search bar glyph and placholder text */
+.navSearchWrapper:before {
+  border-color: #CCCCCC;
+}
+.navSearchWrapper:after {
+  background: #CCCCCC;
+}
+.reactNavSearchWrapper input#search_input_react::placeholder {
+  color: #BBBBBB;
+}
+
+/* Search bar drodown */
+.aa-dropdown-menu {
+  border-radius: 5px;
+}
+
+.reactNavSearchWrapper
+.aa-dropdown-menu .algolia-docsearch-suggestion--category-header {
+  color: white;
+  background: #706AAF;
+  border: 1px solid #BBBBBB;
+}
+
+/* Search suggestion text when cursor is over it */
+.aa-cursor .algolia-docsearch-suggestion--content {
+  color: black;
+}
+
+/* Search suggestion text when highlighted */
+.algolia-autocomplete .algolia-docsearch-suggestion--highlight {
+  color: #5645F5;
+}

@@ -1,0 +1,37 @@
+@media print {
+
+  .fixedHeaderContainer,
+  .docsNavContainer,
+  .homeContainer,
+  .onPageNav,
+  #back-to-top,
+  #cookie-banner,
+  .button,
+  .btnClipboard {
+    display: none;
+  }
+
+  img,
+  figure {
+    display: block;
+    margin: 0 auto;
+    width: 50%;
+  }
+
+  .navPusher,
+  .mainContainer {
+    padding-top: 1rem;
+  }
+
+  #footer {
+    background-color: transparent;
+  }
+
+  #footer * {
+    display: none;
+  }
+
+  #footer .copyright {
+    display: block !important;
+  }
+}

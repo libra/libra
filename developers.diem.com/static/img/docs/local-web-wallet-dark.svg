@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="40px" height="32px" viewBox="0 0 40 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Local Web Wallet</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-690.000000, -2104.000000)">
+            <g id="Local-Web-Wallet" transform="translate(691.000000, 2105.000000)">
+                <path d="M12.6336,5.2043 L-1e-05,5.2043 L-1e-05,0 L17.8378,0 C17.8378,2.8743 15.5078,5.2043 12.6336,5.2043 Z" id="Path" fill="#FFFFFF"></path>
+                <path d="M36.2973,0 L1,0 C0.44772,0 0,0.4477 0,1 L0,28.3617 C0,28.914 0.44772,29.3617 1,29.3617 L36.2973,29.3617 C36.8496,29.3617 37.2973,28.914 37.2973,28.3617 L37.2973,1 C37.2973,0.4477 36.8496,0 36.2973,0 Z" id="Path" stroke="#A3ACB9" stroke-width="2"></path>
+                <line x1="0" y1="4.8259" x2="37.2973" y2="4.8259" id="Path" stroke="#A3ACB9" stroke-width="2"></line>
+                <path d="M25.6003,17.2049 L25.6003,12.6904 L12.0558,12.6904 C11.2247,12.6904 10.5509,12.0166 10.5509,11.1855 L10.5509,22.4726 C10.5509,23.7194 11.5614,24.73 12.8083,24.73 L25.6003,24.73 L25.6003,20.2151 L25.6003,17.2049 Z" id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M22.5904,10.8092 L22.5904,9.6805 L12.0558,9.6805 C11.2247,9.6805 10.5509,10.3544 10.5509,11.1855 C10.5509,12.0166 11.2247,12.6904 12.0558,12.6904" id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>

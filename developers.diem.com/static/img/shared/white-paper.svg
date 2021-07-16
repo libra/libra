@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="45px" height="46px" viewBox="0 0 45 46" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 63.1 (92452) - https://sketch.com -->
+    <title>White Paper</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <circle id="path-1" cx="18" cy="18" r="18"></circle>
+    </defs>
+    <g id="Member-Portal" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Member-Portal-Mobile-Nav---Closed" transform="translate(-264.000000, -7.000000)">
+            <g id="UHF---Mobile-Default">
+                <g id="White-Paper" transform="translate(263.000000, 7.000000)">
+                    <g id="Group-3" transform="translate(6.500000, 0.000000)">
+                        <mask id="mask-2" fill="white">
+                            <use xlink:href="#path-1"></use>
+                        </mask>
+                        <use id="Oval" fill="#FAFAFA" xlink:href="#path-1"></use>
+                        <g id="Document-Illustrataion" mask="url(#mask-2)">
+                            <g transform="translate(1.550071, 5.250000)">
+                                <polygon id="Rectangle-Copy-2" fill="#706AAF" transform="translate(15.607243, 21.167488) rotate(-9.000000) translate(-15.607243, -21.167488) " points="2.51074093 4.11550067 28.6946593 4.12246665 28.7037454 38.2194757 2.51982699 38.2125097"></polygon>
+                                <polygon id="Rectangle-Copy" fill="#42318C" transform="translate(17.550373, 18.971255) rotate(-5.000000) translate(-17.550373, -18.971255) " points="4.45548033 1.92128964 30.6401596 1.92520409 30.6452654 36.0212207 4.46058612 36.0173063"></polygon>
+                                <polygon id="Rectangle" fill="#EFEFEF" points="6.39777758 0 32.5924518 0 32.5924518 34.161718 6.39777758 34.161718"></polygon>
+                                <rect id="Rectangle" fill="#AEAEAE" x="9.53630998" y="6.63920315" width="11.0452198" height="1"></rect>
+                                <rect id="Rectangle-Copy-3" fill="#AEAEAE" x="9.59666637" y="10.2605867" width="15.39088" height="1"></rect>
+                                <rect id="Rectangle-Copy-4" fill="#AEAEAE" x="9.53630998" y="11.8902093" width="19.4347583" height="1"></rect>
+                                <rect id="Rectangle-Copy-5" fill="#AEAEAE" x="9.53630998" y="13.5801883" width="8.20846935" height="1"></rect>
+                                <rect id="Rectangle-Copy-7" fill="#AEAEAE" x="9.53630998" y="17.5637101" width="7.0013415" height="1"></rect>
+                                <rect id="Rectangle-Copy-8" fill="#AEAEAE" x="9.59666637" y="19.2536891" width="15.2701672" height="1"></rect>
+                                <rect id="Rectangle-Copy-12" fill="#AEAEAE" x="9.59666637" y="24.1425569" width="15.2701672" height="1"></rect>
+                                <rect id="Rectangle-Copy-9" fill="#AEAEAE" x="9.53630998" y="20.8229553" width="8.20846935" height="1"></rect>
+                                <rect id="Rectangle-Copy-11" fill="#AEAEAE" x="9.53630998" y="22.4525779" width="12.3730604" height="1"></rect>
+                                <rect id="Rectangle-Copy-10" fill="#AEAEAE" x="19.1933327" y="20.8229553" width="9.77773554" height="1"></rect>
+                                <rect id="Rectangle-Copy-6" fill="#AEAEAE" x="19.1933327" y="13.5801883" width="8.20846935" height="1"></rect>
+                            </g>
+                        </g>
+                    </g>
+                    <text font-family="NBInternationalPro-Reg, NB International Pro" font-size="8" font-weight="normal" fill="#39298C">
+                        <tspan x="1.664" y="44">White Paper</tspan>
+                    </text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

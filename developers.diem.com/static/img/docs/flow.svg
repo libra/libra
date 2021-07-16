@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="34px" height="34px" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>E443DAAE-A1C3-4B3A-B769-78064330776A</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g id="Documentation---Wallets" transform="translate(-389.000000, -832.000000)" stroke-width="2">
+            <g id="Transaction-Workflows" transform="translate(390.000000, 833.000000)">
+                <path d="M6.0833,11.75 C9.2129,11.75 11.75,9.2129 11.75,6.0833 C11.75,2.9537 9.2129,0.41667 6.0833,0.41667 C2.9537,0.41667 0.41666,2.9537 0.41666,6.0833 C0.41666,9.2129 2.9537,11.75 6.0833,11.75 Z" id="Path" stroke="#074957" fill="#94D1BE" fill-rule="nonzero"></path>
+                <path d="M25.9167,31.5833 C29.0463,31.5833 31.5833,29.0463 31.5833,25.9167 C31.5833,22.7871 29.0463,20.25 25.9167,20.25 C22.7871,20.25 20.25,22.7871 20.25,25.9167 C20.25,29.0463 22.7871,31.5833 25.9167,31.5833 Z" id="Path" stroke="#074957" fill="#94D1BE" fill-rule="nonzero"></path>
+                <path d="M17.4167,6.0833 L23.0833,6.0833 C26.2127,6.0833 28.75,8.6206 28.75,11.75 L28.75,14.5833" id="Path" stroke="#402B91"></path>
+                <path d="M14.5833,25.9167 L8.9167,25.9167 C5.7872,25.9167 3.25,23.3794 3.25,20.25 L3.25,17.4167" id="Path" stroke="#736DB1"></path>
+                <polyline id="Path" stroke="#402B91" points="21.6667 1.8333 17.4167 6.0833 21.6667 10.3333"></polyline>
+                <polyline id="Path" stroke="#736DB1" points="10.3333 21.6667 14.5833 25.9167 10.3333 30.1667"></polyline>
+            </g>
+        </g>
+    </g>
+</svg>

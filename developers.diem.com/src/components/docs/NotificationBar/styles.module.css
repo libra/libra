@@ -1,0 +1,20 @@
+.root {
+  background-color: #F7FAFC;
+  border-radius: 8px;
+  border: 1px solid #EDEDED;
+  color: #667184;
+  font-size: 14px;
+  line-height: 24px;
+  margin: 30px 0;
+  padding: 16px 40px;
+}
+
+.root p {
+  margin: 0;
+}
+
+html[data-theme="dark"] .root {
+  background-color: var(--doc-component-background);
+  border: 0;
+  color: white;
+}

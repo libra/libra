@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="34px" viewBox="0 0 20 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Public Demo Wallet</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-439.000000, -2092.000000)">
+            <g id="Public-Demo-Wallet" transform="translate(440.000000, 2093.000000)">
+                <path d="M4.5294,29.3886 C4.9988,29.5155 5.4919,29.5833 6,29.5833 C9.1167,29.5833 11.6667,27.0333 11.6667,23.9167 L11.6667,2.6667 L11.6667,0.41666 L17.5,0.41666 L17.5,4.6667 L14.6667,4.6667 L14.6667,25.9167 C14.6667,29.0333 12.1167,31.5833 9,31.5833 C7.1886,31.5833 5.5686,30.7219 4.5294,29.3886 Z" id="Path" fill="#FFFFFF"></path>
+                <line x1="3.3333" y1="11.75" x2="7.5833" y2="11.75" id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="3.3333" y1="17.4167" x2="7.5833" y2="17.4167" id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="3.3333" y1="23.0833" x2="7.5833" y2="23.0833" id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <path d="M0.5,0.41666 L0.5,4.6667 L3.3333,4.6667 L3.3333,25.9167 C3.3333,29.0333 5.8833,31.5833 9,31.5833 C12.1167,31.5833 14.6667,29.0333 14.6667,25.9167 L14.6667,4.6667 L17.5,4.6667 L17.5,0.41666 L0.5,0.41666 Z" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>

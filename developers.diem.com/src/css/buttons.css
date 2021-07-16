@@ -1,0 +1,45 @@
+.button {
+  position: relative;
+  min-width: 5em;
+  border-radius: 5em;
+  margin: 0.5em;
+  padding: 1em;
+  text-align: center;
+  transition: all 0.2s;
+  background: transparent;
+  border-color: #5645F5;
+  color: #5645F5;
+}
+
+.promoSection .button {
+  border-color: #E7E5FD;
+  color: #E7E5FD;
+}
+
+.button:hover,
+.promoSection .button:hover {
+  background: inherit;
+  border-color: #19CDA6;
+  color: #19CDA6;
+}
+
+.button[type="submit"],
+.button.secondary,
+.docs-next,
+.docs-prev {
+  background-color: #39298C;
+  color: #fff;
+  font-weight: bold;
+}
+
+.button[type="submit"]:hover,
+.button.secondary:hover,
+.docs-next:hover,
+.docs-prev:hover {
+  background-color: #19CDA6;
+  color: #fff;
+}
+
+#back-to-top {
+  background: #39298C;
+}

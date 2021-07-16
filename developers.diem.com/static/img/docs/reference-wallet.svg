@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="30px" viewBox="0 0 32 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>C978A216-79C1-4B66-826F-70B002471F56</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Documentation---Wallets" transform="translate(-390.000000, -1017.000000)">
+            <g id="Reference-Wallet-Setup" transform="translate(391.000000, 1018.000000)">
+                <rect id="Rectangle" fill="#92B5D8" fill-rule="nonzero" x="1" y="5" width="29" height="7"></rect>
+                <line x1="0.3333" y1="5.3333" x2="29.6667" y2="5.3333" id="Path" stroke="#402B91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <path d="M0.3333,12 L29.6667,12 L29.6667,2.6667 C29.6667,1.2 28.4667,0 27,0 L20.3333,0 L3,0 C1.5333,0 0.3333,1.2 0.3333,2.6667 L0.3333,20 C0.3333,21.4667 1.5333,22.6667 3,22.6667 L11,22.6667" id="Path" stroke="#402B91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <line x1="5" y1="17.3333" x2="11" y2="17.3333" id="Path" stroke="#736DB1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <polygon id="Path" stroke="#8ECFBA" fill="#9CD5C2" fill-rule="nonzero" stroke-linecap="round" stroke-linejoin="round" points="19.6667 27.3333 16.3333 28 17 24.6667 25 16.6667 27.6667 19.3333"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

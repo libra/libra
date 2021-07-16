@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="34px" viewBox="0 0 32 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Localization</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-950.000000, -2210.000000)">
+            <g id="Localization" transform="translate(951.000000, 2211.000000)">
+                <polyline id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="10.75 23.0833 5.0833 23.0833 0.8333 31.5833 29.1667 31.5833 24.9167 23.0833 19.25 23.0833"></polyline>
+                <line x1="15" y1="16" x2="15" y2="25.9167" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <path d="M19.7917,5.2083 C19.7917,9.5116 16.3032,13 12,13 C10.6192,13 9.3223,12.6408 8.1976,12.0108 C9.531,14.3911 12.0776,16 15,16 C19.3032,16 22.7917,12.5115 22.7917,8.2083 C22.7917,5.2859 21.1828,2.7393 18.8025,1.4059 C19.4325,2.5306 19.7917,3.8275 19.7917,5.2083 Z" id="Path" fill="#FFFFFF"></path>
+                <path d="M15,16 C19.3032,16 22.7917,12.5115 22.7917,8.2083 C22.7917,3.9051 19.3032,0.41666 15,0.41666 C10.6968,0.41666 7.2083,3.9051 7.2083,8.2083 C7.2083,12.5115 10.6968,16 15,16 Z" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>

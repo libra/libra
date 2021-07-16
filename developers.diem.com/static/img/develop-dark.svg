@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="23px" height="23px" viewBox="0 0 23 23" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>E7A65398-C822-4CA8-8F38-DBCB8C690CE1@1x</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-317.000000, -1343.000000)">
+            <g id="Icon-2" transform="translate(318.000000, 1344.000000)">
+                <rect id="Rectangle" fill="#A3ACB9" x="0" y="5" width="17" height="1" rx="0.5"></rect>
+                <rect id="Rectangle" fill="#A3ACB9" transform="translate(5.500000, 8.500000) rotate(-270.000000) translate(-5.500000, -8.500000) " x="-2" y="8" width="15" height="1" rx="0.5"></rect>
+                <rect id="Rectangle" stroke="#FFFFFF" stroke-width="1.75" fill="#191F36" x="0" y="0" width="11" height="11" rx="1.76470588"></rect>
+                <rect id="Rectangle" stroke="#FFFFFF" stroke-width="1.75" fill="#191F36" opacity="0.800000012" x="10" y="10" width="11" height="11" rx="1.76470588"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

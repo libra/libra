@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="26px" height="27px" viewBox="0 0 26 27" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>4A138A2F-BA49-46AD-A3E5-903CDC317616</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-143.000000, -1136.000000)">
+            <g id="Home" transform="translate(144.000000, 1137.000000)">
+                <g id="Icon/Home">
+                    <g id="Home" transform="translate(0.000000, 0.500000)">
+                        <line x1="2.61293405" y1="21.7907388" x2="8.56395418" y2="21.7907388" id="Path-23" stroke="#A3ACB9"></line>
+                        <line x1="15.1878519" y1="21.7907388" x2="20.6974757" y2="21.7907388" id="Path-23" stroke="#A3ACB9"></line>
+                        <polygon id="Path-19" stroke="#FFFFFF" points="0 9.57591008 0 13.715322 11.8267999 4.47289961 23.5963887 13.715322 23.5963887 9.57591008 11.8267999 -5.68434189e-14"></polygon>
+                        <polyline id="Path-22" stroke="#FFFFFF" points="2.61293405 12.0463258 2.61293405 24.1737762 20.76749 24.1737762 20.76749 11.5136159"></polyline>
+                        <path d="" id="Path-25" stroke="#979797"></path>
+                    </g>
+                </g>
+                <path d="M7.13351028,7.9896241 C9.65010716,10.506221 13.7303169,10.506221 16.2469138,7.9896241 L16.2469138,7.9896241 L16.2469138,7.9896241 L11.8544993,4.54632584 L7.13351028,7.9896241 Z" id="Path-26" fill="#FFFFFF"></path>
+                <polyline id="Path-24" stroke="#FFFFFF" points="8.33540552 24.2067751 8.33540552 15.2067751 15.3354055 15.2067751 15.3354055 24.2067751"></polyline>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="22px" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 63.1 (92452) - https://sketch.com -->
+    <title>Chevron Down</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Member-Portal" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Member-Portal-Mobile-Nav---Closed" transform="translate(-279.000000, -79.000000)">
+            <g id="Chevron-Down" transform="translate(279.000000, 79.000000)">
+                <circle id="Oval" fill="#D8D8D8" opacity="0.0145554315" cx="11" cy="11" r="11"></circle>
+                <path d="M11.2656124,13.8687514 L15.8906014,9.2812684 C16.0374822,9.13438765 16.0374822,8.89690042 15.8906014,8.75001967 L15.271859,8.13127725 C15.1249782,7.98439649 14.887491,7.98439649 14.7406103,8.13127725 L10.9999881,11.8343934 L7.25936589,8.13127725 C7.11248514,7.98439649 6.87499791,7.98439649 6.72811716,8.13127725 L6.10937474,8.75001967 C5.96249399,8.89690042 5.96249399,9.13438765 6.10937474,9.2812684 L10.7343637,13.8687514 C10.8812445,14.0156321 11.1187317,14.0156321 11.2656124,13.8687514 Z" fill="#354052" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>

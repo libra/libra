@@ -1,0 +1,77 @@
+.root {
+  --transition-speed: .25s;
+  background-color: var(--doc-component-background);
+  display: inline-block;
+  overflow: hidden;
+  position: relative;
+}
+
+.contents {
+  align-items: center;
+  display: inline-flex;
+  height: 100%;
+  padding:
+    calc( 47px + var(--border-width) )
+    calc( 14px + var(--border-width) );
+}
+
+.circleOverlay {
+  background-color: rgba(30,72,85,0.1);
+  border-top-right-radius: 50%;
+  border-bottom-right-radius: 50%;
+  height: 263px;
+  left: -184px;
+  opacity: .3;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: background-color var(--transition-speed) ease-in-out;
+  width: 263px;
+}
+
+.root:hover .circleOverlay {
+  background-color: var(--overlay-card-hover);
+}
+
+.image {
+  --image-size: 45px;
+  background-repeat: no-repeat;
+  background-size: var(--image-size) var(--image-size);
+  flex-shrink: 0;
+  height: var(--image-size);
+  margin-right: 29px;
+  width: var(--image-size);
+  z-index: var(--z-just-above);
+}
+
+.textContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.title {
+  font-size: 14px;
+  line-height: 16px;
+  margin: 0;
+}
+
+.description {
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 16px;
+  margin: 0;
+  margin-top: 2px;
+}
+
+html {
+  --overlay-card-hover: #8ecfba;
+}
+
+html[data-theme='dark'] {
+  --overlay-card-hover: inherit;
+}
+
+html[data-theme='dark'] .circleOverlay {
+  transition: none;
+}

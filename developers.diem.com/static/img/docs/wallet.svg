@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="31px" height="32px" viewBox="0 0 31 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>FE4C7883-C2E6-4D56-99EC-35E46A0B99CD</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Documentation---Wallets" transform="translate(-390.000000, -732.000000)">
+            <g id="Introduction-to-Wallets" transform="translate(391.000000, 733.000000)">
+                <path d="M5.6667,3 L3,3 C1.5273,3 0.3333,4.194 0.3333,5.6667 C0.3333,7.1393 1.5273,8.3333 3,8.3333" id="Path" stroke="#402B91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M17.9926,24 L0,24 L0,25.3559 C0,27.921 1.7459,30 3.9,30 L26,30 L25.3523,28.7953 C23.7458,25.8074 20.9718,24 17.9926,24 Z" id="Path" fill="#92B5D8"></path>
+                <polyline id="Path" stroke="#8ECFBA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="5.6667 8.3333 5.6667 0.3333 24.3333 0.3333 24.3333 8.3333"></polyline>
+                <path d="M27,16.3327 L27,8.3333 L3,8.3333 C1.5273,8.3333 0.3333,7.1393 0.3333,5.6667 L0.3333,25.6667 C0.3333,27.876 2.124,29.6667 4.3333,29.6667 L27,29.6667 L27,21.6667" id="Path" stroke="#402B91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M29.6667,21.6667 L23.6667,21.6667 C22.194,21.6667 21,20.4727 21,19 C21,17.5273 22.194,16.3333 23.6667,16.3333 L29.6667,16.3333 L29.6667,21.6667 Z" id="Path" fill="#736DB1" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>

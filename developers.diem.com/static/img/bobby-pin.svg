@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>25B58094-6B3B-46E8-BE5A-F00CF92DF80F</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-248.000000, -625.000000)" stroke-width="3">
+            <g id="Icon/Test-Transaction" transform="translate(248.000000, 625.000000)">
+                <g id="Move" transform="translate(5.000000, 6.000000)">
+                    <polygon id="Rectangle" stroke="#92B5D8" points="20.5944312 3 46 29.4055804 28.4055688 45 3 20.5944196"></polygon>
+                    <circle id="Oval" stroke="#8ECFBA" fill="#42318C" cx="12.5" cy="12.5" r="12.5"></circle>
+                    <circle id="Oval-Copy-2" stroke="#8ECFBA" fill="#42318C" cx="37" cy="37" r="12"></circle>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="50px" height="50px" viewBox="0 0 50 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Tutorial Icons/Get Started/Run a Local Network Darkmode</title>
+    <g id="Tutorial-Icons/Get-Started/Run-a-Local-Network-Darkmode" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-13" transform="translate(8.080196, 6.576213)" stroke="#A3ACB9" stroke-width="2">
+            <g id="Group-8-Copy">
+                <ellipse id="Oval" cx="16.9198041" cy="18.3896686" rx="16.2291999" ry="16.0355181"></ellipse>
+                <ellipse id="Oval" fill="#EEEFF0" cx="16.9198041" cy="2.01296929" rx="1.72651062" ry="1.70590618"></ellipse>
+                <ellipse id="Oval" fill="#EEEFF0" cx="16.9198041" cy="34.7663679" rx="1.72651062" ry="1.70590618"></ellipse>
+                <ellipse id="Oval" fill="#EEEFF0" transform="translate(31.254241, 9.994385) rotate(-300.000000) translate(-31.254241, -9.994385) " cx="31.2542413" cy="9.9943851" rx="1.82267329" ry="1.83364725"></ellipse>
+                <ellipse id="Oval" fill="#EEEFF0" transform="translate(2.585367, 26.348833) rotate(-300.000000) translate(-2.585367, -26.348833) " cx="2.58536697" cy="26.3488334" rx="1.82267329" ry="1.83364725"></ellipse>
+                <ellipse id="Oval" fill="#EEEFF0" transform="translate(31.254241, 26.348833) rotate(-240.000000) translate(-31.254241, -26.348833) " cx="31.2542413" cy="26.3488334" rx="1.82267329" ry="1.83364725"></ellipse>
+                <ellipse id="Oval" fill="#EEEFF0" transform="translate(2.585367, 9.994385) rotate(-240.000000) translate(-2.585367, -9.994385) " cx="2.58536697" cy="9.9943851" rx="1.82267329" ry="1.83364725"></ellipse>
+            </g>
+        </g>
+        <g id="pin-3" transform="translate(18.500000, 16.500000)" stroke="#EEEFF0" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+            <path d="M12.6511628,6.3255814 C12.6511628,10.6744186 6.3255814,17 6.3255814,17 C6.3255814,17 0,10.6744186 0,6.3255814 C0,2.32267442 3.26874419,0 6.3255814,0 C9.3824186,0 12.6511628,2.32267442 12.6511628,6.3255814 Z" id="Path"></path>
+            <circle id="Oval" cx="6.3255814" cy="6.3255814" r="1.97674419"></circle>
+        </g>
+    </g>
+</svg>

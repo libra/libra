@@ -1,0 +1,46 @@
+{
+  "name": "Diem-Documentation",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "NODE_ENV=production docusaurus build",
+    "build-staging": "SEGMENT=staging docusaurus build",
+    "serve": "docusaurus serve",
+    "start": "docusaurus start",
+    "start-with-ada": "TEST_ADA=1 docusaurus start",
+    "swizzle": "docusaurus swizzle",
+    "deploy-staging": "npm run build-staging && npx now"
+  },
+  "dependencies": {
+    "@docusaurus/core": "^2.0.0-alpha.70",
+    "@docusaurus/plugin-client-redirects": "^2.0.0-alpha.70",
+    "@docusaurus/preset-classic": "^2.0.0-alpha.70",
+    "@libra-opensource/diem-cli": "^0.8.1",
+    "@libra-opensource/diem-docusaurus-components": "0.1.19",
+    "@svgr/webpack": "^5.4.0",
+    "bootstrap": "^4.5.3",
+    "classnames": "^2.2.6",
+    "object-assign-deep": "^0.4.0",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
+    "valid-url": "^1.0.9"
+  },
+  "resolutions": {
+    "terser": "4.8.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "react-axe": "^3.4.1"
+  }
+}

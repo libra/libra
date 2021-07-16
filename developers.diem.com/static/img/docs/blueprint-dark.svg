@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="34px" height="31px" viewBox="0 0 34 31" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Wallet Architecture</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-693.000000, -1611.000000)">
+            <g id="Wallet-Architecture" transform="translate(694.000000, 1612.000000)">
+                <polyline id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="10.3334 21.6667 10.3334 24.5 21.6667 24.5 21.6667 8.9167 4.6667 8.9167 4.6667 24.5"></polyline>
+                <path d="M29,4 C29,2 28,2 28,1.5 L30,1.5 L31.5,4 L31.5,21.5 L29,21 C28.8333,20.6667 29,6 29,4 Z" id="Path" fill="#A3ACB9" fill-rule="nonzero"></path>
+                <polyline id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="13.875 8.9167 13.875 16 10.3333 16"></polyline>
+                <path d="M31.5834,24.5 L31.5834,4.6667 C31.5834,3.5395 31.1356,2.4585 30.3386,1.6615 C29.5415,0.86443 28.4605,0.41667 27.3334,0.41667 L25.9167,0.41667 L25.9167,20.25 L27.3334,20.25 C28.4605,20.25 29.5415,20.6978 30.3386,21.4948 C31.1356,22.2918 31.5834,23.3728 31.5834,24.5 Z M31.5834,24.5 C31.5834,25.6272 31.1356,26.7082 30.3386,27.5052 C29.5415,28.3022 28.4605,28.75 27.3334,28.75 L0.41669,28.75 L0.41669,4.6667 L22.375,4.6667" id="Shape" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>

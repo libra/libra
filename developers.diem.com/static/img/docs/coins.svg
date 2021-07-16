@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="34px" viewBox="0 0 32 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>E331E93C-B320-41CB-8BF6-102650B28E40</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Documentation---Wallets" transform="translate(-910.000000, -730.000000)">
+            <g id="Liquidity" transform="translate(911.000000, 731.000000)">
+                <path d="M7.5,8 C3,4.5 16,5.5 16,5.5 L16,10 L13.5,12.5 L13.5,26.5 L9,27.5 C9,27.5 12,11.5 7.5,8 Z" id="Path" fill="#8AB5DC" fill-rule="nonzero"></path>
+                <path d="M8.625,7.5 C12.9282,7.5 16.4167,5.9143 16.4167,3.9583 C16.4167,2.0023 12.9282,0.41667 8.625,0.41667 C4.3218,0.41667 0.8333,2.0023 0.8333,3.9583 C0.8333,5.9143 4.3218,7.5 8.625,7.5 Z" id="Path" stroke="#402B91" stroke-width="2" fill="#92B5D8" fill-rule="nonzero" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M16.4167,3.9583 L16.4167,8.9167 C16.4167,10.8724 12.9281,12.4583 8.625,12.4583 C4.3219,12.4583 0.8333,10.8724 0.8333,8.9167 L0.8333,3.9583" id="Path" stroke="#402B91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M13.5833,16.607 C12.2361,17.1128 10.5085,17.4167 8.625,17.4167 C4.3219,17.4167 0.8333,15.8307 0.8333,13.875 L0.8333,8.9167" id="Path" stroke="#402B91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M13.5826,21.5654 C12.2361,22.0711 10.5085,22.375 8.625,22.375 C4.3219,22.375 0.8333,20.789 0.8333,18.8333 L0.8333,13.875" id="Path" stroke="#402B91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M13.5833,26.5237 C12.2361,27.0295 10.5085,27.3333 8.625,27.3333 C4.3219,27.3333 0.8333,25.7474 0.8333,23.7917 L0.8333,18.8333" id="Path" stroke="#402B91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M21.375,16.7083 C25.6782,16.7083 29.1667,15.1227 29.1667,13.1667 C29.1667,11.2107 25.6782,9.625 21.375,9.625 C17.0718,9.625 13.5833,11.2107 13.5833,13.1667 C13.5833,15.1227 17.0718,16.7083 21.375,16.7083 Z" id="Path" stroke="#074957" stroke-width="2" fill="#94D1BE" fill-rule="nonzero" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M29.1667,13.1667 L29.1667,18.125 C29.1667,20.0807 25.6781,21.6667 21.375,21.6667 C17.0719,21.6667 13.5833,20.0807 13.5833,18.125 L13.5833,13.1667" id="Path" stroke="#074957" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M29.1667,18.125 L29.1667,23.0833 C29.1667,25.039 25.6781,26.625 21.375,26.625 C17.0719,26.625 13.5833,25.039 13.5833,23.0833 L13.5833,18.125" id="Path" stroke="#074957" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M29.1667,23.0833 L29.1667,28.0417 C29.1667,29.9974 25.6781,31.5833 21.375,31.5833 C17.0719,31.5833 13.5833,29.9974 13.5833,28.0417 L13.5833,23.0833" id="Path" stroke="#074957" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>

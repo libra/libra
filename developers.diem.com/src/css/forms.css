@@ -1,0 +1,258 @@
+/* Form CSS */
+
+/**
+ * Main containers and layouts
+ */
+.formPage {
+  padding-top: 0;
+  position: relative;
+}
+
+.formPage .formWrapper {
+  width: 800px;
+  margin: 0 auto;
+}
+
+
+/**
+ * Typography
+ *
+ * FIXME: There should be some consistency throughout the site.
+ * Change this to be consistent.
+ */
+.formHero h1,
+.formHero h2 {
+  text-align: center;
+  color: #fff;
+}
+
+
+/**
+ * Background images
+ */
+.formBgImage {
+  position: absolute;
+  z-index: -1;
+}
+
+.formBgImage.formIcon {
+  right: 1em;
+}
+
+.formBgImage.bgCircleBottom {
+  bottom: 0;
+}
+
+.formBgImage.bgCircleLeft {
+  top: 10em;
+}
+
+.formBgImage.bgCircleRight {
+  right: 5em;
+  top: 60%;
+}
+
+
+/**
+ * Form
+ */
+.formPage form {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.6;
+}
+
+.formPage form .inputGroup {
+  width: 50%;
+  margin-bottom: 1em;
+  display: inline-block;
+  vertical-align: top;
+  height: auto;
+}
+
+.formPage form .inputGroup.hidden {
+  display: none;
+}
+
+.formPage form .formControlGroup {
+  margin: 1.5em 0 0 11em;
+}
+
+.formPage form .button.right {
+  float: right;
+}
+
+.formPage form fieldset {
+  border: none;
+  padding: 0;
+}
+
+.formPage form legend {
+  font-size: 1.5rem;
+  margin-bottom: 0.75em;
+}
+
+.formPage form label {
+  color: var(--accent-highlight);
+  font-weight: bold;
+  width: 95%;
+  font-size: 0.8em;
+  text-align: left;
+  display: inline-block;
+  vertical-align: middle;
+  display: block;
+}
+
+form label.required:after {
+  content: " *";
+}
+
+.formPage form input,
+.formPage form textarea,
+.formPage form select {
+  background: #F3F4FB;
+  display: block;
+  margin: .25em 1em .25em 0;
+  width: 95%;
+  padding: 0.75em;
+  display: inline-block;
+  border: 1px solid #E1E4E7;
+  border-radius: 4px;
+  vertical-align: middle;
+  box-sizing: border-box;
+  line-height: normal;
+  font-size: 1em;
+  transition: all 0.2s;
+}
+
+.formPage form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.formPage form input::placeholder,
+.formPage form textarea::placeholder,
+.formPage form select::placeholder {
+  font-size: 0.9em;
+}
+
+.formPage form input:focus,
+.formPage form textarea:focus,
+.formPage form select:focus {
+  outline: none !important;
+  border-color: #39298C;
+  border: 1px solid #39298C;
+}
+
+/* Customizing the select and adding a chevron for dropdown */
+.formPage form .selectWrapper {
+  position: relative;
+}
+
+.formPage form .selectWrapper::after {
+  border-style: solid;
+  border-width: 0.1em 0.1em 0 0;
+  content: '';
+  display: inline-block;
+  height: 0.35em;
+  width: 0.35em;
+  position: relative;
+  vertical-align: top;
+  -webkit-transform: rotate(135deg);
+          transform: rotate(135deg);
+  left: 90%;
+  top: -2em;
+}
+
+.formPage form .selectWrapper.selectMulti::after {
+  display: none;
+}
+
+.formPage form select {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.formPage form select::-ms-expand {
+  display: none;
+}
+
+@media (max-width: 800px) {
+  .formPage .formWrapper,
+  .formPage form .inputGroup,
+  .formPage form input,
+  .formPage form textarea,
+  .formPage form select {
+    width: 100%;
+  }
+
+  .formPage form .selectWrapper::after {
+    left: 95%;
+    top: -2em;
+  }
+}
+
+/** V2 additions */
+.formHero {
+  background-image: url('/img/hero.jpg');
+  background-size: cover;
+  padding: 4rem 0;
+}
+
+.post {
+  padding: 30px var(--body-horizontal-padding);
+}
+
+#columnContainer {
+  display: flex;
+  padding: 2rem 0;
+}
+
+.formWrapper {
+  padding: 3rem 0;
+}
+
+#columnContainer > div {
+  padding: 0 5px;
+  flex: 1;
+}
+
+.button {
+  border: 1px solid var(--accent-highlight);
+  color: var(--accent-highlight);
+}
+
+.button:hover {
+  color: inherit;
+}
+
+.button.secondary {
+  border: 1px solid var(--brand-color);
+  color: var(--brand-color);
+}
+
+.button.secondary:hover {
+  background-color: var(--brand-color);
+  color: white;
+}
+
+.postContainer {
+  padding: 28px;
+}
+
+.formWrapper option {
+  min-width: fit-content;
+}
+
+@media (max-width: 800px) {
+  #columnContainer {
+    flex-direction: column;
+    padding: 0 0 25px 0;
+  }
+
+  #columnContainer > div {
+    padding: 0;
+  }
+}
+/* End */

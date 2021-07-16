@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Risk</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-433.000000, -1984.000000)">
+            <g id="Risk" transform="translate(434.000000, 1985.000000)">
+                <polyline id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="0.8333 6.5 15 12.875 29.1667 6.5"></polyline>
+                <line x1="15" y1="12.875" x2="15" y2="29.875" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <path d="M4.7292,14.6458 C5.5116,14.6458 6.1458,13.853 6.1458,12.875 C6.1458,11.897 5.5116,11.1042 4.7292,11.1042 C3.9468,11.1042 3.3125,11.897 3.3125,12.875 C3.3125,13.853 3.9468,14.6458 4.7292,14.6458 Z" id="Path" fill="#FFFFFF" fill-rule="nonzero"></path>
+                <path d="M11.1042,25.2708 C11.8866,25.2708 12.5208,24.478 12.5208,23.5 C12.5208,22.522 11.8866,21.7292 11.1042,21.7292 C10.3218,21.7292 9.6875,22.522 9.6875,23.5 C9.6875,24.478 10.3218,25.2708 11.1042,25.2708 Z" id="Path" fill="#FFFFFF" fill-rule="nonzero"></path>
+                <path d="M7.9167,19.9583 C8.6991,19.9583 9.3333,19.1655 9.3333,18.1875 C9.3333,17.2095 8.6991,16.4167 7.9167,16.4167 C7.1343,16.4167 6.5,17.2095 6.5,18.1875 C6.5,19.1655 7.1343,19.9583 7.9167,19.9583 Z" id="Path" fill="#FFFFFF" fill-rule="nonzero"></path>
+                <path d="M22.0834,19.9583 C22.8658,19.9583 23.5,19.1655 23.5,18.1875 C23.5,17.2095 22.8658,16.4167 22.0834,16.4167 C21.3009,16.4167 20.6667,17.2095 20.6667,18.1875 C20.6667,19.1655 21.3009,19.9583 22.0834,19.9583 Z" id="Path" fill="#FFFFFF" fill-rule="nonzero"></path>
+                <path d="M11.1042,7.5625 C12.0822,7.5625 12.875,7.0868 12.875,6.5 C12.875,5.9132 12.0822,5.4375 11.1042,5.4375 C10.1262,5.4375 9.3333,5.9132 9.3333,6.5 C9.3333,7.0868 10.1262,7.5625 11.1042,7.5625 Z" id="Path" fill="#FFFFFF" fill-rule="nonzero"></path>
+                <path d="M18.8958,7.5625 C19.8738,7.5625 20.6667,7.0868 20.6667,6.5 C20.6667,5.9132 19.8738,5.4375 18.8958,5.4375 C17.9178,5.4375 17.125,5.9132 17.125,6.5 C17.125,7.0868 17.9178,7.5625 18.8958,7.5625 Z" id="Path" fill="#FFFFFF" fill-rule="nonzero"></path>
+                <polygon id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="29.1667 23.5 15 29.875 0.8333 23.5 0.8333 6.5 15 0.125 29.1667 6.5"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

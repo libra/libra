@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="50px" height="50px" viewBox="0 0 50 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Tutorial Icons/Diem Reference Wallet/Mobile Darkmode</title>
+    <g id="Tutorial-Icons/Diem-Reference-Wallet/Mobile-Darkmode" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-29" transform="translate(12.500000, 6.500000)">
+            <path d="M3,31.8372093 L21.1304348,31.8372093 C22.787289,31.8372093 24.1304348,33.1803551 24.1304348,34.8372093 L24.1304348,34.8372093 L24.1304348,34.8372093 L0,34.8372093 C-2.02906125e-16,33.1803551 1.34314575,31.8372093 3,31.8372093 Z" id="Rectangle" fill="#A3ACB9" transform="translate(12.065217, 33.337209) scale(1, -1) translate(-12.065217, -33.337209) "></path>
+            <line x1="0" y1="5.37225021" x2="24.1304348" y2="5.37225021" id="Path-7" stroke="#A3ACB9" stroke-width="2"></line>
+            <line x1="9.67216231" y1="2.66034277" x2="14.4582725" y2="2.66034277" id="Path-7" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="0" y1="31.7717391" x2="24.1304348" y2="31.7717391" id="Path-7" stroke="#A3ACB9" stroke-width="2"></line>
+            <rect id="Rectangle" stroke="#A3ACB9" stroke-width="2" x="-3.16191517e-13" y="3.55271368e-15" width="24.1304348" height="37" rx="3"></rect>
+        </g>
+        <g id="wallet-43" transform="translate(16.902218, 17.000000)" stroke="#EEEFF0" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+            <path d="M15.0494674,7.52435745 L15.0494674,3.00989347 L1.50494674,3.00989347 C0.673839901,3.00989347 0,2.33605357 0,1.50494674 L0,12.7920473 C0,14.0388956 1.01057173,15.0494674 2.2574201,15.0494674 L15.0494674,15.0494674 L15.0494674,10.5346272 L15.0494674,7.52435745 Z" id="Path"></path>
+            <path d="M12.0395739,1.12871005 L12.0395739,0 L1.50494674,0 C0.673839901,0 0,0.673839901 0,1.50494674 L0,1.50494674 C0,2.33605357 0.673839901,3.00989347 1.50494674,3.00989347" id="Path"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,57 @@
+@value large-desktop-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value desktop-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value larget-tablet-breakpoint-size from '~diem-docusaurus-components/src/variables.module.css';
+
+.docItemContainer {
+  margin: 0 auto;
+  overflow: hidden;
+  padding:
+    var(--doc-padding-top)
+    var(--doc-padding-right)
+    var(--doc-padding-bottom)
+    var(--doc-padding-left);
+}
+
+.docItemContainer.wider {
+  --doc-padding-left: 35px;
+  --doc-padding-right: 25px;
+}
+
+.docItemWrapper {
+  color: var(--doc-primary);
+  display: flex;
+  padding: 0;
+}
+
+.fullWidthContent {
+  max-width: 100% !important;
+}
+
+.docItemWrapper article {
+  margin-bottom: 55px;
+}
+
+.community {
+  color: var(--doc-secondary-color);
+  display: block;
+  font-size: 15px;
+}
+
+.community a {
+  color: var(--accent-highlight) !important;
+}
+
+@media only screen and (max-width: calc(large-tablet-breakpoint-size * 1px)) {
+  .docTitle {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+}
+
+html {
+  --doc-primary: #15112C;
+}
+
+html[data-theme='dark'] {
+  --doc-primary: white;
+}

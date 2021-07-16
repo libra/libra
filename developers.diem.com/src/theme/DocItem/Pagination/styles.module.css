@@ -1,0 +1,51 @@
+.pagination {
+  display: flex;
+  font-size: 14px;
+  padding-top: 80px;
+  padding-bottom: 20px;
+}
+
+.pagination > a {
+  align-items: center;
+  display: flex;
+}
+
+.pagination > a:hover {
+  text-decoration: none;
+}
+
+.pagination > a:hover:not(.disabled) span,
+.pagination > a:hover:not(.disabled) use {
+  opacity: .875;
+  fill-opacity: .7;
+}
+
+.previous {
+  padding-right: 20px;
+}
+
+.previous svg, .next span {
+  margin-right: 10px;
+}
+
+.pagination span,
+.pagination use {
+  color: var(--pagination-enabled);
+  fill: var(--pagination-enabled);
+}
+
+.disabled span,
+.disabled use {
+  color: var(--pagination-disabled);
+  fill: var(--pagination-disabled);
+}
+
+html {
+  --pagination-disabled: var(--light-gray-1);
+  --pagination-enabled: var(--gray-5);
+}
+
+html[data-theme='dark'] {
+  --pagination-disabled: var(--gray-4);
+  --pagination-enabled: var(--light-gray-1);
+}

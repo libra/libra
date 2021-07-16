@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="22px" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 63.1 (92452) - https://sketch.com -->
+    <title>Chevron Pressed</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Member-Portal" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Member-Portal-Mobile-Nav---Secondary-Open" transform="translate(-279.000000, -79.000000)">
+            <g id="Chevron-Pressed" transform="translate(279.000000, 79.000000)">
+                <circle id="Oval" fill="#D8D8D8" opacity="0.300000012" cx="11" cy="11" r="11"></circle>
+                <path d="M7.25936589,13.8687514 L10.9999881,10.1656352 L14.7406103,13.8687514 C14.887491,14.0156321 15.1249782,14.0156321 15.271859,13.8687514 L15.8906014,13.2500089 C16.0374822,13.1031282 16.0374822,12.865641 15.8906014,12.7187602 L11.2656124,8.13127725 C11.1187317,7.98439649 10.8812445,7.98439649 10.7343637,8.13127725 L6.10937474,12.7187602 C5.96249399,12.865641 5.96249399,13.1031282 6.10937474,13.2500089 L6.72811716,13.8687514 C6.87499791,14.0156321 7.11248514,14.0156321 7.25936589,13.8687514 Z" id="" fill="#354052" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>

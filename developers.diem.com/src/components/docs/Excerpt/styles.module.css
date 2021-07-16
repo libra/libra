@@ -1,0 +1,61 @@
+@value large-tablet-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value desktop-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+
+.root {
+  --text-color: #354052;
+  color: var(--text-color);
+  box-shadow: 0 6px 15px 0 rgba(0,0,0,0.15);
+  border-radius: 5px;
+  margin-bottom: 25px;
+  padding: 30px 0;
+  background-color: #FFFFFF;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 20px;
+}
+
+.imageContainer {
+  align-items: flex-start;
+  display: flex;
+  flex-shrink: 0;
+  padding-right: 25px;
+  margin-bottom: 20px;
+}
+
+.image {
+  width: 125px;
+}
+
+.text {
+  margin: 0;
+}
+
+.text p {
+  margin-bottom: 0px;
+}
+
+@media large-tablet-breakpoint-query {
+  .content {
+    flex-direction: row;
+  }
+}
+
+@media desktop-breakpoint-query {
+  .content {
+    margin: 0 30px 0 50px;
+  }
+
+  .imageContainer {
+    padding-right: 50px;
+    margin-bottom: 0;
+  }
+}
+
+html[data-theme="dark"] .root {
+  --text-color: var(--doc-primary);
+  background-color: #3C4357;
+}

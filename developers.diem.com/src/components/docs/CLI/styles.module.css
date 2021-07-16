@@ -1,0 +1,47 @@
+/* Because the CLI classes are contained in an external dependency,
+ * we use a global stylesheet to style it. However, for media queries,
+ * we still need to use a css module file to import the variables
+ */
+@value mobile-breakpoint-max-query from '~diem-docusaurus-components/src/variables.module.css';
+@value medium-tablet-breakpoint-max-query from '~diem-docusaurus-components/src/variables.module.css';
+@value large-tablet-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value desktop-breakpoint-max-query from '~diem-docusaurus-components/src/variables.module.css';
+
+@media mobile-breakpoint-max-query {
+  :global(.cli) > div {
+    flex-basis: 100% !important;
+    margin-bottom: 15px;
+  }
+
+  :global(.cli) :global(.commands-container) {
+    margin-top: 0px !important;
+  }
+}
+
+@media large-tablet-breakpoint-query and desktop-breakpoint-max-query {
+  :global(.cli) :global(.commands) {
+    display: grid;
+    grid-template-columns: 50% 50%;
+  }
+}
+
+@media large-tablet-breakpoint-query and desktop-breakpoint-max-query,
+medium-tablet-breakpoint-max-query {
+  :global(.cli) {
+    flex-wrap: wrap;
+  }
+
+  :global(.cli) :global(.tutorial) {
+    flex-basis: 30%;
+  }
+
+  :global(.cli) :global(.terminal-container) {
+    flex-basis: 65%;
+  }
+
+  :global(.cli) :global(.commands-container) {
+    flex-basis: 100%;
+    margin-top: 30px;
+    margin-left: 0;
+  }
+}

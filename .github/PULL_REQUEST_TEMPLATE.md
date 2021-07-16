@@ -18,7 +18,7 @@ The project is undergoing daily changes. Pull Requests will be reviewed and resp
 
 ## Related PRs
 
-(If this PR adds or changes functionality, please take some time to update or suggest changes to the docs at https://developers.diem.com, and link to your PR here.)
+(If this PR adds or changes functionality, please take some time to update the docs at https://github.com/diem/diem/tree/main/developers.diem.com, and link to your PR here.)
 
 ## If targeting a release branch, please fill the below out as well
 

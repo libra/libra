@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="27px" height="39px" viewBox="0 0 27 39" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Local Mobile Wallet</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-956.000000, -2103.000000)">
+            <g id="Local-Mobile-Wallet" transform="translate(957.000000, 2104.000000)">
+                <path d="M3,34.8372 L21.1304,34.8372 C22.7873,34.8372 24.1304,33.4941 24.1304,31.8372 L0,31.8372 C0,33.4941 1.3431,34.8372 3,34.8372 Z" id="Path" fill="#FFFFFF"></path>
+                <line x1="0" y1="5.3723" x2="24.1304" y2="5.3723" id="Path" stroke="#A3ACB9" stroke-width="2"></line>
+                <line x1="9.6721" y1="2.66034" x2="14.4583" y2="2.66034" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round"></line>
+                <line x1="0" y1="31.7717" x2="24.1304" y2="31.7717" id="Path" stroke="#A3ACB9" stroke-width="2"></line>
+                <path d="M21.1304,0 L3,0 C1.3431,0 0,1.34315 0,3 L0,34 C0,35.6569 1.3431,37 3,37 L21.1304,37 C22.7873,37 24.1304,35.6569 24.1304,34 L24.1304,3 C24.1304,1.34315 22.7873,0 21.1304,0 Z" id="Path" stroke="#A3ACB9" stroke-width="2"></path>
+                <path d="M19.4517,18.0244 L19.4517,13.5099 L5.9072,13.5099 C5.0761,13.5099 4.4022,12.8361 4.4022,12.0049 L4.4022,23.292 C4.4022,24.5389 5.4128,25.5495 6.6596,25.5495 L19.4517,25.5495 L19.4517,21.0346 L19.4517,18.0244 Z" id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M16.4418,11.6287 L16.4418,10.5 L5.9072,10.5 C5.0761,10.5 4.4022,11.1738 4.4022,12.0049 C4.4022,12.8361 5.0761,13.5099 5.9072,13.5099" id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>

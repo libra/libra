@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="30px" viewBox="0 0 32 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Wallet Administration Dashboard</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g id="Icons" transform="translate(-690.000000, -1845.000000)" stroke-width="2">
+            <g id="Wallet-Administration-Dashboard" transform="translate(691.000000, 1846.000000)">
+                <polygon id="Path" stroke="#A3ACB9" points="29.6667 0.6667 0.3333 0.6667 0.3333 27.3333 29.6667 27.3333"></polygon>
+                <line x1="9.6667" y1="0.6667" x2="9.6667" y2="27.3333" id="Path" stroke="#A3ACB9"></line>
+                <line x1="4.3333" y1="6" x2="5.6667" y2="6" id="Path" stroke="#FFFFFF"></line>
+                <line x1="4.3333" y1="10" x2="5.6667" y2="10" id="Path" stroke="#FFFFFF"></line>
+                <line x1="4.3333" y1="14" x2="5.6667" y2="14" id="Path" stroke="#FFFFFF"></line>
+                <line x1="4.3333" y1="18" x2="5.6667" y2="18" id="Path" stroke="#FFFFFF"></line>
+                <line x1="14.3333" y1="6" x2="17" y2="6" id="Path" stroke="#A3ACB9"></line>
+                <line x1="17" y1="10" x2="20.3333" y2="10" id="Path" stroke="#A3ACB9"></line>
+                <line x1="18.3333" y1="14" x2="25" y2="14" id="Path" stroke="#A3ACB9"></line>
+                <line x1="17" y1="18" x2="20.3333" y2="18" id="Path" stroke="#A3ACB9"></line>
+                <line x1="14.3333" y1="22" x2="17" y2="22" id="Path" stroke="#A3ACB9"></line>
+            </g>
+        </g>
+    </g>
+</svg>

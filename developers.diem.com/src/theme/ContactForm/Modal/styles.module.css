@@ -1,0 +1,71 @@
+:global(.modal) {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0,0,0,0.4);
+  z-index: -9999;
+
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s, visibility 0.5s;
+}
+
+.outer {
+  display: block;
+  position: fixed;
+  top: 25%;
+  left: 50%;
+  width: 80%;
+  max-width: 400px;
+  -webkit-transform: translate(-50%, -25%);
+          transform: translate(-50%, -25%);
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+
+  opacity: 0;
+  visibility: hidden;
+  transition-delay: 0.2s;
+  transition: all 0.2s;
+}
+
+.outer .inner {
+  padding: 2rem;
+  text-align: center;
+}
+
+.outer h2 {
+  color: #000;
+  font-size: 22px;
+}
+
+.outer p {
+  color: #8E9AA3;
+}
+
+.outer img {
+  padding-top: 1rem;
+}
+
+
+:global(.modal.visible) {
+  opacity: 1;
+  visibility: visible;
+  z-index: 9999;
+  transition: opacity 0.5s, visibility 0.5s;
+}
+
+:global(.modal.visible) .outer {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0.2s;
+  transition: all 0.2s;
+}
+
+:global(.modal .buttonWrapper .button:not(:first-child)) {
+  margin-top: 15px;
+}

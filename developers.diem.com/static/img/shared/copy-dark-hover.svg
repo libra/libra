@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="25px" viewBox="0 0 22 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>7666CE3F-7FB9-40EC-B2D2-2FBC17775C85@2x</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g id="Icons" transform="translate(-377.000000, -1230.000000)" stroke-width="1.75">
+            <g id="Document-Icon" transform="translate(378.000000, 1231.000000)">
+                <rect id="Rectangle" stroke="rgba(181,181,181,0.6)" x="0.16" y="4" width="16" height="19"></rect>
+                <polyline id="Path" stroke="rgba(114,114,114,0.6)" points="3 0 20 0 20 20"></polyline>
+                <line x1="4" y1="12.5" x2="12" y2="12.5" id="Path" stroke="rgba(255,255,255,0.6)"></line>
+                <line x1="4" y1="8.5" x2="12" y2="8.5" id="Path" stroke="rgba(255,255,255,0.6)"></line>
+                <line x1="4" y1="16.5" x2="8" y2="16.5" id="Path" stroke="rgba(255,255,255,0.6)"></line>
+            </g>
+        </g>
+    </g>
+</svg>

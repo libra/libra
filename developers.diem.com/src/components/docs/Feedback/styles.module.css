@@ -1,0 +1,34 @@
+.root {
+  --feedback-color: var(--gray-6);
+}
+
+.root span,
+.root a {
+  margin-right: 12px;
+}
+
+.root span {
+  color: var(--feedback-color);
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.root a {
+  cursor: pointer;
+}
+
+.root svg {
+  width: 14px;
+}
+
+.root svg:hover path {
+  fill-opacity: var(--default-hover-opacity);
+}
+
+html[data-theme="dark"] .root {
+  --feedback-color: var(--gray-2);
+}
+
+html[data-theme="dark"] .root path {
+  fill: var(--feedback-color);
+}

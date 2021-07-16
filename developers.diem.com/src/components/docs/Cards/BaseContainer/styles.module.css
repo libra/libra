@@ -1,0 +1,86 @@
+@value small-tablet-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+
+.root {
+  --border-width: 1px;
+  --transition-speed: .15s;
+  color: var(--doc-primary);
+  position: relative;
+  transition: box-shadow var(--transition-speed) ease-in-out;
+  width: 100%;
+}
+
+.root.disabled,
+.root.disabled .overlay {
+  cursor: default;
+}
+
+.root:hover {
+  color: var(--doc-primary);
+  box-shadow: 0px 12px 15px 0px rgba(0,0,0,0.2);
+  text-decoration: none;
+}
+
+.root:hover .overlay {
+  opacity: 1;
+  visibility: initial;
+}
+
+.children {
+  height: 100%;
+  width: 100%;
+}
+
+.overlay {
+  align-content: center;
+  background-color: var(--doc-component-background);
+  bottom: 0;
+  display: flex;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-speed) ease-in-out;
+}
+
+.overlay p {
+  align-items: center;
+  display: flex;
+  font-size: 11px;
+  font-weight: 300;
+  justify-content: center;
+  line-height: 16px;
+  margin: 0;
+  padding: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+/* Properties */
+.hasRoundedCorners {
+  border-radius: 5px;
+}
+
+.hasShadow {
+  box-shadow: 0px 8px 15px 0px rgba(0,0,0,0.15);
+}
+
+@media small-tablet-breakpoint-query {
+  .root {
+    width: var(--doc-card-size);
+  }
+}
+
+html {
+  --doc-card-size: 243px;
+}
+
+html[data-theme='dark'] .root {
+  border: var(--border-width) solid transparent;
+}
+
+html[data-theme='dark'] .root:hover {
+  border-color: white;
+  transition: border-color .2s ease-in-out;
+}

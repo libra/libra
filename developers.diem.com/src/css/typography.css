@@ -1,0 +1,44 @@
+/*
+ * Copyright (c) The Diem Core Contributors
+ * SPDX-License-Identifier: CC-BY-4.0
+ */
+
+/* CSS Custom Properties available for reference,
+but not using for now due to no IE support */
+:root {
+  --primaryText: #000000;
+  --secondaryText: #8E9AA3;
+  --tertiaryText: #B3BCC3;
+  --dividerLines: #E1E4E7;
+  --fieldBg: #F5F6FA;
+  --homeBg: #F3F4FB;
+  --darkPurple: #39298C;
+  --medPurple: #5645F5;
+  --lightPurple: #E7E5FD;
+  --darkTeal: #1E4855;
+  --teal: #19CDA6;
+  --lightBlue: #92b5d8;
+  --primaryTheme: var(--darkPurple);
+}
+
+
+a,
+p a {
+  color: #39298C;
+  transition: all 0.2s;
+}
+
+a:hover,
+p a:hover {
+  color: #19CDA6;
+}
+
+sub {
+  vertical-align: sub;
+  font-size: smaller;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'NB International Pro', 'Helvetica', sans-serif;
+  font-weight: bold;
+}

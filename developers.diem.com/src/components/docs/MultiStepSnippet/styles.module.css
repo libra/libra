@@ -1,0 +1,173 @@
+@value small-tablet-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value small-tablet-breakpoint-max-query from '~diem-docusaurus-components/src/variables.module.css';
+@value large-tablet-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value large-tablet-breakpoint-max-query from '~diem-docusaurus-components/src/variables.module.css';
+@value desktop-breakpoint-query from '~diem-docusaurus-components/src/variables.module.css';
+@value desktop-breakpoint-max-query from '~diem-docusaurus-components/src/variables.module.css';
+
+.root {
+  --carot-offset: 10px;
+  --snippet-background-color: rgb(246, 248, 250);
+  margin-bottom: 25px;
+}
+
+.root :global(.tabs) {
+  overflow-x: inherit;
+}
+
+.root :global(.snippet-header) {
+  border-top-left-radius: 0;
+  position: sticky;
+  top: 0;
+}
+
+.root div[role="tabpanel"] {
+  background-color: var(--snippet-background-color); /* matches the color of the snippet theme */
+  margin-top: 0 !important;
+  position: relative;
+}
+
+.root div[role="tabpanel"] > div > div {
+  border: 1px solid var(--snippet-border-color);
+}
+
+.root :global(.tab-item) {
+  border: 0;
+  flex: 1;
+  padding: 0;
+  word-break: inherit;
+}
+
+.root :global(.tab-item) a {
+  border-radius: 0;
+}
+
+.root :global(.tab-item--active) {
+  outline: none;
+}
+
+.root div[role="tabpanel"] > div > div { /* CodeBlock Component */
+  min-height: 120px;
+  max-height: 300px;
+  overflow: auto;
+  position: unset;
+}
+
+.root :global(.snippet-container) {
+  position: unset;
+}
+
+.root :global(.prism-code) {
+  padding:
+    calc( var(--snippet-header-height) + 10px )
+    0px
+    20px;
+}
+
+.root :global(.prism-code) > div { /* CodeBlockLines */
+  padding: 0 20px;
+}
+
+.root li[role="tab"]:first-child > * {
+  border-top-left-radius: var(--snippet-border-radius);
+}
+
+@media small-tablet-breakpoint-max-query,
+large-tablet-breakpoint-query and desktop-breakpoint-max-query {
+  .root li[role="tab"]:before {
+    content: '';
+    padding-top: 100%;
+  }
+
+  .root :global(.snippet-header) {
+    border-top-right-radius: 0;
+  }
+
+  .root div[role="tabpanel"],
+  .root div[role="tabpanel"] > div > div {
+    border-bottom-left-radius: var(--snippet-border-radius);
+    border-bottom-right-radius: var(--snippet-border-radius);
+  }
+
+  .root li[role="tab"]:last-child > * {
+    border-top-right-radius: var(--snippet-border-radius);
+  }
+}
+
+@media small-tablet-breakpoint-query and large-tablet-breakpoint-max-query,
+desktop-breakpoint-query {
+  .root > div {
+    display: flex;
+  }
+
+  .root div[role="tabpanel"],
+  .root :global(.snippet-header),
+  .root div[role="tabpanel"] > div > div {
+    border-top-right-radius: var(--snippet-border-radius);
+  }
+
+  .root div[role="tabpanel"],
+  .root div[role="tabpanel"] > div > div {
+    border-bottom-right-radius: var(--snippet-border-radius);
+  }
+
+  .root ul[role="tablist"] {
+    flex-direction: column;
+    min-height: 400px;
+  }
+
+  .root ul[role="tablist"] > * {
+    flex: 1 !important;
+  }
+
+  .root li[role="tab"] {
+    flex: initial;
+    min-height: 138px;
+    position: relative;
+  }
+
+  .root div[role="tabpanel"] {
+    margin: 0 !important;
+    flex: 1;
+  }
+
+  .root div[role="tabpanel"] > div {
+    height: 100%;
+    position: absolute;
+    width: 100%;
+  }
+
+  .root div[role="tabpanel"] > div > div { /* CodeBlock Component */
+    height: 100%;
+    margin: 0;
+    max-height: 100%;
+    overflow: auto;
+    padding: 0;
+    width: 100%;
+  }
+
+  .root :global(.prism-code) {
+    max-height: initial;
+  }
+
+  .root li[role="tab"]:last-child > * {
+    border-bottom-left-radius: var(--snippet-border-radius);
+  }
+}
+@media small-tablet-breakpoint-max-query,
+large-tablet-breakpoint-query and desktop-breakpoint-max-query {
+  .root li[role="tab"] {
+    background: transparent !important;
+    border-radius: 0;
+    overflow: hidden;
+    padding-bottom: var(--carot-offset);
+  }
+
+  .root div[role="tabpanel"] {
+    margin-top: calc( var(--carot-offset) * -1 ) !important;
+  }
+}
+
+html[data-theme="dark"] .root {
+  --snippet-background-color: rgb(41, 45, 62);
+}

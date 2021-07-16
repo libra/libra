@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="34px" height="33px" viewBox="0 0 34 33" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Login &amp; Authentication</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-693.000000, -1718.000000)">
+            <g id="Login-&amp;-Authentication" transform="translate(694.000000, 1718.000000)">
+                <path d="M5,28 C7.5,28 23,28 26.5,28 C30,28 31,31 31,31 L1,31 C1,31 2.5,28 5,28 Z" id="Path" fill="#A3ACB9" fill-rule="nonzero"></path>
+                <polygon id="Path" stroke="#A3ACB9" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero" stroke-linecap="round" stroke-linejoin="round" points="14.5833 16 6.0833 16 6.0833 24.5 14.5833 24.5"></polygon>
+                <line x1="18.8333" y1="17.4167" x2="25.9166" y2="17.4167" id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="18.8333" y1="23.0833" x2="25.9166" y2="23.0833" id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <polyline id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="18.8326 7.5 31.5833 7.5 31.5833 31.5833 0.41666 31.5833 0.41666 7.5 13.1667 7.5"></polyline>
+                <path d="M18.8333,10.3333 L13.1667,10.3333 L13.1667,3.25001 C13.1667,1.6853 14.4353,0.41667 16,0.41667 C17.5647,0.41667 18.8333,1.6853 18.8333,3.25001 L18.8333,10.3333 Z" id="Path" fill="#A3ACB9" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>

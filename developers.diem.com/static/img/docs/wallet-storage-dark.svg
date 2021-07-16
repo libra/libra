@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="36px" height="32px" viewBox="0 0 36 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Storage</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-924.000000, -1842.000000)">
+            <g id="Storage" transform="translate(925.000000, 1843.000000)">
+                <path d="M28.5,9 L5.5,9 C1.5,9 1,12 1,12 L33,12 C33,12 32.5,9 28.5,9 Z" id="Path" fill="#A3ACB9" fill-rule="nonzero"></path>
+                <polygon id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="33.5 0 0.5 0 0.5 12 33.5 12"></polygon>
+                <polygon id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill-rule="nonzero" points="33.5 18 0.5 18 0.5 30 33.5 30"></polygon>
+                <line x1="8" y1="6" x2="5" y2="6" id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="8" y1="24" x2="5" y2="24" id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="15.5" y1="6" x2="12.5" y2="6" id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="15.5" y1="24" x2="12.5" y2="24" id="Path" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <path d="M27.5,7.5 C28.3284,7.5 29,6.8284 29,6 C29,5.1716 28.3284,4.5 27.5,4.5 C26.6716,4.5 26,5.1716 26,6 C26,6.8284 26.6716,7.5 27.5,7.5 Z" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M27.5,25.5 C28.3284,25.5 29,24.8284 29,24 C29,23.1716 28.3284,22.5 27.5,22.5 C26.6716,22.5 26,23.1716 26,24 C26,24.8284 26.6716,25.5 27.5,25.5 Z" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill-rule="nonzero"></path>
+                <line x1="5" y1="12" x2="5" y2="15" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="29" y1="12" x2="29" y2="15" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

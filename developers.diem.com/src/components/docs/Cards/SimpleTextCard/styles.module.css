@@ -1,0 +1,36 @@
+.root {
+  align-items: center;
+  background-color: var(--doc-component-background);
+  display: inline-flex;
+  padding:
+    calc( 19px + var(--border-width) )
+    calc( 14px + var(--border-width) )
+    calc( 19px + var(--border-width) )
+    calc( 19px + var(--border-width) );
+}
+
+.image {
+  --image-size: 38px;
+  background-size: var(--image-size) var(--image-size);
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+  height: var(--image-size);
+  margin-right: 10px;
+  width: var(--image-size);
+}
+
+.image.smaller {
+  --image-size: 30px;
+  margin-right: 12px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 16px;
+  margin: 0;
+}
+
+.bolded {
+  font-weight: bold;
+}

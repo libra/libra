@@ -1,0 +1,17 @@
+@value medium-tablet-breakpoint-max-query from '~diem-docusaurus-components/src/variables.module.css';
+
+.root {
+  margin: 5em;
+}
+
+.walletApp {
+  width: 100%;
+  height: 800px;
+  border: 0;
+}
+
+@media medium-tablet-breakpoint-max-query {
+  .root {
+    margin: 1.5em;
+  }
+}

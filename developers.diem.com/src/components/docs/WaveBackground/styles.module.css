@@ -1,0 +1,36 @@
+/*
+ * If these values become dependent on media queries,
+ * it's probably best to refactor the code to grab these
+ * values from CSS variables. For now, this is best in
+ * terms of performance
+ */
+@value negative-top: -25;
+@value negative-margin-top: -9;
+
+@value negative-top-px: calc( negative-top * 1px );
+@value negative-margin-top-px: calc( negative-margin-top * 1px );
+
+@value total-offset: negative-top + negative-margin-top;
+
+.root {
+  margin-left: calc( -1 * var(--doc-padding-left) );
+  position: relative;
+  width: calc( 100% + var(--doc-padding-left) + var(--doc-padding-right) );
+  z-index: -1;
+}
+
+.root > div {
+  position: absolute;
+  top: negative-top-px;
+  width: 100%;
+}
+
+.rectangle {
+  background-color: #F3F5F9;
+  margin-top: negative-margin-top-px;
+  width: 100%;
+}
+
+html[data-theme='dark'] .rectangle {
+  background-color: #1F263F;
+}

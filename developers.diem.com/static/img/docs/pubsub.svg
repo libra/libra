@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="34px" viewBox="0 0 32 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>3A343712-4EA9-46B4-8D41-94C43B78E806</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Documentation---Wallets" transform="translate(-390.000000, -1660.000000)">
+            <g id="PubSub" transform="translate(391.000000, 1661.000000)">
+                <path d="M26.375,28.8571 C28.475,28.8571 28.475,28 29,28 L29,29.7143 L26.375,31 L8,31 L8.525,28.8571 C8.875,28.7143 24.275,28.8571 26.375,28.8571 Z" id="Path" fill="#8DB7DC" fill-rule="nonzero"></path>
+                <path d="M7.9167,26.625 L7.9167,28.0417 C7.9167,31.2292 4.375,31.5833 4.375,31.5833 C4.375,31.5833 25.382,31.5833 25.625,31.5833 C27.5807,31.5833 29.1667,29.9974 29.1667,28.0417 L29.1667,26.625 L7.9167,26.625 Z" id="Path" stroke="#402B91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <path d="M24.9167,23.0833 L24.9167,0.41666 L0.8333,0.41666 L0.8333,28.0417 C0.8333,29.9974 2.4193,31.5833 4.375,31.5833" id="Path" stroke="#402B91" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                <line x1="6.5" y1="7.5" x2="19.25" y2="7.5" id="Path" stroke="#7367B4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="6.5" y1="13.1667" x2="19.25" y2="13.1667" id="Path" stroke="#7367B4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="6.5" y1="18.8333" x2="19.25" y2="18.8333" id="Path" stroke="#7367B4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

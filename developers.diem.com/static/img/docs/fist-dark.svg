@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="29px" height="29px" viewBox="0 0 29 29" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Custody</title>
+    <g id="---Developers" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Icons" transform="translate(-433.000000, -1864.000000)">
+            <g id="Custody" transform="translate(434.000000, 1865.000000)">
+                <line x1="5.3448" y1="6.5117" x2="5.3448" y2="12.7473" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line>
+                <path d="M18.5,1.5 C10,-0.5 23.1077,2.2275 23.1077,2.2275 C25.5788,2.6228 27.2392,4.9758 26.7835,7.4365 L23.1606,27 L17.5,27 C17.5,27 27,3.5 18.5,1.5 Z" id="Path" fill="#FFFFFF" fill-rule="nonzero"></path>
+                <path d="M23.1077,2.2275 L9.4709,0.0456 C7.306,-0.3008 5.3448,1.3715 5.3448,3.564 L5.3448,6.5117 L2.6724,6.5117 C1.1965,6.5117 0,7.7082 0,9.1841 L0,16.3105 C0,19.9479 4.454,22.9079 4.454,27 L23.1606,27 L26.7835,7.4365 C27.2392,4.9758 25.5787,2.6228 23.1077,2.2275 Z" id="Path" stroke="#A3ACB9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>

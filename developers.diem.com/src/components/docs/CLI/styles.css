@@ -1,0 +1,149 @@
+.cli {
+  --commands-item-horizontal-padding: 5px;
+  display: flex;
+}
+
+.markdown .cli li {
+  list-style: none;
+}
+
+.cli ul {
+  padding-left: 0;
+  margin: 0;
+}
+
+.cli h2 {
+  margin: 0;
+}
+
+.cli p {
+  margin: 0;
+}
+
+.cli .tutorial {
+  flex-basis: 250px;
+  flex-shrink: 0;
+  margin-right: 15px;
+}
+
+.cli .tutorial .list-group-item:not(:first-child) {
+  margin-top: 15px;
+}
+
+.cli .tutorial .step-headline {
+  font-weight: bold;
+}
+
+.cli .step-description {
+  color: var(--gray-6);
+  font-size: 14px;
+}
+
+.cli .terminal-container {
+  border: none;
+  background-color: var(--default-background-color);
+  border-radius: 0;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.cli .xterm-viewport {
+  overflow: hidden !important;
+}
+
+.cli canvas {
+  padding-right: 10px;
+}
+
+.cli .terminal-container:last-child {
+  margin-top: 15px !important;
+}
+
+.cli .cursor-pointer {
+  cursor: pointer;
+}
+
+.cli button {
+  background-color: var(--default-background-color);
+  border: 1px solid black;
+  border-radius: 2px;
+  cursor: pointer;
+  margin-top: 10px;
+  padding: 5px 18px;
+}
+
+.cli button:hover {
+  background-color: var(--accent-highlight);
+  color: white;
+}
+
+.cli .card {
+  box-shadow: none;
+}
+
+.cli .commands-container {
+  flex-basis: 180px;
+  flex-shrink: 0;
+  font-size: 14px;
+  margin-left: 15px;
+}
+
+.cli .commands {
+  padding: 0;
+}
+
+.cli .commands .command {
+  padding: 5px var(--commands-item-horizontal-padding);
+}
+
+.cli .commands .command:hover {
+  background-color: var(--brand-color);
+  color: white;
+}
+
+.cli .commands .current-command {
+  padding: 0 var(--commands-item-horizontal-padding);
+  margin: 6px 0 15px 5px;
+}
+
+.cli .command-title {
+  margin: 0;
+}
+
+.cli .commands .form-group {
+  margin-top: 10px;
+}
+
+.cli .form-typed-input {
+  display: block;
+  max-width: 300px;
+  width: 100%;
+  margin: 3px 0;
+}
+
+.cli .form-check {
+  align-items: center;
+  display: flex;
+}
+
+.cli input[type='checkbox'] {
+  margin: 0 10px;
+  max-width: 300px;
+}
+
+.cli input:first-child {
+  margin-left: 0;
+}
+
+html[data-theme="dark"] .cli button {
+  border: 1px solid white;
+  color: white;
+}
+
+html[data-theme="dark"] .cli button:hover {
+  color: var(--brand-color);
+}
+
+html[data-theme="dark"] .cli .step-description {
+  color: var(--doc-secondary-color);
+}

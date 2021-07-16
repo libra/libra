@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800px" height="895px" viewBox="0 0 800 895" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>merkle-accumulators</title>
+    <desc>Created with Sketch.</desc>
+    <g id="merkle-accumulators" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect fill="#FFFFFF" x="0" y="0" width="800" height="895"></rect>
+        <rect id="Rectangle" fill="#F5F6FA" x="497" y="683" width="412" height="225"></rect>
+        <text id="Merkle-Accumulators" font-family="Helvetica" font-size="40" font-weight="normal" fill="#15112C">
+            <tspan x="200" y="61">Merkle Accumulators</tspan>
+        </text>
+        <g id="Group" transform="translate(305.000000, 119.000000)">
+            <path d="M70,25 L20,86" id="Line-4" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M20,86 L20,145" id="Line" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M70,25 L120,85" id="Line-2" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <circle id="Oval" fill="#221B62" cx="20" cy="85" r="20"></circle>
+            <circle id="Oval" fill="#5645F5" cx="20" cy="145" r="20"></circle>
+            <rect id="Rectangle" fill="#B3BCC3" x="100" y="65" width="40" height="40"></rect>
+            <polygon id="Rectangle" fill="#0F7B63" points="70 0 95 25 70 50 45 25"></polygon>
+        </g>
+        <g id="Group-2" transform="translate(59.000000, 378.000000)">
+            <path d="M241,86 L200,145" id="Line-4" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M201,146 L201,205" id="Line" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M241,86 L290,146" id="Line-2" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M155,25 L242,86" id="Line-2" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <circle id="Oval" fill="#221B62" cx="200" cy="146" r="20"></circle>
+            <circle id="Oval" fill="#5645F5" cx="200" cy="205" r="20"></circle>
+            <rect id="Rectangle" fill="#B3BCC3" x="270" y="125" width="40" height="40"></rect>
+            <path d="M20,146 L20,205" id="Line" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M120,146 L120,205" id="Line" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M70,85 L20,145" id="Line-4" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M155,25 L69,86" id="Line-4" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M70,86 L120,146" id="Line-2" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <circle id="Oval" fill="#221B62" cx="120" cy="145" r="20"></circle>
+            <circle id="Oval" fill="#5645F5" cx="120" cy="205" r="20"></circle>
+            <circle id="Oval" fill="#221B62" cx="20" cy="145" r="20"></circle>
+            <circle id="Oval" fill="#5645F5" cx="20" cy="205" r="20"></circle>
+            <polygon id="Rectangle" fill="#0F7B63" points="70 60 95 85 70 110 45 85"></polygon>
+            <polygon id="Rectangle" fill="#0F7B63" points="241 57 266 82 241 107 216 82"></polygon>
+            <polygon id="Rectangle" fill="#0F7B63" points="155 0 180 25 155 50 130 25"></polygon>
+        </g>
+        <g id="Group-2" transform="translate(436.000000, 377.000000)">
+            <path d="M241,87 L200,146" id="Line-4" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M201,147 L201,206" id="Line" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M241,87 L290,147" id="Line-2" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M154,26 L242,87" id="Line-2" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <circle id="Oval" fill="#221B62" cx="200" cy="147" r="20"></circle>
+            <circle id="Oval" fill="#5645F5" cx="200" cy="206" r="20"></circle>
+            <path d="M291,147 L291,206" id="Line" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <circle id="Oval" fill="#221B62" cx="290" cy="147" r="20"></circle>
+            <circle id="Oval" fill="#5645F5" cx="290" cy="206" r="20"></circle>
+            <path d="M20,147 L20,206" id="Line" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M120,147 L120,206" id="Line" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M70,86 L20,146" id="Line-4" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M154,25 L70,87" id="Line-4" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M70,87 L120,147" id="Line-2" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <circle id="Oval" fill="#221B62" cx="120" cy="146" r="20"></circle>
+            <circle id="Oval" fill="#5645F5" cx="120" cy="206" r="20"></circle>
+            <circle id="Oval" fill="#221B62" cx="20" cy="146" r="20"></circle>
+            <circle id="Oval" fill="#5645F5" cx="20" cy="206" r="20"></circle>
+            <polygon id="Rectangle" fill="#0F7B63" points="70 61 95 86 70 111 45 86"></polygon>
+            <polygon id="Rectangle" fill="#0F7B63" points="154 0 179 25 154 50 129 25"></polygon>
+            <polygon id="Rectangle" fill="#0F7B63" points="241 62 266 87 241 112 216 87"></polygon>
+        </g>
+        <g id="Group" transform="translate(566.000000, 118.000000)">
+            <path d="M20,87 L20,146" id="Line" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M120,87 L120,146" id="Line" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M70,26 L20,86" id="Line-4" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <path d="M70,25 L120,87" id="Line-2" stroke="#000000" stroke-width="4" stroke-linecap="square"></path>
+            <polygon id="Rectangle" fill="#0F7B63" points="70 0 95 25 70 50 45 25"></polygon>
+            <circle id="Oval" fill="#221B62" cx="120" cy="86" r="20"></circle>
+            <circle id="Oval" fill="#5645F5" cx="120" cy="146" r="20"></circle>
+            <circle id="Oval" fill="#221B62" cx="20" cy="86" r="20"></circle>
+            <circle id="Oval" fill="#5645F5" cx="20" cy="146" r="20"></circle>
+        </g>
+        <rect id="Rectangle" fill="#B3BCC3" x="101" y="184" width="40" height="40"></rect>
+        <text id="0" font-family="Helvetica" font-size="25" font-weight="normal" fill="#15112C">
+            <tspan x="114.048096" y="320">0</tspan>
+        </text>
+        <text id="3" font-family="Helvetica" font-size="25" font-weight="normal" fill="#15112C">
+            <tspan x="214.048096" y="640">3</tspan>
+        </text>
+        <text id="Internal-Node-Leaf-N" font-family="Helvetica" font-size="25" font-weight="normal" line-spacing="40" fill="#15112C">
+            <tspan x="568" y="736">Internal Node</tspan>
+            <tspan x="568" y="776">Leaf Node</tspan>
+            <tspan x="568" y="816">Object</tspan>
+            <tspan x="568" y="856">Placeholder Node</tspan>
+        </text>
+        <text id="a" font-family="Helvetica" font-size="25" font-weight="normal" fill="#FFFFFF">
+            <tspan x="207" y="408">a</tspan>
+        </text>
+        <text id="j" font-family="Helvetica" font-size="25" font-weight="normal" fill="#FFFFFF">
+            <tspan x="346" y="530">j</tspan>
+        </text>
+        <text id="b" font-family="Helvetica" font-size="25" font-weight="normal" fill="#FFFFFF">
+            <tspan x="122" y="469">b</tspan>
+        </text>
+        <text id="g" font-family="Helvetica" font-size="25" font-weight="normal" fill="#FFFFFF">
+            <tspan x="293" y="466">g</tspan>
+        </text>
+        <text id="c" font-family="Helvetica" font-size="25" font-weight="normal" fill="#FFFFFF">
+            <tspan x="72" y="529">c</tspan>
+        </text>
+        <text id="d" font-family="Helvetica" font-size="25" font-weight="normal" fill="#FFFFFF">
+            <tspan x="72" y="589">d</tspan>
+        </text>
+        <text id="e" font-family="Helvetica" font-size="25" font-weight="normal" fill="#FFFFFF">
+            <tspan x="172" y="529">e</tspan>
+        </text>
+        <text id="f" font-family="Helvetica" font-size="25" font-weight="normal" fill="#FFFFFF">
+            <tspan x="175" y="591">f</tspan>
+        </text>
+        <text id="h" font-family="Helvetica" font-size="25" font-weight="normal" fill="#FFFFFF">
+            <tspan x="253" y="531">h</tspan>
+        </text>
+        <text id="i" font-family="Helvetica" font-size="25" font-weight="normal" fill="#FFFFFF">
+            <tspan x="256" y="590">i</tspan>
+        </text>
+        <rect id="Rectangle" fill="#B3BCC3" x="532" y="843" width="20" height="20"></rect>
+        <circle id="Oval" fill="#5645F5" cx="542" cy="813" r="10"></circle>
+        <polygon id="Rectangle" fill="#0F7B63" points="542 723 552 733 542 743 532 733"></polygon>
+        <circle id="Oval" fill="#221B62" cx="542" cy="773" r="10"></circle>
+        <text id="4" font-family="Helvetica" font-size="25" font-weight="normal" fill="#15112C">
+            <tspan x="584.048096" y="640">4</tspan>
+        </text>
+        <text id="1" font-family="Helvetica" font-size="25" font-weight="normal" fill="#15112C">
+            <tspan x="370.5" y="320">1</tspan>
+        </text>
+        <text id="2" font-family="Helvetica" font-size="25" font-weight="normal" fill="#15112C">
+            <tspan x="622.048096" y="320">2</tspan>
+        </text>
+    </g>
+</svg>
