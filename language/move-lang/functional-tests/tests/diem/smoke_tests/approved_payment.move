@@ -23,7 +23,7 @@ module {{default}}::ApprovedPayment {
 
     // Deposit `coin` in `payee`'s account if the `signature` on the payment metadata matches the
     // public key stored in the `approved_payment` resource
-    public fun deposit<Token: store>(
+    public fun deposit<Token>(
         _payer: &signer,
         approved_payment: &T,
         _payee: address,
@@ -49,7 +49,7 @@ module {{default}}::ApprovedPayment {
 
     // Wrapper of `deposit` that withdraw's from the sender's balance and uses the top-level
     // `ApprovedPayment` resource under the payee account.
-    public fun deposit_to_payee<Token: store>(
+    public fun deposit_to_payee<Token>(
         payer: &signer,
         payee: address,
         _amount: u64,

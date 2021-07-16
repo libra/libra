@@ -28,7 +28,7 @@ This module defines the coin type XUS and its initialization function.
 The type tag representing the <code><a href="XUS.md#0x1_XUS">XUS</a></code> currency on-chain.
 
 
-<pre><code><b>struct</b> <a href="XUS.md#0x1_XUS">XUS</a> has store
+<pre><code><b>struct</b> <a href="XUS.md#0x1_XUS">XUS</a>
 </code></pre>
 
 

@@ -64,7 +64,7 @@ module DiemFramework::TreasuryComplianceScripts {
     /// * `TreasuryComplianceScripts::burn_with_amount`
     /// * `TreasuryComplianceScripts::preburn`
 
-    public(script) fun cancel_burn_with_amount<Token: store>(account: signer, preburn_address: address, amount: u64) {
+    public(script) fun cancel_burn_with_amount<Token>(account: signer, preburn_address: address, amount: u64) {
         DiemAccount::cancel_burn<Token>(&account, preburn_address, amount)
     }
 
@@ -167,7 +167,7 @@ module DiemFramework::TreasuryComplianceScripts {
     /// * `TreasuryComplianceScripts::cancel_burn_with_amount`
     /// * `TreasuryComplianceScripts::preburn`
 
-    public(script) fun burn_with_amount<Token: store>(account: signer, sliding_nonce: u64, preburn_address: address, amount: u64) {
+    public(script) fun burn_with_amount<Token>(account: signer, sliding_nonce: u64, preburn_address: address, amount: u64) {
         SlidingNonce::record_nonce_or_abort(&account, sliding_nonce);
         Diem::burn<Token>(&account, preburn_address, amount)
     }
@@ -238,7 +238,7 @@ module DiemFramework::TreasuryComplianceScripts {
     /// * `TreasuryComplianceScripts::burn_with_amount`
     /// * `TreasuryComplianceScripts::burn_txn_fees`
 
-    public(script) fun preburn<Token: store>(account: signer, amount: u64) {
+    public(script) fun preburn<Token>(account: signer, amount: u64) {
         let withdraw_cap = DiemAccount::extract_withdraw_capability(&account);
         DiemAccount::preburn<Token>(&account, &withdraw_cap, amount);
         DiemAccount::restore_withdraw_capability(withdraw_cap);
@@ -305,7 +305,7 @@ module DiemFramework::TreasuryComplianceScripts {
     /// * `TreasuryComplianceScripts::burn_with_amount`
     /// * `TreasuryComplianceScripts::cancel_burn_with_amount`
 
-    public(script) fun burn_txn_fees<CoinType: store>(tc_account: signer) {
+    public(script) fun burn_txn_fees<CoinType>(tc_account: signer) {
         TransactionFee::burn_fees<CoinType>(&tc_account);
     }
 
@@ -362,7 +362,7 @@ module DiemFramework::TreasuryComplianceScripts {
     /// * `PaymentScripts::peer_to_peer_with_metadata`
     /// * `AccountAdministrationScripts::rotate_dual_attestation_info`
 
-    public(script) fun tiered_mint<CoinType: store>(
+    public(script) fun tiered_mint<CoinType>(
         tc_account: signer,
         sliding_nonce: u64,
         designated_dealer_address: address,
@@ -562,7 +562,7 @@ module DiemFramework::TreasuryComplianceScripts {
     /// * `TreasuryComplianceScripts::update_dual_attestation_limit`
     /// * `TreasuryComplianceScripts::update_minting_ability`
 
-    public(script) fun update_exchange_rate<Currency: store>(
+    public(script) fun update_exchange_rate<Currency>(
             tc_account: signer,
             sliding_nonce: u64,
             new_exchange_rate_numerator: u64,
@@ -634,7 +634,7 @@ module DiemFramework::TreasuryComplianceScripts {
     /// * `TreasuryComplianceScripts::update_dual_attestation_limit`
     /// * `TreasuryComplianceScripts::update_exchange_rate`
 
-    public(script) fun update_minting_ability<Currency: store>(
+    public(script) fun update_minting_ability<Currency>(
         tc_account: signer,
         allow_minting: bool
     ) {

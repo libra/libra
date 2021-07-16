@@ -55,7 +55,7 @@ use DiemFramework::SlidingNonce;
 /// * `Script::peer_to_peer_with_metadata`
 /// * `Script::rotate_dual_attestation_info`
 
-fun tiered_mint<CoinType: store>(
+fun tiered_mint<CoinType>(
     tc_account: signer,
     sliding_nonce: u64,
     designated_dealer_address: address,

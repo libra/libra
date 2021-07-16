@@ -7,7 +7,7 @@ module DiemFramework::XUS {
     use Std::FixedPoint32;
 
     /// The type tag representing the `XUS` currency on-chain.
-    struct XUS has store { }
+    struct XUS { }
 
     /// Registers the `XUS` cointype. This can only be called from genesis.
     public fun initialize(
