@@ -94,61 +94,63 @@ fun main() {
 }
 // check: "Keep(ABORTED { code: 519,"
 
-//! new-transaction
-//! sender: blessed
-script {
-use DiemFramework::VASP;
-fun main(account: signer) {
-    let account = &account;
-    VASP::publish_parent_vasp_credential(account, account);
-    abort 99
-}
-}
-// check: "Keep(ABORTED { code: 771,"
+// TODO: VASP::publish_parent_vasp_credential is now a friend function
+// Make into unit test.
+// //! new-transaction
+// //! sender: blessed
+// script {
+// use DiemFramework::VASP;
+// fun main(account: signer) {
+//     let account = &account;
+//     VASP::publish_parent_vasp_credential(account, account);
+//     abort 99
+// }
+// }
+// // check: "Keep(ABORTED { code: 771,"
 
-//! new-transaction
-//! sender: diemroot
-script {
-use DiemFramework::VASP;
-fun main(account: signer) {
-    let account = &account;
-    VASP::publish_parent_vasp_credential(account, account);
-}
-}
-// check: "Keep(ABORTED { code: 258,"
+// //! new-transaction
+// //! sender: diemroot
+// script {
+// use DiemFramework::VASP;
+// fun main(account: signer) {
+//     let account = &account;
+//     VASP::publish_parent_vasp_credential(account, account);
+// }
+// }
+// // check: "Keep(ABORTED { code: 258,"
 
-//! new-transaction
-//! sender: blessed
-script {
-use DiemFramework::VASP;
-fun main(account: signer) {
-    let account = &account;
-    VASP::publish_child_vasp_credential(account, account);
-}
-}
-// check: "Keep(ABORTED { code: 771,"
+// //! new-transaction
+// //! sender: blessed
+// script {
+// use DiemFramework::VASP;
+// fun main(account: signer) {
+//     let account = &account;
+//     VASP::publish_child_vasp_credential(account, account);
+// }
+// }
+// // check: "Keep(ABORTED { code: 771,"
 
-//! new-transaction
-//! sender: blessed
-script {
-use DiemFramework::VASP;
-fun main(account: signer) {
-    let account = &account;
-    VASP::publish_child_vasp_credential(account, account);
-}
-}
-// check: "Keep(ABORTED { code: 771,"
+// //! new-transaction
+// //! sender: blessed
+// script {
+// use DiemFramework::VASP;
+// fun main(account: signer) {
+//     let account = &account;
+//     VASP::publish_child_vasp_credential(account, account);
+// }
+// }
+// // check: "Keep(ABORTED { code: 771,"
 
-//! new-transaction
-//! sender: parent
-script {
-use DiemFramework::VASP;
-fun main(account: signer) {
-    let account = &account;
-    VASP::publish_child_vasp_credential(account, account);
-}
-}
-// check: "Keep(ABORTED { code: 2307,"
+// //! new-transaction
+// //! sender: parent
+// script {
+// use DiemFramework::VASP;
+// fun main(account: signer) {
+//     let account = &account;
+//     VASP::publish_child_vasp_credential(account, account);
+// }
+// }
+// // check: "Keep(ABORTED { code: 2307,"
 
 //! new-transaction
 //! sender: parent

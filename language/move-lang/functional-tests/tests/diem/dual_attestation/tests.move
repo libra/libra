@@ -32,27 +32,30 @@ script{
 }
 // check: "Keep(EXECUTED)"
 
-//! new-transaction
-//! sender: blessed
-script{
-    use DiemFramework::DualAttestation;
-    fun main(account: signer) {
-    let account = &account;
-        DualAttestation::publish_credential(account, account, x"");
-    }
-}
-// check: "Keep(ABORTED { code: 1283,"
+// TODO: DualAttestation::publish_credential is now a friend function
+// Make this into a unit test.
+// //! new-transaction
+// //! sender: blessed
+// script{
+//     use DiemFramework::DualAttestation;
+//     fun main(account: signer) {
+//     let account = &account;
+//         DualAttestation::publish_credential(account, account, x"");
+//     }
+// }
+// // check: "Keep(ABORTED { code: 1283,"
 
-//! new-transaction
-//! sender: blessed
-script{
-    use DiemFramework::DualAttestation;
-    fun main(account: signer) {
-    let account = &account;
-        DualAttestation::publish_credential(account, account, x"");
-    }
-}
-// check: "Keep(ABORTED { code: 1283,"
+// TODO: Make into unit test
+// //! new-transaction
+// //! sender: blessed
+// script{
+//     use DiemFramework::DualAttestation;
+//     fun main(account: signer) {
+//     let account = &account;
+//         DualAttestation::publish_credential(account, account, x"");
+//     }
+// }
+// // check: "Keep(ABORTED { code: 1283,"
 
 //! new-transaction
 //! sender: blessed
@@ -61,16 +64,17 @@ script{
 stdlib_script::AccountCreationScripts::create_parent_vasp_account
 // check: "Keep(EXECUTED)"
 
-//! new-transaction
-//! sender: bob
-script{
-    use DiemFramework::DualAttestation;
-    fun main(account: signer) {
-    let account = &account;
-        DualAttestation::publish_credential(account, account, x"");
-    }
-}
-// check: "Keep(ABORTED { code: 258,"
+// TODO: Make into unit test
+// //! new-transaction
+// //! sender: bob
+// script{
+//     use DiemFramework::DualAttestation;
+//     fun main(account: signer) {
+//     let account = &account;
+//         DualAttestation::publish_credential(account, account, x"");
+//     }
+// }
+// // check: "Keep(ABORTED { code: 258,"
 
 //! new-transaction
 //! sender: blessed
@@ -140,19 +144,20 @@ script{
 }
 // check: "Keep(ABORTED { code: 1,"
 
-//! new-transaction
-//! sender: diemroot
-//! execute-as: freddymac
-script{
-use DiemFramework::DualAttestation;
-fun main(dr_account: signer, freddy: signer) {
-    let dr_account = &dr_account;
-    let freddy = &freddy;
-    DualAttestation::publish_credential(freddy, dr_account, b"freddy");
-    DualAttestation::publish_credential(freddy, dr_account, b"freddy");
-}
-}
-// check: "Discard(INVALID_WRITE_SET)"
+// TODO: Make into unit test
+// //! new-transaction
+// //! sender: diemroot
+// //! execute-as: freddymac
+// script{
+// use DiemFramework::DualAttestation;
+// fun main(dr_account: signer, freddy: signer) {
+//     let dr_account = &dr_account;
+//     let freddy = &freddy;
+//     DualAttestation::publish_credential(freddy, dr_account, b"freddy");
+//     DualAttestation::publish_credential(freddy, dr_account, b"freddy");
+// }
+// }
+// // check: "Discard(INVALID_WRITE_SET)"
 
 //! new-transaction
 script{

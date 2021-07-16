@@ -2,16 +2,17 @@
 module DiemFramework::DualAttestation {
     use DiemFramework::CoreAddresses;
     use DiemFramework::XDX::XDX;
-    use Std::BCS;
     use DiemFramework::Diem;
     use DiemFramework::DiemTimestamp;
     use DiemFramework::Roles;
     use DiemFramework::Signature;
     use DiemFramework::VASP;
+    use Std::BCS;
     use Std::Errors;
     use Std::Event::{Self, EventHandle};
     use Std::Signer;
     use Std::Vector;
+    friend DiemFramework::DiemAccount;
 
     /// This resource holds an entity's globally unique name and all of the metadata it needs to
     /// participate in off-chain protocols.
@@ -90,7 +91,7 @@ module DiemFramework::DualAttestation {
     /// `base_url` and `compliance_public_key`. Before receiving any dual attestation payments,
     /// the `created` account must send a transaction that invokes `rotate_base_url` and
     /// `rotate_compliance_public_key` to set these fields to a valid URL/public key.
-    public fun publish_credential(
+    public(friend) fun publish_credential(
         created: &signer,
         creator: &signer,
         human_name: vector<u8>,

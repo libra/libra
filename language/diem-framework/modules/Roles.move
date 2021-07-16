@@ -10,6 +10,7 @@ module DiemFramework::Roles {
     use DiemFramework::DiemTimestamp;
     use Std::Errors;
     use Std::Signer;
+    friend DiemFramework::DiemAccount;
 
     /// A `RoleId` resource was in an unexpected state
     const EROLE_ID: u64 = 0;
@@ -438,6 +439,8 @@ module DiemFramework::Roles {
             DiemTimestamp::is_operating() ==>
                 spec_has_treasury_compliance_role_addr(@TreasuryCompliance);
 
+        // TODO: These specs really just repeat what's in spec_can_hold_balance_addr. It's nice to
+        // be able to link to DIP-2, but can we do that with less verbose specs?
         /// DiemRoot cannot have balances [[D1]][ROLE].
         invariant [global, isolated] forall addr: address where spec_has_diem_root_role_addr(addr):
             !spec_can_hold_balance_addr(addr);

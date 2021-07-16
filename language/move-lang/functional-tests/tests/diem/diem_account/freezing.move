@@ -1,5 +1,6 @@
 //! account: bob
 //! account: vasp, 0, 0, address
+//! account: child, 0, 0, address
 //! account: alice, 0, 0, address
 
 //! new-transaction
@@ -81,39 +82,59 @@ fun main(account: signer) {
 }
 // check: "Keep(ABORTED { code: 775,"
 
-// TODO: this can go away once //! account works
-// create a parent VASPx
+// This replaces the transaction below, which was commented out because the
+// function is now "friend", to make the rest of the script work.
 //! new-transaction
 //! sender: blessed
-script {
-use DiemFramework::DiemAccount;
-use DiemFramework::XUS::XUS;
-fun main(dr_account: signer) {
-    let dr_account = &dr_account;
-    DiemAccount::create_parent_vasp_account<XUS>(
-        dr_account,
-        @{{vasp}},
-        {{vasp::auth_key}},
-        x"0A",
-        true,
-    );
-}
-}
+//! type-args: 0x1::XUS::XUS
+//! args: 0, {{vasp}}, {{vasp::auth_key}}, b"bob", true
+stdlib_script::AccountCreationScripts::create_parent_vasp_account
 // check: "Keep(EXECUTED)"
 
-// create a child VASP
+// TODO: DiemAccount::create_parent_vasp_account is now a friend function
+// and cannot be accessed.  Commented out (not deleted) because it will become
+// a unit test
+// // TODO: this can go away once //! account works
+// // create a parent VASPx
+// //! new-transaction
+// //! sender: blessed
+// script {
+// use DiemFramework::DiemAccount;
+// use DiemFramework::XUS::XUS;
+// fun main(dr_account: signer) {
+//     let dr_account = &dr_account;
+//     DiemAccount::create_parent_vasp_account<XUS>(
+//         dr_account,
+//         @{{vasp}},
+//         {{vasp::auth_key}},
+//         x"0A",
+//         true,
+//     );
+// }
+// }
+// // check: "Keep(EXECUTED)"
+
 //! new-transaction
 //! sender: vasp
-script {
-use DiemFramework::DiemAccount;
-use DiemFramework::XUS::XUS;
-fun main(parent_vasp: signer) {
-    let parent_vasp = &parent_vasp;
-    let dummy_auth_key_prefix = x"00000000000000000000000000000000";
-    DiemAccount::create_child_vasp_account<XUS>(parent_vasp, @0xAA, dummy_auth_key_prefix, false);
-}
-}
+//! type-args: 0x1::XUS::XUS
+//! args: {{child}}, {{child::auth_key}}, true, 0
+stdlib_script::AccountCreationScripts::create_child_vasp_account
 // check: "Keep(EXECUTED)"
+
+// TODO: DiemAccount::create_child_vasp_account is a friend function
+// // create a child VASP
+// //! new-transaction
+// //! sender: vasp
+// script {
+// use DiemFramework::DiemAccount;
+// use DiemFramework::XUS::XUS;
+// fun main(parent_vasp: signer) {
+//     let parent_vasp = &parent_vasp;
+//     let dummy_auth_key_prefix = x"00000000000000000000000000000000";
+//     DiemAccount::create_child_vasp_account<XUS>(parent_vasp, @{{child}}, dummy_auth_key_prefix, false);
+// }
+// }
+// // check: "Keep(EXECUTED)"
 
 //! new-transaction
 //! sender: blessed
@@ -123,14 +144,14 @@ use DiemFramework::AccountFreezing;
 // doesn't freeze the child
 fun main(account: signer) {
     let account = &account;
-    AccountFreezing::freeze_account(account, @0xAA);
-    assert(AccountFreezing::account_is_frozen(@0xAA), 3);
+    AccountFreezing::freeze_account(account, @{{child}});
+    assert(AccountFreezing::account_is_frozen(@{{child}}), 3);
     assert(!AccountFreezing::account_is_frozen(@{{vasp}}), 4);
-    AccountFreezing::unfreeze_account(account, @0xAA);
-    assert(!AccountFreezing::account_is_frozen(@0xAA), 5);
+    AccountFreezing::unfreeze_account(account, @{{child}});
+    assert(!AccountFreezing::account_is_frozen(@{{child}}), 5);
     AccountFreezing::freeze_account(account, @{{vasp}});
     assert(AccountFreezing::account_is_frozen(@{{vasp}}), 6);
-    assert(!AccountFreezing::account_is_frozen(@0xAA), 7);
+    assert(!AccountFreezing::account_is_frozen(@{{child}}), 7);
     AccountFreezing::unfreeze_account(account, @{{vasp}});
     assert(!AccountFreezing::account_is_frozen(@{{vasp}}), 8);
 }
@@ -307,16 +328,17 @@ script {
 }
 // check: "Keep(ABORTED { code: 1281,"
 
-//! new-transaction
-//! sender: alice
-script {
-use DiemFramework::AccountFreezing;
-fun main(account: signer) {
-    let account = &account;
-    AccountFreezing::create(account);
-}
-}
-// check: "Keep(ABORTED { code: 518,"
+// TODO: make into unit test
+// //! new-transaction
+// //! sender: alice
+// script {
+// use DiemFramework::AccountFreezing;
+// fun main(account: signer) {
+//     let account = &account;
+//     AccountFreezing::create(account);
+// }
+// }
+// // check: "Keep(ABORTED { code: 518,"
 
 //! new-transaction
 //! sender: blessed

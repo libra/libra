@@ -290,6 +290,30 @@ fn debug_print_fun_id_set(
     );
 }
 
+#[allow(dead_code)]
+pub fn debug_print_inv_set(
+    global_env: &GlobalEnv,
+    global_ids: &BTreeSet<GlobalId>,
+    set_name: &str,
+) {
+    if global_ids.is_empty() {
+        return;
+    }
+    let global_invs = global_ids
+        .iter()
+        .map(|gid| global_env.get_global_invariant(*gid))
+        .collect::<Vec<_>>();
+    debug!("{}:\n", set_name);
+    for inv in &global_invs {
+        let loc = &inv.unwrap().loc;
+        debug!(
+            "{:?}: {}",
+            inv.unwrap().kind,
+            global_env.get_source(loc).unwrap(),
+        );
+    }
+}
+
 /// Print sets and maps computed during verification analysis
 /// TODO: Complete this and write it properly as Display
 #[allow(dead_code)]
@@ -297,7 +321,11 @@ fn debug_print_invariant_analysis_data(
     global_env: &GlobalEnv,
     inv_ana_data: &InvariantAnalysisData,
 ) {
-    debug!("target_invariants <can't print yet>");
+    debug_print_inv_set(
+        global_env,
+        &inv_ana_data.target_invariants,
+        "target_invariants",
+    );
     debug_print_fun_id_set(
         global_env,
         &inv_ana_data.disabled_inv_fun_set,
@@ -469,6 +497,8 @@ impl FunctionTargetProcessor for VerificationAnalysisProcessorV2 {
             funs_that_delegate_to_caller,
             friend_fun_ids,
         };
+
+        debug_print_invariant_analysis_data(&global_env, &inv_ana_data);
 
         global_env.set_extension(inv_ana_data);
     }

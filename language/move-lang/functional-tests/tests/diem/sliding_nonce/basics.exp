@@ -1,30 +1,6 @@
 [0] Transaction(0)
-[1] Move VM Status: EXECUTED
-[2] Transaction Status: Keep(EXECUTED)
+[1] Move VM Status: ABORTED { code: 5, location: 00000000000000000000000000000001::SlidingNonce }
+[2] Transaction Status: Keep(ABORTED { code: 5, location: 00000000000000000000000000000001::SlidingNonce })
 [3] Transaction(1)
-[4] Move VM Status: ABORTED { code: 263, location: 00000000000000000000000000000001::SlidingNonce }
-[5] Transaction Status: Keep(ABORTED { code: 263, location: 00000000000000000000000000000001::SlidingNonce })
-[6] Transaction(2)
-[7] Move VM Status: ABORTED { code: 1030, location: 00000000000000000000000000000001::SlidingNonce }
-[8] Transaction Status: Keep(ABORTED { code: 1030, location: 00000000000000000000000000000001::SlidingNonce })
-[9] Transaction(3)
-[10] Move VM Status: ABORTED { code: 5, location: 00000000000000000000000000000001::SlidingNonce }
-[11] Transaction Status: Keep(ABORTED { code: 5, location: 00000000000000000000000000000001::SlidingNonce })
-[12] Transaction(4)
-[13] Move VM Status: EXECUTED
-[14] Transaction Status: Keep(EXECUTED)
-[15] Transaction(5)
-[16] Move VM Status: ABORTED { code: 1030, location: 00000000000000000000000000000001::SlidingNonce }
-[17] Transaction Status: Keep(ABORTED { code: 1030, location: 00000000000000000000000000000001::SlidingNonce })
-[18] Transaction(6)
-[19] Move VM Status: ABORTED { code: 1030, location: 00000000000000000000000000000001::SlidingNonce }
-[20] Transaction Status: Keep(ABORTED { code: 1030, location: 00000000000000000000000000000001::SlidingNonce })
-[21] Transaction(7)
-[22] Move VM Status: ABORTED { code: 1030, location: 00000000000000000000000000000001::SlidingNonce }
-[23] Transaction Status: Keep(ABORTED { code: 1030, location: 00000000000000000000000000000001::SlidingNonce })
-[24] Transaction(8)
-[25] Move VM Status: ABORTED { code: 1030, location: 00000000000000000000000000000001::SlidingNonce }
-[26] Transaction Status: Keep(ABORTED { code: 1030, location: 00000000000000000000000000000001::SlidingNonce })
-[27] Transaction(9)
-[28] Move VM Status: ABORTED { code: 1030, location: 00000000000000000000000000000001::SlidingNonce }
-[29] Transaction Status: Keep(ABORTED { code: 1030, location: 00000000000000000000000000000001::SlidingNonce })
+[4] Move VM Status: ABORTED { code: 5, location: 00000000000000000000000000000001::SlidingNonce }
+[5] Transaction Status: Keep(ABORTED { code: 5, location: 00000000000000000000000000000001::SlidingNonce })

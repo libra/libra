@@ -6,6 +6,7 @@
 module DiemFramework::SlidingNonce {
     use Std::Signer;
     use Std::Errors;
+    friend DiemFramework::DiemAccount;
 
     struct SlidingNonce has key {
         /// Minimum nonce in sliding window. All transactions with smaller
@@ -257,7 +258,7 @@ module DiemFramework::SlidingNonce {
 
     /// Publishes nonce resource for `account`
     /// This is required before other functions in this module can be called for `account`
-    public fun publish(account: &signer) {
+    public(friend) fun publish(account: &signer) {
         assert(!exists<SlidingNonce>(Signer::address_of(account)), Errors::already_published(ENONCE_ALREADY_PUBLISHED));
         move_to(account, SlidingNonce {  min_nonce: 0, nonce_mask: 0 });
     }

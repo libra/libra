@@ -271,7 +271,7 @@ The <code><a href="AccountFreezing.md#0x1_AccountFreezing_FreezingBit">FreezingB
 
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="AccountFreezing.md#0x1_AccountFreezing_create">create</a>(account: &signer)
+<pre><code><b>public</b>(<b>friend</b>) <b>fun</b> <a href="AccountFreezing.md#0x1_AccountFreezing_create">create</a>(account: &signer)
 </code></pre>
 
 
@@ -280,7 +280,7 @@ The <code><a href="AccountFreezing.md#0x1_AccountFreezing_FreezingBit">FreezingB
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="AccountFreezing.md#0x1_AccountFreezing_create">create</a>(account: &signer) {
+<pre><code><b>public</b>(<b>friend</b>) <b>fun</b> <a href="AccountFreezing.md#0x1_AccountFreezing_create">create</a>(account: &signer) {
     <b>let</b> addr = <a href="../../../../../../move-stdlib/docs/Signer.md#0x1_Signer_address_of">Signer::address_of</a>(account);
     <b>assert</b>(!<b>exists</b>&lt;<a href="AccountFreezing.md#0x1_AccountFreezing_FreezingBit">FreezingBit</a>&gt;(addr), <a href="../../../../../../move-stdlib/docs/Errors.md#0x1_Errors_already_published">Errors::already_published</a>(<a href="AccountFreezing.md#0x1_AccountFreezing_EFREEZING_BIT">EFREEZING_BIT</a>));
     move_to(account, <a href="AccountFreezing.md#0x1_AccountFreezing_FreezingBit">FreezingBit</a> { is_frozen: <b>false</b> })

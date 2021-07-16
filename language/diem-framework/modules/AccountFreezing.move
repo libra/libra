@@ -6,6 +6,7 @@ module DiemFramework::AccountFreezing {
     use Std::Event::{Self, EventHandle};
     use Std::Errors;
     use Std::Signer;
+    friend DiemFramework::DiemAccount;
 
     struct FreezingBit has key {
         /// If `is_frozen` is set true, the account cannot be used to send transactions or receive funds
@@ -64,7 +65,7 @@ module DiemFramework::AccountFreezing {
         ensures exists<FreezeEventsHolder>(addr);
     }
 
-    public fun create(account: &signer) {
+    public(friend) fun create(account: &signer) {
         let addr = Signer::address_of(account);
         assert(!exists<FreezingBit>(addr), Errors::already_published(EFREEZING_BIT));
         move_to(account, FreezingBit { is_frozen: false })

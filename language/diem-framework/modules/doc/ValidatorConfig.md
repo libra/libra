@@ -174,7 +174,7 @@ will have critical info such as keys, network addresses for validators,
 and the address of the validator operator.
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="ValidatorConfig.md#0x1_ValidatorConfig_publish">publish</a>(validator_account: &signer, dr_account: &signer, human_name: vector&lt;u8&gt;)
+<pre><code><b>public</b>(<b>friend</b>) <b>fun</b> <a href="ValidatorConfig.md#0x1_ValidatorConfig_publish">publish</a>(validator_account: &signer, dr_account: &signer, human_name: vector&lt;u8&gt;)
 </code></pre>
 
 
@@ -183,7 +183,7 @@ and the address of the validator operator.
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="ValidatorConfig.md#0x1_ValidatorConfig_publish">publish</a>(
+<pre><code><b>public</b>(<b>friend</b>) <b>fun</b> <a href="ValidatorConfig.md#0x1_ValidatorConfig_publish">publish</a>(
     validator_account: &signer,
     dr_account: &signer,
     human_name: vector&lt;u8&gt;,
