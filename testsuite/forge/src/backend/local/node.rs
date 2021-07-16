@@ -1,7 +1,7 @@
 // Copyright (c) The Diem Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{HealthCheckError, Node, NodeExt, Validator};
+use crate::{HealthCheckError, LocalVersion, Node, NodeExt, Validator, Version};
 use anyhow::{anyhow, Context, Result};
 use diem_config::config::NodeConfig;
 use diem_logger::{debug, warn};
@@ -12,7 +12,7 @@ use diem_sdk::{
 use std::{
     env,
     fs::{self, OpenOptions},
-    path::{Path, PathBuf},
+    path::PathBuf,
     process::{Child, Command},
     str::FromStr,
 };
@@ -40,16 +40,16 @@ impl Drop for Process {
 
 #[derive(Debug)]
 pub struct LocalNode {
+    version: LocalVersion,
     process: Option<Process>,
     name: String,
     peer_id: AccountAddress,
     directory: PathBuf,
     config: NodeConfig,
-    diem_node_bin_path: PathBuf,
 }
 
 impl LocalNode {
-    pub fn new(diem_node_bin_path: &Path, name: String, directory: PathBuf) -> Result<Self> {
+    pub fn new(version: LocalVersion, name: String, directory: PathBuf) -> Result<Self> {
         let config_path = directory.join("node.yaml");
         let config = NodeConfig::load(&config_path)
             .with_context(|| format!("Failed to load NodeConfig from file: {:?}", config_path))?;
@@ -58,12 +58,12 @@ impl LocalNode {
             .ok_or_else(|| anyhow!("unable to retrieve PeerId from config"))?;
 
         Ok(Self {
+            version,
             process: None,
             name,
             peer_id,
             directory,
             config,
-            diem_node_bin_path: PathBuf::from(diem_node_bin_path),
         })
     }
 
@@ -91,7 +91,7 @@ impl LocalNode {
             .open(self.log_path())?;
 
         // Start node process
-        let mut node_command = Command::new(self.diem_node_bin_path.as_path());
+        let mut node_command = Command::new(self.version.bin());
         node_command
             .current_dir(&self.directory)
             .arg("-f")
@@ -104,7 +104,7 @@ impl LocalNode {
         let process = node_command.spawn().with_context(|| {
             format!(
                 "Error launching node process with binary: {:?}",
-                self.diem_node_bin_path.as_path()
+                self.version.bin()
             )
         })?;
 
@@ -180,7 +180,11 @@ impl Node for LocalNode {
         self.name()
     }
 
-    fn json_rpc_endpoint(&self) -> reqwest::Url {
+    fn version(&self) -> Version {
+        self.version.version()
+    }
+
+    fn json_rpc_endpoint(&self) -> Url {
         let ip = self.config().json_rpc.address.ip();
         let port = self.config().json_rpc.address.port();
         Url::from_str(&format!("http://{}:{}/v1", ip, port)).expect("Invalid URL.")

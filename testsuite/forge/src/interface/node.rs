@@ -1,7 +1,7 @@
 // Copyright (c) The Diem Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::Result;
+use crate::{Result, Version};
 use debug_interface::NodeDebugClient;
 use diem_config::{config::NodeConfig, network_id::NetworkId};
 use diem_sdk::{client::Client as JsonRpcClient, types::PeerId};
@@ -30,6 +30,9 @@ pub trait Node {
 
     /// Return the human readable name of this Node
     fn name(&self) -> &str;
+
+    /// Return the version this node is running
+    fn version(&self) -> Version;
 
     /// Return the URL for the JSON-RPC endpoint of this Node
     fn json_rpc_endpoint(&self) -> Url;

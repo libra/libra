@@ -1,7 +1,7 @@
 // Copyright (c) The Diem Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{ChainInfo, FullNode, Result, Validator};
+use crate::{ChainInfo, FullNode, Result, Validator, Version};
 use diem_sdk::types::PeerId;
 
 /// Trait used to represent a running network comprised of Validators and FullNodes
@@ -45,6 +45,9 @@ pub trait Swarm {
 
     /// Removes the FullNode with the provided PeerId
     fn remove_full_node(&mut self, id: PeerId) -> Result<()>;
+
+    /// Return a list of supported Versions
+    fn versions<'a>(&'a self) -> Box<dyn Iterator<Item = Version> + 'a>;
 
     /// Construct a ChainInfo from this Swarm
     fn chain_info(&mut self) -> ChainInfo<'_>;

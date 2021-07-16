@@ -1,7 +1,10 @@
 // Copyright (c) The Diem Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{ChainInfo, FullNode, HealthCheckError, LocalNode, Node, NodeExt, Swarm, Validator};
+use crate::{
+    ChainInfo, FullNode, HealthCheckError, LocalNode, LocalVersion, Node, NodeExt, Swarm,
+    Validator, Version,
+};
 use anyhow::{anyhow, Result};
 use diem_config::config::NodeConfig;
 use diem_genesis_tool::validator_builder::ValidatorBuilder;
@@ -15,6 +18,7 @@ use std::{
     convert::TryFrom,
     fs, mem, ops,
     path::{Path, PathBuf},
+    sync::Arc,
 };
 use tempfile::TempDir;
 
@@ -25,7 +29,6 @@ pub enum SwarmDirectory {
 }
 
 impl SwarmDirectory {
-    #[allow(dead_code)]
     pub fn persist(&mut self) {
         match self {
             SwarmDirectory::Persistent(_) => {}
@@ -37,7 +40,6 @@ impl SwarmDirectory {
         }
     }
 
-    #[allow(dead_code)]
     pub fn into_persistent(self) -> Self {
         match self {
             SwarmDirectory::Temporary(tempdir) => SwarmDirectory::Persistent(tempdir.into_path()),
@@ -73,16 +75,16 @@ struct ValidatorNetworkAddressEncryptionKey {
 }
 
 pub struct LocalSwarmBuilder {
-    diem_node_bin_path: PathBuf,
+    versions: Arc<HashMap<Version, LocalVersion>>,
     template: NodeConfig,
     number_of_validators: usize,
     dir: Option<PathBuf>,
 }
 
 impl LocalSwarmBuilder {
-    pub fn new<T: AsRef<Path>>(diem_node_bin_path: T) -> Self {
+    pub fn new(versions: Arc<HashMap<Version, LocalVersion>>) -> Self {
         Self {
-            diem_node_bin_path: diem_node_bin_path.as_ref().into(),
+            versions,
             template: NodeConfig::default_for_validator(),
             number_of_validators: 1,
             dir: None,
@@ -119,12 +121,19 @@ impl LocalSwarmBuilder {
             .num_validators(self.number_of_validators)
             .template(self.template)
             .build()?;
-        let diem_node_bin_path = self.diem_node_bin_path;
+
+        // Get the latest version to start the nodes with
+        let version = self
+            .versions
+            .iter()
+            .max_by(|v1, v2| v1.0.cmp(&v2.0))
+            .unwrap()
+            .1;
 
         let validators = validators
             .into_iter()
             .map(|v| {
-                let node = LocalNode::new(&diem_node_bin_path, v.name, v.directory)?;
+                let node = LocalNode::new(version.to_owned(), v.name, v.directory)?;
                 Ok((node.peer_id(), node))
             })
             .collect::<Result<HashMap<_, _>>>()?;
@@ -157,6 +166,7 @@ impl LocalSwarmBuilder {
         );
 
         Ok(LocalSwarm {
+            versions: self.versions,
             validators,
             dir,
             validator_network_address_encryption_key,
@@ -170,6 +180,7 @@ impl LocalSwarmBuilder {
 
 #[derive(Debug)]
 pub struct LocalSwarm {
+    versions: Arc<HashMap<Version, LocalVersion>>,
     validators: HashMap<PeerId, LocalNode>,
     dir: SwarmDirectory,
     validator_network_address_encryption_key: ValidatorNetworkAddressEncryptionKey,
@@ -180,8 +191,8 @@ pub struct LocalSwarm {
 }
 
 impl LocalSwarm {
-    pub fn builder<T: AsRef<Path>>(diem_node_bin_path: T) -> LocalSwarmBuilder {
-        LocalSwarmBuilder::new(diem_node_bin_path)
+    pub fn builder(versions: Arc<HashMap<Version, LocalVersion>>) -> LocalSwarmBuilder {
+        LocalSwarmBuilder::new(versions)
     }
 
     pub fn launch(&mut self) -> Result<()> {
@@ -338,6 +349,10 @@ impl Swarm for LocalSwarm {
 
     fn remove_full_node(&mut self, _id: PeerId) -> Result<()> {
         todo!()
+    }
+
+    fn versions<'a>(&'a self) -> Box<dyn Iterator<Item = Version> + 'a> {
+        Box::new(self.versions.keys().cloned())
     }
 
     fn chain_info(&mut self) -> ChainInfo<'_> {

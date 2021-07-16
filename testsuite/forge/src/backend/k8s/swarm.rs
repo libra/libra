@@ -3,7 +3,7 @@
 
 use crate::{
     backend::k8s::node::K8sNode, query_sequence_numbers, ChainInfo, FullNode, Node, Result, Swarm,
-    Validator,
+    Validator, Version,
 };
 use anyhow::format_err;
 use diem_logger::*;
@@ -216,6 +216,10 @@ impl Swarm for K8sSwarm {
     }
 
     fn remove_full_node(&mut self, _id: PeerId) -> Result<()> {
+        todo!()
+    }
+
+    fn versions<'a>(&'a self) -> Box<dyn Iterator<Item = Version> + 'a> {
         todo!()
     }
 
