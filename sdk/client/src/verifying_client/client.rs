@@ -337,27 +337,14 @@ impl<S: Storage> VerifyingClient<S> {
     /// Send a single request via `VerifyingClient::batch`.
     pub async fn request(&self, request: MethodRequest) -> Result<Response<MethodResponse>> {
         let mut responses = self.batch(vec![request]).await?.into_iter();
-        let response = match responses.next() {
-            Some(response) => response,
-            None => {
-                return Err(Error::rpc_response(
-                    "expected one response, received empty response batch",
-                ))
-            }
-        };
-        let rest = responses.as_slice();
-        if !rest.is_empty() {
-            return Err(Error::rpc_response(format!(
-                "expected one response, received unexpected responses: {:?}",
-                rest,
-            )));
-        }
-        response
+        responses
+            .next()
+            .expect("batch guarantees the correct number of responses")
     }
 
     pub fn actual_batch_size(&self, requests: &[MethodRequest]) -> usize {
         VerifyingBatch::from_batch(requests.to_vec())
-            .num_subrequests(self.trusted_state_store.read().unwrap().trusted_state())
+            .num_requests(self.trusted_state_store.read().unwrap().trusted_state())
     }
 
     pub async fn batch(

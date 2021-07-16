@@ -38,7 +38,7 @@ impl VerifyingBatch {
         }
     }
 
-    pub(crate) fn num_subrequests(&self, request_trusted_state: &TrustedState) -> usize {
+    pub(crate) fn num_requests(&self, request_trusted_state: &TrustedState) -> usize {
         let num_client_requests = self
             .requests
             .iter()
@@ -86,11 +86,11 @@ impl VerifyingBatch {
     )> {
         let request_version = request_trusted_state.version();
         // make sure we get the exact number of responses back as we expect
-        let num_subrequests = self.num_subrequests(request_trusted_state);
-        if num_subrequests != responses.len() {
+        let num_requests = self.num_requests(request_trusted_state);
+        if num_requests != responses.len() {
             return Err(Error::rpc_response(format!(
                 "expected {} responses, received {} responses in batch",
-                num_subrequests,
+                num_requests,
                 responses.len()
             )));
         }
