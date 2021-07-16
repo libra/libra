@@ -18,5 +18,11 @@ sandbox run storage/0x00000000000000000000000000000001/modules/TreasuryComplianc
 # transfer 700 XUS from 0xDD to 0xA
 sandbox run storage/0x00000000000000000000000000000001/modules/PaymentScripts.mv peer_to_peer_with_metadata --mode diem --type-args 0x1::XUS::XUS --signers 0xDD --args 0xA 700 x"" x""
 
-# transfer 500 XUS from 0xA to 0xB
-experimental read-write-set storage/0x00000000000000000000000000000001/modules/PaymentScripts.mv peer_to_peer_with_metadata --mode diem --concretize --type-args 0x1::XUS::XUS --signers 0xA --args 0xB 500 x"" x""
+# get concretized read/write set for a transfer
+experimental read-write-set storage/0x00000000000000000000000000000001/modules/PaymentScripts.mv peer_to_peer_with_metadata --mode diem --concretize paths --type-args 0x1::XUS::XUS --signers 0xA --args 0xB 500 x"" x""
+
+# same thing, but get resources read only
+experimental read-write-set storage/0x00000000000000000000000000000001/modules/PaymentScripts.mv peer_to_peer_with_metadata --mode diem --concretize reads --type-args 0x1::XUS::XUS --signers 0xA --args 0xB 500 x"" x""
+
+# same thing, but get resources written only
+experimental read-write-set storage/0x00000000000000000000000000000001/modules/PaymentScripts.mv peer_to_peer_with_metadata --mode diem --concretize writes --type-args 0x1::XUS::XUS --signers 0xA --args 0xB 500 x"" x""

@@ -4,7 +4,7 @@ Command `sandbox run storage/0x00000000000000000000000000000001/modules/AccountC
 Command `sandbox run  storage/0x00000000000000000000000000000001/modules/AccountCreationScripts.mv create_parent_vasp_account --mode diem --type-args 0x1::XDX::XDX --signers 0xB1E55ED --args 0 0xB x"00000000000000000000000000000000" b"VASP_B" true`:
 Command `sandbox run storage/0x00000000000000000000000000000001/modules/TreasuryComplianceScripts.mv tiered_mint --mode diem --type-args 0x1::XUS::XUS --signers 0xB1E55ED --args 0 0xDD 1000 0`:
 Command `sandbox run storage/0x00000000000000000000000000000001/modules/PaymentScripts.mv peer_to_peer_with_metadata --mode diem --type-args 0x1::XUS::XUS --signers 0xDD --args 0xA 700 x"" x""`:
-Command `experimental read-write-set storage/0x00000000000000000000000000000001/modules/PaymentScripts.mv peer_to_peer_with_metadata --mode diem --concretize --type-args 0x1::XUS::XUS --signers 0xA --args 0xB 500 x"" x""`:
+Command `experimental read-write-set storage/0x00000000000000000000000000000001/modules/PaymentScripts.mv peer_to_peer_with_metadata --mode diem --concretize paths --type-args 0x1::XUS::XUS --signers 0xA --args 0xB 500 x"" x""`:
 0xa/0x1::AccountFreezing::FreezingBit: Read
 0xa/0x1::AccountFreezing::FreezingBit/is_frozen: Read
 0xa/0x1::VASP::ParentVASP: Read
@@ -41,3 +41,21 @@ Command `experimental read-write-set storage/0x00000000000000000000000000000001/
 0xa550c18/0x1::DualAttestation::Limit: Read
 0xa550c18/0x1::DualAttestation::Limit/micro_xdx_limit: Read
 
+Command `experimental read-write-set storage/0x00000000000000000000000000000001/modules/PaymentScripts.mv peer_to_peer_with_metadata --mode diem --concretize reads --type-args 0x1::XUS::XUS --signers 0xA --args 0xB 500 x"" x""`:
+0xa/0x1::AccountFreezing::FreezingBit
+0xa/0x1::VASP::ParentVASP
+0xa/0x1::DiemAccount::DiemAccount
+0xa/0x1::DiemAccount::Balance<0x1::XUS::XUS>
+0xb/0x1::AccountFreezing::FreezingBit
+0xb/0x1::VASP::ParentVASP
+0xb/0x1::DualAttestation::Credential
+0xb/0x1::DiemAccount::DiemAccount
+0xb/0x1::DiemAccount::Balance<0x1::XUS::XUS>
+0xa550c18/0x1::DiemTimestamp::CurrentTimeMicroseconds
+0xa550c18/0x1::Diem::CurrencyInfo<0x1::XUS::XUS>
+0xa550c18/0x1::DualAttestation::Limit
+Command `experimental read-write-set storage/0x00000000000000000000000000000001/modules/PaymentScripts.mv peer_to_peer_with_metadata --mode diem --concretize writes --type-args 0x1::XUS::XUS --signers 0xA --args 0xB 500 x"" x""`:
+0xa/0x1::DiemAccount::DiemAccount
+0xa/0x1::DiemAccount::Balance<0x1::XUS::XUS>
+0xb/0x1::DiemAccount::DiemAccount
+0xb/0x1::DiemAccount::Balance<0x1::XUS::XUS>

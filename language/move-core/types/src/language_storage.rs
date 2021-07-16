@@ -151,3 +151,9 @@ impl Display for TypeTag {
         }
     }
 }
+
+impl Display for ResourceKey {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "0x{}/{}", self.address.short_str_lossless(), self.type_)
+    }
+}

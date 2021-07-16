@@ -4,24 +4,24 @@ sandbox publish
 # print the abstract read/write set state
 experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeSecondaryIndexes.mv read_indirect
 # try to concretize, should print nothing. publish first resource needed
-experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeSecondaryIndexes.mv read_indirect --concretize --args 0xA
+experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeSecondaryIndexes.mv read_indirect --concretize paths --args 0xA
 sandbox run storage/0x00000000000000000000000000000001/modules/ConcretizeSecondaryIndexes.mv publish_addr --signers 0xA --args 0xB
 # try to concretize, should print one read. publish second resource needed
-experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeSecondaryIndexes.mv read_indirect --concretize --args 0xA
+experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeSecondaryIndexes.mv read_indirect --concretize paths --args 0xA
 sandbox run storage/0x00000000000000000000000000000001/modules/ConcretizeSecondaryIndexes.mv publish --signers 0xB
 # try to concretize, should now print both resources
-experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeSecondaryIndexes.mv read_indirect --concretize --args 0xA
+experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeSecondaryIndexes.mv read_indirect --concretize paths --args 0xA
 
 # check that concretizing with both signers and address args works
-experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeSecondaryIndexes.mv multi_arg --concretize --signers 0x1 --args 0xA 2
+experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeSecondaryIndexes.mv multi_arg --concretize paths --signers 0x1 --args 0xA 2
 
 ## vector + secondary index test
 # print the abstract read/write set state
 experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeVector.mv read_vec
 # try to concretize, should print nothing. publish resources needed
-experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeVector.mv read_vec --concretize --args 0x1
+experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeVector.mv read_vec --concretize paths --args 0x1
 sandbox run storage/0x00000000000000000000000000000001/modules/ConcretizeVector.mv publish --signers 0x1 0x2
 # try to concretize, should now print one S resource and two T resources
-experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeVector.mv read_vec --concretize --args 0x1
+experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeVector.mv read_vec --concretize paths --args 0x1
 # same thing, but with write function
-experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeVector.mv write_vec --concretize --args 0x1 2
+experimental read-write-set storage/0x00000000000000000000000000000001/modules/ConcretizeVector.mv write_vec --concretize paths --args 0x1 2

@@ -11,6 +11,7 @@ use move_core_types::{
     transaction_argument::{convert_txn_args, TransactionArgument},
 };
 
+use crate::ConcretizeMode;
 use anyhow::{anyhow, Result};
 use std::fs;
 
@@ -21,7 +22,7 @@ pub fn analyze_read_write_set(
     signers: &[String],
     txn_args: &[TransactionArgument],
     type_args: &[TypeTag],
-    concretize: bool,
+    concretize: ConcretizeMode,
     verbose: bool,
 ) -> Result<()> {
     let module_id = CompiledModule::deserialize(&fs::read(module_file)?)
@@ -40,31 +41,59 @@ pub fn analyze_read_write_set(
     let modules = dep_graph.compute_topological_order()?;
     let rw = read_write_set::analyze(modules)?;
     if let Some(fenv) = rw.get_function_env(&module_id, &fun_id) {
-        if concretize {
-            let signer_addresses = signers
-                .iter()
-                .map(|s| AccountAddress::from_hex_literal(&s))
-                .collect::<Result<Vec<AccountAddress>, _>>()?;
-            // TODO: parse Value's directly instead of going through the indirection of TransactionArgument?
-            let script_args: Vec<Vec<u8>> = convert_txn_args(&txn_args);
-            // substitute given script arguments + blockchain state into abstract r/w set
-            // safe to unwrap here because every function must be analyzed
-            let results = rw.get_concretized_summary(
-                &module_id,
-                &fun_id,
-                &signer_addresses,
-                &script_args,
-                type_args,
-                state,
-            )?;
-            println!("{}", results.display(&fenv))
-        } else {
-            // don't try try to concretize; just print the R/W set
-            // safe to unwrap here because every function must be analyzed
-            let results = rw.get_summary(&module_id, &fun_id).expect(
-                "Invariant violation: couldn't resolve R/W set summary for defined function",
-            );
-            println!("{}", results.display(&fenv))
+        let signer_addresses = signers
+            .iter()
+            .map(|s| AccountAddress::from_hex_literal(&s))
+            .collect::<Result<Vec<AccountAddress>, _>>()?;
+        // TODO: parse Value's directly instead of going through the indirection of TransactionArgument?
+        let script_args: Vec<Vec<u8>> = convert_txn_args(&txn_args);
+        // substitute given script arguments + blockchain state into abstract r/w set
+        match concretize {
+            ConcretizeMode::Paths => {
+                let results = rw.get_concretized_summary(
+                    &module_id,
+                    &fun_id,
+                    &signer_addresses,
+                    &script_args,
+                    type_args,
+                    state,
+                )?;
+                println!("{}", results.display(&fenv))
+            }
+            ConcretizeMode::Reads => {
+                let results = rw.get_keys_read(
+                    &module_id,
+                    &fun_id,
+                    &signer_addresses,
+                    &script_args,
+                    &type_args,
+                    state,
+                )?;
+                for key in results {
+                    println!("{}", key)
+                }
+            }
+            ConcretizeMode::Writes => {
+                let results = rw.get_keys_written(
+                    &module_id,
+                    &fun_id,
+                    &signer_addresses,
+                    &script_args,
+                    &type_args,
+                    state,
+                )?;
+                for key in results {
+                    println!("{}", key)
+                }
+            }
+            ConcretizeMode::Dont => {
+                // don't try try to concretize; just print the R/W set
+                // safe to unwrap here because every function must be analyzed
+                let results = rw.get_summary(&module_id, &fun_id).expect(
+                    "Invariant violation: couldn't resolve R/W set summary for defined function",
+                );
+                println!("{}", results.display(&fenv))
+            }
         }
     } else {
         println!("Function {} not found in {}", function, module_file)
