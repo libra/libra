@@ -189,6 +189,8 @@ impl SpeculationCache {
             );
             id
         };
+        // prune the previous root state tree
+        self.committed_trees.state_tree().prune();
         self.committed_block_id = new_root_block_id;
         self.committed_trees = committed_trees.clone();
         self.synced_trees = committed_trees;
