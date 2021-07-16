@@ -1,7 +1,7 @@
 // Copyright (c) The Diem Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{FullNode, HealthCheckError, Node, Result, Validator};
+use crate::{FullNode, HealthCheckError, Node, Result, Validator, Version};
 use anyhow::format_err;
 use diem_config::config::NodeConfig;
 use diem_sdk::{client::Client as JsonRpcClient, types::PeerId};
@@ -50,6 +50,10 @@ impl Node for K8sNode {
 
     fn name(&self) -> &str {
         &self.name
+    }
+
+    fn version(&self) -> Version {
+        todo!()
     }
 
     fn json_rpc_endpoint(&self) -> Url {
