@@ -6,9 +6,8 @@ use crate::{
     error::{Error, Result, WaitForTransactionError},
     request::MethodRequest,
     response::{MethodResponse, Response},
-    state::State,
     verifying_client::{
-        methods::VerifyingBatch,
+        methods::{verify_latest_li_matches_state, VerifyingBatch},
         state_store::{Storage, TrustedStateStore},
     },
 };
@@ -19,7 +18,6 @@ use diem_json_rpc_types::views::{
 use diem_types::{
     account_address::AccountAddress,
     event::EventKey,
-    ledger_info::LedgerInfo,
     proof::{AccumulatorConsistencyProof, TransactionAccumulatorSummary},
     state_proof::StateProof,
     transaction::{SignedTransaction, Transaction, Version},
@@ -285,17 +283,20 @@ impl<S: Storage> VerifyingClient<S> {
             .verify_and_ratchet(state_proof, maybe_accumulator)
             .map_err(Error::invalid_proof)?;
 
-        // Try to compare-and-swap the new trusted state into the state store.
-        // If the client is issuing muiltiple concurrent requests, the potential
-        // new trusted state might not be newer than the current trusted state,
-        // in which case we just don't persist this change.
-        if let Some(new_state) = change.new_state() {
+        self.ratchet(change.new_state())
+    }
+
+    /// Try to compare-and-swap a verified trusted state change into the state store.
+    /// If the client is issuing muiltiple concurrent requests, the potential
+    /// new trusted state might not be newer than the current trusted state,
+    /// in which case we just don't persist this change.
+    pub fn ratchet(&self, new_state: Option<TrustedState>) -> Result<()> {
+        if let Some(new_state) = new_state {
             self.trusted_state_store
                 .write()
                 .unwrap()
                 .ratchet(new_state)?;
         }
-
         Ok(())
     }
 
@@ -445,8 +446,7 @@ impl<S: Storage> VerifyingClient<S> {
     }
 
     pub fn actual_batch_size(requests: &[MethodRequest]) -> usize {
-        let actual_requests = VerifyingBatch::from_batch(requests.to_vec()).collect_requests();
-        actual_requests.len() + 1 /* get_state_proof */
+        VerifyingBatch::from_batch(requests.to_vec()).num_subrequests()
     }
 
     pub async fn batch(
@@ -454,6 +454,7 @@ impl<S: Storage> VerifyingClient<S> {
         requests: Vec<MethodRequest>,
     ) -> Result<Vec<Result<Response<MethodResponse>>>> {
         let request_trusted_state = self.trusted_state();
+        let request_version = request_trusted_state.version();
 
         // if we haven't built an accumulator yet, we need to do a sync first.
         if request_trusted_state.accumulator_summary().is_none() {
@@ -465,59 +466,15 @@ impl<S: Storage> VerifyingClient<S> {
 
         // transform each request into verifying sub-request batches
         let batch = VerifyingBatch::from_batch(requests);
-
         // flatten and collect sub-request batches into flat list of requests
-        let mut requests = batch.collect_requests();
-        // append get_state_proof request
-        let start_version = self.version();
-        requests.push(MethodRequest::get_state_proof(start_version));
-
+        let requests = batch.collect_requests(request_version);
         // actually send the batch
-        let mut responses = self.inner.batch(requests).await?;
+        let responses = self.inner.batch(requests).await?;
+        // validate responses and state proof w.r.t. request trusted state
+        let (new_state, responses) = batch.validate_responses(&request_trusted_state, responses)?;
+        // try to ratchet our trusted state in our state store
+        self.ratchet(new_state)?;
 
-        // extract and verify the state proof
-        let (state_proof_response, state) = responses.pop().unwrap()?.into_parts();
-        let state_proof_view = state_proof_response.try_into_get_state_proof()?;
-        let state_proof = StateProof::try_from(&state_proof_view).map_err(Error::decode)?;
-
-        // check the response metadata matches the state proof
-        verify_latest_li_matches_state(state_proof.latest_ledger_info(), &state)?;
-
-        // try to ratchet our trusted state using the state proof
-        self.verify_and_ratchet(&request_trusted_state, &state_proof, None)?;
-
-        // remote says we're too far behind and need to sync. we have to throw
-        // out the batch since we can't verify any proofs
-        if state_proof.epoch_changes().more {
-            // TODO(philiphayes): what is the right behaviour here? it would obv.
-            // be more convenient to just call `self.sync` here and then retry,
-            // but maybe a client would like to control the syncs itself?
-            return Err(Error::unknown(
-                "our client is too far behind, we need to sync",
-            ));
-        }
-
-        // unflatten subresponses, verify, and collect into one response per request
-        batch.validate_responses(start_version, &state, &state_proof, responses)
+        Ok(responses)
     }
-}
-
-/// Check that certain metadata (version and timestamp) in a `LedgerInfo` matches
-/// the response `State`.
-fn verify_latest_li_matches_state(latest_li: &LedgerInfo, state: &State) -> Result<()> {
-    if latest_li.version() != state.version {
-        return Err(Error::invalid_proof(format!(
-            "latest LedgerInfo version ({}) doesn't match response version ({})",
-            latest_li.version(),
-            state.version,
-        )));
-    }
-    if latest_li.timestamp_usecs() != state.timestamp_usecs {
-        return Err(Error::invalid_proof(format!(
-            "latest LedgerInfo timestamp ({}) doesn't match response timestamp ({})",
-            latest_li.timestamp_usecs(),
-            state.timestamp_usecs,
-        )));
-    }
-    Ok(())
 }

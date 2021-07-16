@@ -19,9 +19,11 @@ use diem_types::{
     block_metadata::new_block_event_key,
     contract_event::{EventByVersionWithProof, EventWithProof},
     event::EventKey,
+    ledger_info::LedgerInfo,
     proof::{AccumulatorConsistencyProof, TransactionAccumulatorSummary},
     state_proof::StateProof,
     transaction::{AccountTransactionsWithProof, Version},
+    trusted_state::TrustedState,
 };
 use std::convert::TryFrom;
 
@@ -40,23 +42,26 @@ impl VerifyingBatch {
         self.requests
             .iter()
             .map(|request| request.subrequests.len())
-            .sum()
+            .sum::<usize>()
+            + 1 /* get_state_proof */
     }
 
-    pub(crate) fn collect_requests(&self) -> Vec<MethodRequest> {
-        self.requests
+    pub(crate) fn collect_requests(&self, request_version: Version) -> Vec<MethodRequest> {
+        let mut requests = self
+            .requests
             .iter()
             .flat_map(|request| request.subrequests.iter().cloned())
-            .collect()
+            .collect::<Vec<_>>();
+        requests.push(MethodRequest::get_state_proof(request_version));
+        requests
     }
 
     pub(crate) fn validate_responses(
         self,
-        start_version: Version,
-        state: &State,
-        state_proof: &StateProof,
-        responses: Vec<Result<Response<MethodResponse>>>,
-    ) -> Result<Vec<Result<Response<MethodResponse>>>> {
+        request_trusted_state: &TrustedState,
+        mut responses: Vec<Result<Response<MethodResponse>>>,
+    ) -> Result<(Option<TrustedState>, Vec<Result<Response<MethodResponse>>>)> {
+        // make sure we get the exact number of responses back as we expect
         let num_subrequests = self.num_subrequests();
         if num_subrequests != responses.len() {
             return Err(Error::rpc_response(format!(
@@ -66,8 +71,19 @@ impl VerifyingBatch {
             )));
         }
 
+        // pull out the state proof response, since we need to ratchet our state
+        // first before validating the subsequent responses
+        // note: the .unwrap() is ok since we just checked that we have enough responses above
+        let (state_proof_response, state) = responses.pop().unwrap()?.into_parts();
+        let state_proof_view = state_proof_response.try_into_get_state_proof()?;
+        let state_proof = StateProof::try_from(&state_proof_view).map_err(Error::decode)?;
+
+        // check the response metadata matches the state proof
+        verify_latest_li_matches_state(state_proof.latest_ledger_info(), &state)?;
+
+        // check that all responses fulfilled at the same chain state
         for response in responses.iter().flatten() {
-            if response.state() != state {
+            if response.state() != &state {
                 return Err(Error::rpc_response(format!(
                     "expected all responses in batch to have the same metadata: {:?}, \
                          received unexpected response metadata: {:?}",
@@ -77,18 +93,62 @@ impl VerifyingBatch {
             }
         }
 
-        let mut responses_iter = responses.into_iter();
+        // try to verify and ratchet our trusted state using the state proof
+        let new_state = request_trusted_state
+            .verify_and_ratchet(&state_proof, None)
+            .map_err(Error::invalid_proof)?
+            .new_state();
 
-        Ok(self
+        // remote says we're too far behind and need to sync. we have to throw
+        // out the batch since we can't verify any proofs
+        if state_proof.epoch_changes().more {
+            // TODO(philiphayes): what is the right behaviour here? it would obv.
+            // be more convenient to just call `self.sync` here and then retry,
+            // but maybe a client would like to control the syncs itself?
+            return Err(Error::unknown(
+                "our client is too far behind, we need to sync",
+            ));
+        }
+
+        // unflatten subresponses, verify, and collect into one response per request
+        let mut responses_iter = responses.into_iter();
+        let validated_responses = self
             .requests
             .into_iter()
             .map(|request| {
                 let n = request.subrequests.len();
                 let subresponses = responses_iter.by_ref().take(n).collect();
-                request.validate_subresponses(start_version, state, state_proof, subresponses)
+                request.validate_subresponses(
+                    request_trusted_state.version(),
+                    &state,
+                    &state_proof,
+                    subresponses,
+                )
             })
-            .collect())
+            .collect::<Vec<_>>();
+
+        Ok((new_state, validated_responses))
     }
+}
+
+/// Check that certain metadata (version and timestamp) in a `LedgerInfo` matches
+/// the response `State`.
+pub(crate) fn verify_latest_li_matches_state(latest_li: &LedgerInfo, state: &State) -> Result<()> {
+    if latest_li.version() != state.version {
+        return Err(Error::invalid_proof(format!(
+            "latest LedgerInfo version ({}) doesn't match response version ({})",
+            latest_li.version(),
+            state.version,
+        )));
+    }
+    if latest_li.timestamp_usecs() != state.timestamp_usecs {
+        return Err(Error::invalid_proof(format!(
+            "latest LedgerInfo timestamp ({}) doesn't match response timestamp ({})",
+            latest_li.timestamp_usecs(),
+            state.timestamp_usecs,
+        )));
+    }
+    Ok(())
 }
 
 #[derive(Clone, Copy)]
