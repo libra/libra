@@ -969,15 +969,17 @@ impl<V: VMExecutor> BlockExecutor for Executor<V> {
         }
 
         let mut write_lock = self.cache.write();
-        let arc_blocks = block_ids
-            .iter()
-            .map(|id| write_lock.get_block(id))
-            .collect::<Result<Vec<_>, Error>>()?;
-        let blocks = arc_blocks.iter().map(|b| b.lock()).collect::<Vec<_>>();
-
-        for block in blocks {
-            block.output().executed_trees().state_tree().prune()
-        }
+        // let arc_blocks = block_ids
+        //     .iter()
+        //     .rev()
+        //     .skip(1)
+        //     .map(|id| write_lock.get_block(id))
+        //     .collect::<Result<Vec<_>, Error>>()?;
+        // let blocks = arc_blocks.iter().map(|b| b.lock()).collect::<Vec<_>>();
+        //
+        // for block in blocks {
+        //     block.output().executed_trees().state_tree().prune()
+        // }
 
         write_lock.prune(ledger_info_with_sigs.ledger_info())?;
 

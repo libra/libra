@@ -45,7 +45,7 @@ use std::{
     convert::TryFrom,
     path::PathBuf,
     sync::{mpsc, Arc},
-    time::Instant,
+    time::{Duration, Instant},
 };
 use storage_client::StorageClient;
 use storage_interface::{DbReader, DbReaderWriter};
@@ -267,20 +267,105 @@ impl TransactionGenerator {
     }
 }
 
+fn report_block(
+    version: Version,
+    global_start_time: Instant,
+    execute_time: Duration,
+    commit_start: Instant,
+    block_size: usize,
+) {
+    info!(
+        "Version: {}. execute time: {} ms. commit time: {} ms. TPS: {:.0}. Accumulative TPS: {:.0}",
+        version,
+        execute_time.as_millis(),
+        commit_start.elapsed().as_millis(),
+        block_size as f64 / commit_start.elapsed().as_secs_f64(),
+        version as f64 / global_start_time.elapsed().as_secs_f64(),
+    );
+    info!(
+        "Accumulative total: VM time: {:.0} secs, executor time: {:.0} secs, commit time: {:.0} secs",
+        DIEM_EXECUTOR_VM_EXECUTE_BLOCK_SECONDS.get_sample_sum(),
+        DIEM_EXECUTOR_EXECUTE_BLOCK_SECONDS.get_sample_sum() - DIEM_EXECUTOR_VM_EXECUTE_BLOCK_SECONDS.get_sample_sum(),
+        DIEM_EXECUTOR_COMMIT_BLOCKS_SECONDS.get_sample_sum(),
+    );
+    const NANOS_PER_SEC: f64 = 1_000_000_000.0;
+    info!(
+        "Accumulative per transaction: VM time: {:.0} ns, executor time: {:.0} ns, commit time: {:.0} ns",
+        DIEM_EXECUTOR_VM_EXECUTE_BLOCK_SECONDS.get_sample_sum() * NANOS_PER_SEC
+            / version as f64,
+        (DIEM_EXECUTOR_EXECUTE_BLOCK_SECONDS.get_sample_sum() - DIEM_EXECUTOR_VM_EXECUTE_BLOCK_SECONDS.get_sample_sum()) * NANOS_PER_SEC
+            / version as f64,
+        DIEM_EXECUTOR_COMMIT_BLOCKS_SECONDS.get_sample_sum() * NANOS_PER_SEC
+            / version as f64,
+    );
+}
+
+pub struct TransactionCommitter {
+    executor: Arc<Executor<DiemVM>>,
+    block_receiver: mpsc::Receiver<(HashValue, HashValue, Instant, Duration, usize)>,
+}
+
+impl TransactionCommitter {
+    fn new(
+        executor: Arc<Executor<DiemVM>>,
+        block_receiver: mpsc::Receiver<(HashValue, HashValue, Instant, Duration, usize)>,
+    ) -> Self {
+        Self {
+            executor,
+            block_receiver,
+        }
+    }
+
+    fn run(&mut self) {
+        let mut version = 0;
+        while let Ok((block_id, root_hash, start_time, execution_time, num_txns)) =
+            self.block_receiver.recv()
+        {
+            version += num_txns as u64;
+            let commit_start = std::time::Instant::now();
+            let block_info = BlockInfo::new(
+                1,        /* epoch */
+                0,        /* round, doesn't matter */
+                block_id, /* id, doesn't matter */
+                root_hash, version, 0,    /* timestamp_usecs, doesn't matter */
+                None, /* next_epoch_state */
+            );
+            let ledger_info = LedgerInfo::new(
+                block_info,
+                HashValue::zero(), /* consensus_data_hash, doesn't matter */
+            );
+            let ledger_info_with_sigs =
+                LedgerInfoWithSignatures::new(ledger_info, BTreeMap::new() /* signatures */);
+
+            self.executor
+                .commit_blocks(vec![block_id], ledger_info_with_sigs)
+                .unwrap();
+
+            report_block(version, start_time, execution_time, commit_start, num_txns);
+        }
+    }
+}
+
 pub struct TransactionExecutor {
-    executor: Executor<DiemVM>,
+    executor: Arc<Executor<DiemVM>>,
     parent_block_id: HashValue,
     start_time: Instant,
     version: u64,
+    commit_sender: mpsc::SyncSender<(HashValue, HashValue, Instant, Duration, usize)>,
 }
 
 impl TransactionExecutor {
-    pub fn new(executor: Executor<DiemVM>, parent_block_id: HashValue) -> Self {
+    pub fn new(
+        executor: Arc<Executor<DiemVM>>,
+        parent_block_id: HashValue,
+        commit_sender: mpsc::SyncSender<(HashValue, HashValue, Instant, Duration, usize)>,
+    ) -> Self {
         Self {
             executor,
             parent_block_id,
             version: 0,
             start_time: Instant::now(),
+            commit_sender,
         }
     }
 
@@ -296,69 +381,17 @@ impl TransactionExecutor {
             .execute_block((block_id, transactions), self.parent_block_id)
             .unwrap();
 
-        let commit_start = std::time::Instant::now();
-        let block_info = BlockInfo::new(
-            1,        /* epoch */
-            0,        /* round, doesn't matter */
-            block_id, /* id, doesn't matter */
-            output.root_hash(),
-            self.version,
-            0,    /* timestamp_usecs, doesn't matter */
-            None, /* next_epoch_state */
-        );
-        let ledger_info = LedgerInfo::new(
-            block_info,
-            HashValue::zero(), /* consensus_data_hash, doesn't matter */
-        );
-        let ledger_info_with_sigs =
-            LedgerInfoWithSignatures::new(ledger_info, BTreeMap::new() /* signatures */);
-
-        self.executor
-            .commit_blocks(vec![block_id], ledger_info_with_sigs)
-            .unwrap();
-
         self.parent_block_id = block_id;
 
-        Self::report_block(
-            self.version,
-            self.start_time,
-            execute_start,
-            commit_start,
-            num_txns,
-        );
-    }
-
-    fn report_block(
-        version: Version,
-        global_start_time: Instant,
-        execute_start: Instant,
-        commit_start: Instant,
-        block_size: usize,
-    ) {
-        info!(
-            "Version: {}. execute time: {} ms. commit time: {} ms. TPS: {:.0}. Accumulative TPS: {:.0}",
-            version,
-            commit_start.duration_since(execute_start).as_millis(),
-            commit_start.elapsed().as_millis(),
-            block_size as f64 / execute_start.elapsed().as_secs_f64(),
-            version as f64 / global_start_time.elapsed().as_secs_f64(),
-        );
-        info!(
-            "Accumulative total: VM time: {:.0} secs, executor time: {:.0} secs, commit time: {:.0} secs",
-            DIEM_EXECUTOR_VM_EXECUTE_BLOCK_SECONDS.get_sample_sum(),
-            DIEM_EXECUTOR_EXECUTE_BLOCK_SECONDS.get_sample_sum() - DIEM_EXECUTOR_VM_EXECUTE_BLOCK_SECONDS.get_sample_sum(),
-            DIEM_EXECUTOR_COMMIT_BLOCKS_SECONDS.get_sample_sum(),
-        );
-        const NANOS_PER_SEC: f64 = 1_000_000_000.0;
-        info!(
-            "Accumulative per transaction: VM time: {:.0} ns, executor time: {:.0} ns, commit time: {:.0} ns",
-            DIEM_EXECUTOR_VM_EXECUTE_BLOCK_SECONDS.get_sample_sum() * NANOS_PER_SEC
-                / version as f64,
-            (DIEM_EXECUTOR_EXECUTE_BLOCK_SECONDS.get_sample_sum() - DIEM_EXECUTOR_VM_EXECUTE_BLOCK_SECONDS.get_sample_sum()) * NANOS_PER_SEC
-                / version as f64,
-            DIEM_EXECUTOR_COMMIT_BLOCKS_SECONDS.get_sample_sum() * NANOS_PER_SEC
-                / version as f64,
-        );
+        self.commit_sender
+            .send((
+                block_id,
+                output.root_hash(),
+                self.start_time,
+                Instant::now().duration_since(execute_start),
+                num_txns,
+            ))
+            .unwrap();
     }
 }
 
@@ -400,8 +433,11 @@ pub fn run_benchmark(
 
     let (db, executor) = create_storage_service_and_executor(&config);
     let parent_block_id = executor.committed_block_id();
+    let executor_1 = Arc::new(executor);
+    let executor_2 = executor_1.clone();
 
     let (block_sender, block_receiver) = mpsc::sync_channel(50 /* bound */);
+    let (commit_sender, commit_receiver) = mpsc::sync_channel(50);
 
     // Spawn two threads to run transaction generator and executor separately.
     let gen_thread = std::thread::Builder::new()
@@ -416,19 +452,28 @@ pub fn run_benchmark(
     let exe_thread = std::thread::Builder::new()
         .name("txn_executor".to_string())
         .spawn(move || {
-            let mut exe = TransactionExecutor::new(executor, parent_block_id);
+            let mut exe = TransactionExecutor::new(executor_1, parent_block_id, commit_sender);
             while let Ok(transactions) = block_receiver.recv() {
                 info!("Received block of size {:?}", transactions.len());
                 exe.execute_block(transactions);
             }
+            exe.commit_sender
         })
         .expect("Failed to spawn transaction executor thread.");
+    let commit_thread = std::thread::Builder::new()
+        .name("txn_committer".to_string())
+        .spawn(move || {
+            let mut committer = TransactionCommitter::new(executor_2, commit_receiver);
+            committer.run();
+        })
+        .expect("Failed to spawn transaction committer thread.");
 
     // Wait for generator to finish.
     let mut generator = gen_thread.join().unwrap();
     generator.drop_sender();
     // Wait until all transactions are committed.
     exe_thread.join().unwrap();
+    commit_thread.join().unwrap();
 
     // Do a sanity check on the sequence number to make sure all transactions are committed.
     generator.verify_sequence_number(db.as_ref());
