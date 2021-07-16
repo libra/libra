@@ -63,17 +63,11 @@ pub struct Substitution {
     subs: BTreeMap<u16, Type>,
 }
 
-/// Represents an type error resulting from unification.
-pub struct TypeError {
-    pub message: String,
-}
-
-impl TypeError {
-    fn new(msg: impl Into<String>) -> Self {
-        TypeError {
-            message: msg.into(),
-        }
-    }
+/// Represents an error resulting from type unification.
+pub enum TypeUnificationError {
+    TypeMismatch(Type, Type),
+    ArityMismatch(String, usize, usize),
+    CyclicSubstitution(Type, Type),
 }
 
 impl PrimitiveType {
@@ -554,21 +548,17 @@ impl Substitution {
     /// unification. If unification fails, the substitution will be in some intermediate state;
     /// to implement transactional unification, the substitution must be cloned before calling
     /// this.
-    ///
-    /// The passed `display_context` is needed for visualization of types on unification errors.
-    pub fn unify<'a>(
+    pub fn unify(
         &mut self,
-        display_context: &'a TypeDisplayContext<'a>,
         variance: Variance,
         t1: &Type,
         t2: &Type,
-    ) -> Result<Type, TypeError> {
+    ) -> Result<Type, TypeUnificationError> {
         // Derive the variance level for recursion
         let sub_variance = match variance {
             Variance::Allow => Variance::Allow,
             Variance::Shallow | Variance::Disallow => Variance::Disallow,
         };
-
         // If any of the arguments is a reference, drop it for unification, but ensure
         // it is put back since we need to maintain this information for later phases.
         if let Type::Reference(is_mut, bt1) = t1 {
@@ -580,25 +570,21 @@ impl Substitution {
             };
             return Ok(Type::Reference(
                 *is_mut,
-                Box::new(self.unify(display_context, sub_variance, bt1.as_ref(), t2)?),
+                Box::new(self.unify(sub_variance, bt1.as_ref(), t2)?),
             ));
         }
         if let Type::Reference(is_mut, bt2) = t2 {
             return Ok(Type::Reference(
                 *is_mut,
-                Box::new(self.unify(display_context, sub_variance, t1, bt2.as_ref())?),
+                Box::new(self.unify(sub_variance, t1, bt2.as_ref())?),
             ));
         }
 
         // Substitute or assign variables.
-        if let Some(rt) =
-            self.try_substitute_or_assign(display_context, variance, false, &t1, &t2)?
-        {
+        if let Some(rt) = self.try_substitute_or_assign(variance, false, &t1, &t2)? {
             return Ok(rt);
         }
-        if let Some(rt) =
-            self.try_substitute_or_assign(display_context, variance, true, &t2, &t1)?
-        {
+        if let Some(rt) = self.try_substitute_or_assign(variance, true, &t2, &t1)? {
             return Ok(rt);
         }
 
@@ -631,7 +617,6 @@ impl Substitution {
             }
             (Type::Tuple(ts1), Type::Tuple(ts2)) => {
                 return Ok(Type::Tuple(self.unify_vec(
-                    display_context,
                     sub_variance,
                     ts1,
                     ts2,
@@ -640,8 +625,8 @@ impl Substitution {
             }
             (Type::Fun(ts1, r1), Type::Fun(ts2, r2)) => {
                 return Ok(Type::Fun(
-                    self.unify_vec(display_context, sub_variance, ts1, ts2, "functions")?,
-                    Box::new(self.unify(display_context, sub_variance, &*r1, &*r2)?),
+                    self.unify_vec(sub_variance, ts1, ts2, "functions")?,
+                    Box::new(self.unify(sub_variance, &*r1, &*r2)?),
                 ));
             }
             (Type::Struct(m1, s1, ts1), Type::Struct(m2, s2, ts2)) => {
@@ -649,13 +634,12 @@ impl Substitution {
                     return Ok(Type::Struct(
                         *m1,
                         *s1,
-                        self.unify_vec(display_context, sub_variance, ts1, ts2, "structs")?,
+                        self.unify_vec(sub_variance, ts1, ts2, "structs")?,
                     ));
                 }
             }
             (Type::Vector(e1), Type::Vector(e2)) => {
                 return Ok(Type::Vector(Box::new(self.unify(
-                    display_context,
                     sub_variance,
                     &*e1,
                     &*e2,
@@ -663,7 +647,6 @@ impl Substitution {
             }
             (Type::TypeDomain(e1), Type::TypeDomain(e2)) => {
                 return Ok(Type::TypeDomain(Box::new(self.unify(
-                    display_context,
                     sub_variance,
                     &*e1,
                     &*e2,
@@ -676,34 +659,30 @@ impl Substitution {
             }
             _ => {}
         }
-
-        Err(TypeError::new(format!(
-            "expected `{}` but found `{}`",
-            self.specialize(&t2).display(display_context),
-            self.specialize(&t1).display(display_context),
-        )))
+        Err(TypeUnificationError::TypeMismatch(
+            self.specialize(t1),
+            self.specialize(t2),
+        ))
     }
 
     /// Helper to unify two type vectors.
-    fn unify_vec<'a>(
+    fn unify_vec(
         &mut self,
-        display_context: &'a TypeDisplayContext<'a>,
         variance: Variance,
         ts1: &[Type],
         ts2: &[Type],
         item_name: &str,
-    ) -> Result<Vec<Type>, TypeError> {
+    ) -> Result<Vec<Type>, TypeUnificationError> {
         if ts1.len() != ts2.len() {
-            return Err(TypeError::new(format!(
-                "{} have different arity ({} != {})",
-                item_name,
+            return Err(TypeUnificationError::ArityMismatch(
+                item_name.to_owned(),
                 ts1.len(),
-                ts2.len()
-            )));
+                ts2.len(),
+            ));
         }
         let mut rs = vec![];
         for i in 0..ts1.len() {
-            rs.push(self.unify(display_context, variance, &ts1[i], &ts2[i])?);
+            rs.push(self.unify(variance, &ts1[i], &ts2[i])?);
         }
         Ok(rs)
     }
@@ -712,20 +691,19 @@ impl Substitution {
     /// was performed, None if not.
     fn try_substitute_or_assign(
         &mut self,
-        display_context: &TypeDisplayContext,
         variance: Variance,
         swapped: bool,
         t1: &Type,
         t2: &Type,
-    ) -> Result<Option<Type>, TypeError> {
+    ) -> Result<Option<Type>, TypeUnificationError> {
         if let Type::Var(v1) = t1 {
             if let Some(s1) = self.subs.get(&v1).cloned() {
                 return if swapped {
                     // Place the type terms in the right order again, so we
                     // get the 'expected vs actual' direction right.
-                    Ok(Some(self.unify(display_context, variance, t2, &s1)?))
+                    Ok(Some(self.unify(variance, t2, &s1)?))
                 } else {
-                    Ok(Some(self.unify(display_context, variance, &s1, t2)?))
+                    Ok(Some(self.unify(variance, &s1, t2)?))
                 };
             }
             let is_t1_var = |t: &Type| {
@@ -746,10 +724,10 @@ impl Substitution {
             } else {
                 // It is not clear to me whether this can ever occur given we do no global
                 // unification with recursion, but to be on the save side, we have it.
-                Err(TypeError::new(&format!(
-                    "[internal] type unification cycle check failed ({:?} =?= {:?})",
-                    t1, t2
-                )))
+                Err(TypeUnificationError::CyclicSubstitution(
+                    self.specialize(t1),
+                    self.specialize(t2),
+                ))
             }
         } else {
             Ok(None)
@@ -760,6 +738,30 @@ impl Substitution {
 impl Default for Substitution {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl TypeUnificationError {
+    pub fn message(&self, display_context: &TypeDisplayContext) -> String {
+        match self {
+            TypeUnificationError::TypeMismatch(t1, t2) => {
+                format!(
+                    "expected `{}` but found `{}`",
+                    t2.display(display_context),
+                    t1.display(display_context),
+                )
+            }
+            TypeUnificationError::ArityMismatch(item, a1, a2) => {
+                format!("{} have different arity ({} != {})", item, a1, a2)
+            }
+            TypeUnificationError::CyclicSubstitution(t1, t2) => {
+                format!(
+                    "[internal] type unification cycle check failed ({} =?= {})",
+                    t1.display(display_context),
+                    t2.display(display_context),
+                )
+            }
+        }
     }
 }
 
