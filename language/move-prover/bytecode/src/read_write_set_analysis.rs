@@ -26,21 +26,13 @@ use move_model::{
     model::{FunctionEnv, GlobalEnv, ModuleId, StructId},
     ty::Type,
 };
-use std::{cmp::Ordering, fmt, fmt::Formatter};
+use read_write_set_types::{
+    Access, AccessPath as RWAccessPath, Offset as RWOffset, ReadWriteSet, Root as RWRoot,
+};
+use std::{fmt, fmt::Formatter};
 
 // =================================================================================================
 // Data Model
-
-/// An access to local or global state
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
-pub enum Access {
-    /// Read via RHS * or exists
-    Read,
-    /// Written via LHS *, move_to, or move_from
-    Write,
-    /// Could be read or written
-    ReadWrite,
-}
 
 /// A record of the glocals and locals accessed by the current procedure + the address values stored
 /// by locals or globals
@@ -57,22 +49,6 @@ pub struct ReadWriteSetState {
 /// overapproximate `ReadWriteSet`
 #[derive(Debug, Clone, Eq, PartialOrd, PartialEq)]
 pub struct SpecializedReadWriteSetState(AccessPathTrie<Access>);
-
-impl Access {
-    pub fn is_read(&self) -> bool {
-        match self {
-            Access::Read | Access::ReadWrite => true,
-            Access::Write => false,
-        }
-    }
-
-    pub fn is_write(&self) -> bool {
-        match self {
-            Access::Write | Access::ReadWrite => true,
-            Access::Read => false,
-        }
-    }
-}
 
 // =================================================================================================
 // Abstract Domain Operations
@@ -433,19 +409,6 @@ impl AbstractDomain for ReadWriteSetState {
 impl FootprintDomain for Access {
     fn make_footprint(_ap: AccessPath) -> Option<Self> {
         None
-    }
-}
-
-impl PartialOrd for Access {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        if self == other {
-            return Some(Ordering::Equal);
-        }
-        match (self, other) {
-            (Access::ReadWrite, _) => Some(Ordering::Greater),
-            (_, Access::ReadWrite) => Some(Ordering::Less),
-            _ => None,
-        }
     }
 }
 
@@ -877,5 +840,69 @@ impl Default for ReadWriteSetState {
             accesses: AccessPathTrie::default(),
             locals: AccessPathTrie::default(),
         }
+    }
+}
+
+// =================================================================================================
+// Converting Infer Result into standalone types
+
+impl Offset {
+    pub fn make_canonical(&self, env: &GlobalEnv) -> Option<RWOffset> {
+        Some(match self {
+            Offset::Field(idx) => RWOffset::Field(*idx),
+            Offset::VectorIndex => RWOffset::VectorIndex,
+            Offset::Global(s) => RWOffset::Global(s.get_type().into_struct_type(env)?),
+        })
+    }
+}
+impl AccessPath {
+    pub fn make_canonical(&self, env: &GlobalEnv) -> Option<Vec<RWAccessPath>> {
+        let (roots, access_opt) = match self.root() {
+            Root::Formal(idx) => (vec![RWRoot::Formal(*idx)], None),
+            Root::Global(key) => (
+                key.address()
+                    .get_concrete_addresses()
+                    .into_iter()
+                    .map(RWRoot::Const)
+                    .collect(),
+                key.struct_type().get_type().into_struct_type(env),
+            ),
+            _ => return None,
+        };
+        let mut offsets = access_opt
+            .clone()
+            .map_or_else(|| vec![], |struct_ty| vec![RWOffset::Global(struct_ty)]);
+
+        offsets.append(
+            &mut self
+                .offsets()
+                .iter()
+                .map(|offset| offset.make_canonical(env))
+                .collect::<Option<Vec<_>>>()?,
+        );
+
+        Some(
+            roots
+                .into_iter()
+                .map(|root| RWAccessPath {
+                    root,
+                    offsets: offsets.clone(),
+                })
+                .collect(),
+        )
+    }
+}
+
+impl ReadWriteSetState {
+    pub fn make_canonical(&self, env: &GlobalEnv) -> Option<ReadWriteSet> {
+        let mut analysis_result = ReadWriteSet::new();
+        self.accesses.iter_paths(|access_path, access| {
+            // TODO: Replace the unwrap here?
+            let access_pathes = access_path.make_canonical(env).unwrap();
+            for concrete_access_path in access_pathes {
+                analysis_result.add_access_path(concrete_access_path, access.clone());
+            }
+        });
+        Some(analysis_result)
     }
 }

@@ -1,0 +1,15 @@
+[package]
+name = "read-write-set-types"
+version = "0.1.0"
+authors = ["Diem Association <opensource@diem.com>"]
+description = "Type definition for read/write set inference for Move bytecode programs"
+repository = "https://github.com/diem/diem"
+homepage = "https://diem.com"
+license = "Apache-2.0"
+publish = false
+edition = "2018"
+
+[dependencies]
+anyhow = "1.0.38"
+diem-workspace-hack = { path = "../../../../common/workspace-hack" }
+move-core-types = { path = "../../../move-core/types" }

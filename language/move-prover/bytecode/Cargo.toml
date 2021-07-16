@@ -18,6 +18,7 @@ ir-to-bytecode = { path = "../../compiler/ir-to-bytecode" }
 diem-workspace-hack = { path = "../../../common/workspace-hack" }
 move-core-types = { path = "../../move-core/types" }
 move-command-line-common = { path = "../../move-command-line-common" }
+read-write-set-types = { path = "../../tools/read-write-set/types" }
 
 codespan = "0.8.0"
 codespan-reporting = { version = "0.8.0", features = ["serde", "serialization"] }

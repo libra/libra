@@ -3,6 +3,7 @@
 
 use crate::{
     data_cache::MoveStorage, native_functions::NativeFunction, runtime::VMRuntime, session::Session,
+     loader::Loader,
 };
 use move_binary_format::errors::{Location, VMResult};
 use move_core_types::{account_address::AccountAddress, identifier::Identifier};
@@ -37,5 +38,9 @@ impl MoveVM {
     ///     and apply the effects to the storage when the Session ends.
     pub fn new_session<'r, S: MoveStorage>(&self, remote: &'r S) -> Session<'r, '_, S> {
         self.runtime.new_session(remote)
+    }
+
+    pub fn loader(&self) -> &Loader {
+        self.runtime.loader()
     }
 }

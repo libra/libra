@@ -12,10 +12,12 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0.38"
 diem-workspace-hack = { path = "../../../common/workspace-hack" }
+read-write-set-types = { path = "types" }
 move-binary-format = { path = "../../move-binary-format" }
 move-bytecode-utils = { path = "../move-bytecode-utils" }
 move-core-types = { path = "../../move-core/types" }
 move-vm-runtime = { path = "../../move-vm/runtime" }
+move-stdlib = { path = "../../move-stdlib" }
 move-model = { path = "../../move-model" }
 prover_bytecode = { path = "../../move-prover/bytecode", package="bytecode" }
 resource-viewer = { path = "../resource-viewer" }

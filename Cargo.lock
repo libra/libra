@@ -612,6 +612,7 @@ dependencies = [
  "num 0.4.0",
  "once_cell",
  "petgraph",
+ "read-write-set-types",
  "serde",
  "serde_json",
 ]
@@ -6176,8 +6177,19 @@ dependencies = [
  "move-bytecode-utils",
  "move-core-types",
  "move-model",
+ "move-stdlib",
  "move-vm-runtime",
+ "read-write-set-types",
  "resource-viewer",
+]
+
+[[package]]
+name = "read-write-set-types"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "diem-workspace-hack",
+ "move-core-types",
 ]
 
 [[package]]

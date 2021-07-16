@@ -400,4 +400,8 @@ impl VMRuntime {
             gas_status,
         )
     }
+
+    pub(crate) fn loader(&self) -> &Loader {
+        &self.loader
+    }
 }

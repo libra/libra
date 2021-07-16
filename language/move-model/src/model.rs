@@ -1295,20 +1295,26 @@ impl GlobalEnv {
         sid: StructId,
         ts: &[Type],
     ) -> Option<language_storage::StructTag> {
-        if ts.iter().any(|t| t.is_open()) {
-            None
-        } else {
+        self.get_struct_type(mid, sid, ts)?.to_struct_tag()
+    }
+
+    /// Attempt to compute a struct type for (`mid`, `sid`, `ts`).
+    pub fn get_struct_type(
+        &self,
+        mid: ModuleId,
+        sid: StructId,
+        ts: &[Type],
+    ) -> Option<language_storage::StructType> {
             let menv = self.get_module(mid);
-            Some(language_storage::StructTag {
+            Some(language_storage::StructType {
                 address: *menv.self_address(),
                 module: menv.get_identifier(),
                 name: menv.get_struct(sid).get_identifier(),
                 type_params: ts
                     .iter()
-                    .map(|t| t.clone().into_type_tag(self).unwrap())
+                    .map(|t| t.clone().into_type(self).unwrap())
                     .collect(),
             })
-        }
     }
 
     /// Gets the location of the given node.

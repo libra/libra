@@ -10,6 +10,7 @@ use move_core_types::{
     language_storage::TypeTag,
     transaction_argument::{convert_txn_args, TransactionArgument},
 };
+use move_stdlib::natives::all_natives;
 
 use anyhow::{anyhow, Result};
 use std::fs;
@@ -38,36 +39,35 @@ pub fn analyze_read_write_set(
         )
     }
     let modules = dep_graph.compute_topological_order()?;
-    let rw = read_write_set::analyze(modules)?;
-    if let Some(fenv) = rw.get_function_env(&module_id, &fun_id) {
-        if concretize {
-            let signer_addresses = signers
-                .iter()
-                .map(|s| AccountAddress::from_hex_literal(&s))
-                .collect::<Result<Vec<AccountAddress>, _>>()?;
-            // TODO: parse Value's directly instead of going through the indirection of TransactionArgument?
-            let script_args: Vec<Vec<u8>> = convert_txn_args(&txn_args);
-            // substitute given script arguments + blockchain state into abstract r/w set
-            // safe to unwrap here because every function must be analyzed
-            let results = rw.get_concretized_summary(
-                &module_id,
-                &fun_id,
-                &signer_addresses,
-                &script_args,
-                type_args,
-                state,
-            )?;
-            println!("{}", results.display(&fenv))
-        } else {
-            // don't try try to concretize; just print the R/W set
-            // safe to unwrap here because every function must be analyzed
-            let results = rw.get_summary(&module_id, &fun_id).expect(
-                "Invariant violation: couldn't resolve R/W set summary for defined function",
-            );
-            println!("{}", results.display(&fenv))
-        }
+    let rw = read_write_set::analyze(
+        modules,
+        all_natives(AccountAddress::from_hex_literal("0x1").unwrap()),
+    )?;
+    if concretize {
+        let signer_addresses = signers
+            .iter()
+            .map(|s| AccountAddress::from_hex_literal(&s))
+            .collect::<Result<Vec<AccountAddress>, _>>()?;
+        // TODO: parse Value's directly instead of going through the indirection of TransactionArgument?
+        let script_args: Vec<Vec<u8>> = convert_txn_args(&txn_args);
+        // substitute given script arguments + blockchain state into abstract r/w set
+        // safe to unwrap here because every function must be analyzed
+        let results = rw.get_concretized_summary(
+            &module_id,
+            &fun_id,
+            &signer_addresses,
+            &script_args,
+            type_args,
+            state,
+        )?;
+        println!("{}", results)
     } else {
-        println!("Function {} not found in {}", function, module_file)
+        // don't try try to concretize; just print the R/W set
+        // safe to unwrap here because every function must be analyzed
+        let results = rw
+            .get_canonical_summary(&module_id, &fun_id)
+            .expect("Invariant violation: couldn't resolve R/W set summary for defined function");
+        println!("{}", results)
     }
     Ok(())
 }

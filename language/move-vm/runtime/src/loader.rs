@@ -3,7 +3,8 @@
 
 use crate::{
     logging::expect_no_verification_errors,
-    native_functions::{NativeFunction, NativeFunctions},
+    data_cache::{MoveStorage, TransactionDataCache},
+    native_functions::{NativeFunctions, NativeFunction},
 };
 use bytecode_verifier::{self, cyclic_dependencies, dependencies, script_signature};
 use move_binary_format::{
@@ -414,7 +415,8 @@ impl ModuleCache {
 // entities. Each cache is protected by a `RwLock`. Operation in the Loader must be thread safe
 // (operating on values on the stack) and when cache needs updating the mutex must be taken.
 // The `pub(crate)` API is what a Loader offers to the runtime.
-pub(crate) struct Loader {
+// The `pub` API is what a loader offers to external uses.
+pub struct Loader {
     scripts: RwLock<ScriptCache>,
     module_cache: RwLock<ModuleCache>,
     type_cache: RwLock<TypeCache>,
@@ -1873,5 +1875,47 @@ impl Loader {
     }
     pub(crate) fn type_to_type_layout(&self, ty: &Type) -> PartialVMResult<MoveTypeLayout> {
         self.type_to_type_layout_impl(ty, 1)
+    }
+}
+
+// Public APIs for external uses.
+impl Loader {
+    pub fn get_function_signature(
+        &self,
+        function_name: &IdentStr,
+        module_id: &ModuleId,
+        ty_args: &[TypeTag],
+        move_storage: &impl MoveStorage,
+    ) -> VMResult<(Vec<TypeTag>, Vec<TypeTag>)> {
+        let mut data_store = TransactionDataCache::new(move_storage, self);
+        let (_, _, param_types, return_types) = self.load_function(
+            function_name,
+            module_id,
+            ty_args,
+            false,
+            &mut data_store,
+        )?;
+        let type_to_type_tag = |ty_vec: Vec<Type>| {
+            ty_vec
+                .iter()
+                .map(|ty| self.type_to_type_tag(ty))
+                .collect::<PartialVMResult<Vec<_>>>()
+                .map_err(|e| e.finish(Location::Undefined))
+        };
+        Ok((
+            type_to_type_tag(param_types)?,
+            type_to_type_tag(return_types)?,
+        ))
+    }
+
+    pub fn get_type_layout(
+        &self,
+        type_tag: &TypeTag,
+        move_storage: &impl MoveStorage,
+    ) -> VMResult<MoveTypeLayout> {
+        let mut data_store = TransactionDataCache::new(move_storage, self);
+        let ty = self.load_type(type_tag, &mut data_store)?;
+        self.type_to_type_layout(&ty)
+            .map_err(|e| e.finish(Location::Undefined))
     }
 }

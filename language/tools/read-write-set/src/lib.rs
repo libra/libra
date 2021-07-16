@@ -4,25 +4,27 @@
 pub mod dynamic_analysis;
 
 use crate::dynamic_analysis::ConcretizedSecondaryIndexes;
-use anyhow::{bail, Result};
+use anyhow::{anyhow, bail, Result};
 use move_binary_format::file_format::CompiledModule;
 use move_bytecode_utils::Modules;
 use move_core_types::{
     account_address::AccountAddress,
-    identifier::IdentStr,
+    identifier::{IdentStr, Identifier},
     language_storage::{ModuleId, ResourceKey, TypeTag},
 };
 use move_model::model::{FunctionEnv, GlobalEnv};
-use move_vm_runtime::data_cache::MoveStorage;
+use move_vm_runtime::{data_cache::MoveStorage, move_vm::MoveVM, native_functions::NativeFunction};
 use prover_bytecode::{
     access_path::Offset,
     function_target_pipeline::{FunctionTargetPipeline, FunctionTargetsHolder, FunctionVariant},
     read_write_set_analysis::{ReadWriteSetProcessor, ReadWriteSetState},
 };
+use read_write_set_types::ReadWriteSet;
 
 pub struct ReadWriteSetAnalysis {
     targets: FunctionTargetsHolder,
     env: GlobalEnv,
+    move_vm: MoveVM,
 }
 
 /// Infer read/write set results for `modules`.
@@ -30,19 +32,27 @@ pub struct ReadWriteSetAnalysis {
 /// (i.e., a child node in the dependency graph should appear earlier in the
 /// vector than its parents), and all dependencies of each module must be
 /// included.
-pub fn analyze<'a>(
+pub fn analyze<'a, I>(
     modules: impl IntoIterator<Item = &'a CompiledModule>,
-) -> Result<ReadWriteSetAnalysis> {
+    natives: I,
+) -> Result<ReadWriteSetAnalysis>
+where
+    I: IntoIterator<Item = (AccountAddress, Identifier, Identifier, NativeFunction)>,
+{
     let module_map = Modules::new(modules);
     let dep_graph = module_map.compute_dependency_graph();
     let topo_order = dep_graph.compute_topological_order()?;
-    analyze_sorted(topo_order)
+    analyze_sorted(topo_order, natives)
 }
 
 /// Like analyze_unsorted, but assumes that `modules` is already topologically sorted
-pub fn analyze_sorted<'a>(
+pub fn analyze_sorted<'a, I>(
     modules: impl IntoIterator<Item = &'a CompiledModule>,
-) -> Result<ReadWriteSetAnalysis> {
+    natives: I,
+) -> Result<ReadWriteSetAnalysis>
+where
+    I: IntoIterator<Item = (AccountAddress, Identifier, Identifier, NativeFunction)>,
+{
     let env = move_model::run_bytecode_model_builder(modules)?;
     let mut pipeline = FunctionTargetPipeline::default();
     pipeline.add_processor(ReadWriteSetProcessor::new());
@@ -54,7 +64,11 @@ pub fn analyze_sorted<'a>(
     }
     pipeline.run(&env, &mut targets);
 
-    Ok(ReadWriteSetAnalysis { targets, env })
+    Ok(ReadWriteSetAnalysis {
+        targets,
+        env,
+        move_vm: MoveVM::new(natives).map_err(|_| anyhow!("Failed to spawn MoveVM"))?,
+    })
 }
 
 impl ReadWriteSetAnalysis {
@@ -69,6 +83,11 @@ impl ReadWriteSetAnalysis {
                     .flatten()
             })
             .flatten()
+    }
+
+    pub fn get_canonical_summary(&self, module: &ModuleId, fun: &IdentStr) -> Option<ReadWriteSet> {
+        self.get_summary(module, fun)
+            .and_then(|rw| rw.make_canonical(&self.env))
     }
 
     fn get_summary_(&self, module: &ModuleId, fun: &IdentStr) -> Result<&ReadWriteSetState> {
@@ -89,16 +108,21 @@ impl ReadWriteSetAnalysis {
         signers: &[AccountAddress],
         actuals: &[Vec<u8>],
         type_actuals: &[TypeTag],
-        blockchain_view: &dyn MoveStorage,
+        blockchain_view: &impl MoveStorage,
     ) -> Result<ConcretizedSecondaryIndexes> {
-        let state = self.get_summary_(module, fun)?;
+        let state = self
+            .get_summary_(module, fun)?
+            .make_canonical(&self.env)
+            .unwrap();
         dynamic_analysis::concretize(
-            state.accesses().clone(),
+            state,
+            module,
+            fun,
             signers,
             actuals,
             type_actuals,
-            &self.get_function_env(module, fun).unwrap(),
             blockchain_view,
+            self.move_vm.loader(),
         )
     }
 
@@ -127,7 +151,7 @@ impl ReadWriteSetAnalysis {
         signers: &[AccountAddress],
         actuals: &[Vec<u8>],
         type_actuals: &[TypeTag],
-        blockchain_view: &dyn MoveStorage,
+        blockchain_view: &impl MoveStorage,
     ) -> Result<Vec<ResourceKey>> {
         self.get_concretized_keys(
             module,
@@ -150,7 +174,7 @@ impl ReadWriteSetAnalysis {
         signers: &[AccountAddress],
         actuals: &[Vec<u8>],
         type_actuals: &[TypeTag],
-        blockchain_view: &dyn MoveStorage,
+        blockchain_view: &impl MoveStorage,
     ) -> Result<Vec<ResourceKey>> {
         self.get_concretized_keys(
             module,
@@ -175,22 +199,27 @@ impl ReadWriteSetAnalysis {
         signers: &[AccountAddress],
         actuals: &[Vec<u8>],
         type_actuals: &[TypeTag],
-        blockchain_view: &dyn MoveStorage,
+        blockchain_view: &impl MoveStorage,
         is_write: bool,
     ) -> Result<Vec<ResourceKey>> {
-        if let Some(state) = self.get_summary(module, fun) {
+        if let Some(state) = self
+            .get_summary(module, fun)
+            .and_then(|s| s.make_canonical(&self.env))
+        {
             let results = dynamic_analysis::concretize(
-                state.accesses().clone(),
+                state,
+                module,
+                fun,
                 signers,
                 actuals,
                 type_actuals,
-                &self.get_function_env(module, fun).unwrap(),
                 blockchain_view,
+                self.move_vm.loader(),
             )?;
             Ok(if is_write {
-                results.get_keys_written(&self.env)
+                results.get_keys_written().unwrap()
             } else {
-                results.get_keys_read(&self.env)
+                results.get_keys_read().unwrap()
             })
         } else {
             bail!("Couldn't resolve function {:?}::{:?}", module, fun)

@@ -8,7 +8,7 @@ use crate::{
     model::{GlobalEnv, ModuleId, StructEnv, StructId},
     symbol::{Symbol, SymbolPool},
 };
-use move_core_types::language_storage::{StructTag, TypeTag};
+use move_core_types::language_storage::{StructTag, TypeTag, StructType, Type as MType};
 use std::{
     collections::{BTreeMap, BTreeSet},
     fmt,
@@ -86,16 +86,16 @@ impl PrimitiveType {
         }
     }
 
-    /// Attempt to convert this type into a language_storage::TypeTag
-    pub fn into_type_tag(self) -> Option<TypeTag> {
+    /// Attempt to convert this type into a language_storage::Type
+    pub fn into_type(self) -> Option<MType> {
         use PrimitiveType::*;
         Some(match self {
-            Bool => TypeTag::Bool,
-            U8 => TypeTag::U8,
-            U64 => TypeTag::U64,
-            U128 => TypeTag::U128,
-            Address => TypeTag::Address,
-            Signer => TypeTag::Signer,
+            Bool => MType::Bool,
+            U8 => MType::U8,
+            U64 => MType::U64,
+            U128 => MType::U128,
+            Address => MType::Address,
+            Signer => MType::Signer,
             Num | Range | TypeValue | EventStore => return None,
         })
     }
@@ -396,45 +396,49 @@ impl Type {
         }
     }
 
-    pub fn into_struct_tag(self, env: &GlobalEnv) -> Option<StructTag> {
+    /// Attempt to convert this type into a language_storage::TypeTag
+    pub fn into_struct_type(self, env: &GlobalEnv) -> Option<StructType> {
         use Type::*;
-        if self.is_open() {
-            None
-        } else {
             Some (
                 match self {
 		    Struct(mid, sid, ts) =>
-                        env.get_struct_tag(mid, sid, &ts)
+                        env.get_struct_type(mid, sid, &ts)
                             .expect("Invariant violation: struct type argument contains incomplete, tuple, reference, or spec type"),
 
                     _ => return None
 		}
 	    )
-        }
+    }
+
+    /// Attempt to convert this type into a language_storage::Type
+    pub fn into_type(self, env: &GlobalEnv) -> Option<MType> {
+        use Type::*;
+            Some (
+                match self {
+                    Primitive(p) => p.into_type().expect("Invariant violation: unexpected spec primitive"),
+                    Struct(mid, sid, ts) => MType::Struct(
+                        env.get_struct_type(mid, sid, &ts)
+                            .expect("Invariant violation: struct type argument contains incomplete, tuple, reference, or spec type")
+                    ),
+                    Vector(et) => MType::Vector(
+                        Box::new(et.into_type(env)
+                                 .expect("Invariant violation: vector type argument contains incomplete, tuple, reference, or spec type"))
+                    ),
+                    TypeParameter(idx) => MType::TypeArg(idx as usize),
+                    Tuple(..) | Error | Fun(..) | TypeDomain(..) | ResourceDomain(..) | TypeLocal(..) | Var(..) | Reference(..) =>
+                        return None
+                }
+            )
+    }
+
+    /// Attempt to convert this type into a language_storage::StructTag
+    pub fn into_struct_tag(self, env: &GlobalEnv) -> Option<StructTag> {
+       self.into_struct_type(env)?.to_struct_tag()
     }
 
     /// Attempt to convert this type into a language_storage::TypeTag
     pub fn into_type_tag(self, env: &GlobalEnv) -> Option<TypeTag> {
-        use Type::*;
-        if self.is_open() || self.is_reference() || self.is_spec() {
-            None
-        } else {
-            Some (
-                match self {
-                    Primitive(p) => p.into_type_tag().expect("Invariant violation: unexpected spec primitive"),
-                    Struct(mid, sid, ts) =>TypeTag::Struct(
-                        env.get_struct_tag(mid, sid, &ts)
-                            .expect("Invariant violation: struct type argument contains incomplete, tuple, reference, or spec type")
-                    ),
-                    Vector(et) => TypeTag::Vector(
-                        Box::new(et.into_type_tag(env)
-                                 .expect("Invariant violation: vector type argument contains incomplete, tuple, reference, or spec type"))
-                    ),
-                    Tuple(..) | Error | Fun(..) | TypeDomain(..) | ResourceDomain(..) | TypeParameter(..) | TypeLocal(..) | Var(..) | Reference(..) =>
-                        return None
-                }
-            )
-        }
+        self.into_type(env)?.to_type_tag()
     }
 
     /// Create a `Type` from `t`

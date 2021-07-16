@@ -118,6 +118,7 @@ members = [
     "language/tools/move-coverage",
     "language/tools/move-explain",
     "language/tools/move-unit-test",
+    "language/tools/read-write-set/types",
     "language/tools/read-write-set",
     "language/tools/resource-viewer",
     "language/tools/vm-genesis",
