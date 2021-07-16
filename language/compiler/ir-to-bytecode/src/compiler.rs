@@ -8,6 +8,7 @@ use crate::{
 use anyhow::{bail, format_err, Result};
 use bytecode_source_map::source_map::SourceMap;
 use move_binary_format::{
+    check_bounds::BoundsChecker,
     errors::Location as VMErrorLocation,
     file_format::{
         Ability, AbilitySet, Bytecode, CodeOffset, CodeUnit, CompiledModule, CompiledScript,
@@ -461,7 +462,7 @@ pub fn compile_script<'a>(
         _compiled_deps,
         source_map,
     ) = context.materialize_pools();
-    CompiledScript {
+    let script = CompiledScript {
         version: VERSION_MAX,
         module_handles,
         struct_handles,
@@ -475,12 +476,14 @@ pub fn compile_script<'a>(
         type_parameters: sig.type_parameters,
         parameters: parameters_sig_idx,
         code,
+    };
+    match BoundsChecker::verify_script(&script) {
+        Ok(()) => Ok((script, source_map)),
+        Err(e) => Err(InternalCompilerError::BoundsCheckErrors(
+            e.finish(VMErrorLocation::Undefined),
+        )
+        .into()),
     }
-    .freeze()
-    .map_err(|e| {
-        InternalCompilerError::BoundsCheckErrors(e.finish(VMErrorLocation::Undefined)).into()
-    })
-    .map(|frozen_script| (frozen_script, source_map))
 }
 
 /// Compile a module.
@@ -559,7 +562,7 @@ pub fn compile_module<'a>(
         _compiled_deps,
         source_map,
     ) = context.materialize_pools();
-    CompiledModule {
+    let module = CompiledModule {
         version: VERSION_MAX,
         module_handles,
         self_module_handle_idx,
@@ -576,12 +579,14 @@ pub fn compile_module<'a>(
         constant_pool,
         struct_defs,
         function_defs,
+    };
+    match BoundsChecker::verify_module(&module) {
+        Ok(()) => Ok((module, source_map)),
+        Err(e) => Err(InternalCompilerError::BoundsCheckErrors(
+            e.finish(VMErrorLocation::Undefined),
+        )
+        .into()),
     }
-    .freeze()
-    .map_err(|e| {
-        InternalCompilerError::BoundsCheckErrors(e.finish(VMErrorLocation::Undefined)).into()
-    })
-    .map(|frozen_module| (frozen_module, source_map))
 }
 
 // Note: DO NOT try to recover from this function as it zeros out the `outer_contexts` dependencies
@@ -655,9 +660,8 @@ fn compile_explicit_dependency_declarations(
             constant_pool,
             struct_defs: vec![],
             function_defs: vec![],
-        }
-        .freeze()
-        .map_err(|e| {
+        };
+        BoundsChecker::verify_module(&compiled_module).map_err(|e| {
             InternalCompilerError::BoundsCheckErrors(e.finish(VMErrorLocation::Undefined))
         })?;
         dependencies_acc = compiled_deps;

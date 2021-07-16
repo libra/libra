@@ -4,6 +4,7 @@ use crate::release_flow::{
     create::create_release_from_artifact, hash_for_modules, load_latest_artifact,
 };
 use anyhow::{bail, Result};
+use bytecode_verifier::verify_module;
 use diem_transaction_replay::DiemDebugger;
 use diem_types::{
     access_path::Path,
@@ -27,6 +28,10 @@ pub fn verify_release(
     // If set to true, will verify the release payload against the latest blockchain height instead of the height recorded in the artifact file. This would be needed when the height is already pruned.
     use_latest_version: bool,
 ) -> Result<()> {
+    for (_, module) in remote_modules {
+        verify_module(&module).expect("invalid remote module");
+    }
+
     let artifact = load_latest_artifact(&chain_id)?;
     if artifact.chain_id != chain_id {
         bail!("Unexpected ChainId");

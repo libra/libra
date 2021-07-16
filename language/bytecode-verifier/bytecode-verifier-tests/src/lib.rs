@@ -4,4 +4,7 @@
 #![forbid(unsafe_code)]
 
 #[cfg(test)]
+pub mod support;
+
+#[cfg(test)]
 pub mod unit_tests;

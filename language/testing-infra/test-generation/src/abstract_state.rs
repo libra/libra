@@ -451,16 +451,13 @@ pub struct AbstractState {
 impl AbstractState {
     /// Create a new AbstractState with empty stack, locals, and register
     pub fn new() -> AbstractState {
+        let compiled_module = empty_module();
         AbstractState {
             stack: Vec::new(),
             instantiation: Vec::new(),
             locals: HashMap::new(),
             register: None,
-            module: InstantiableModule::new(
-                empty_module()
-                    .freeze()
-                    .expect("Empty module should pass the bounds checker"),
-            ),
+            module: InstantiableModule::new(compiled_module),
             acquires_global_resources: Vec::new(),
             aborted: false,
             control_flow_allowed: false,
@@ -479,11 +476,7 @@ impl AbstractState {
         call_graph: CallGraph,
     ) -> AbstractState {
         let locals_len = locals.len();
-        let module = InstantiableModule::new(
-            module
-                .freeze()
-                .expect("Module should pass the bounds checker"),
-        );
+        let module = InstantiableModule::new(module);
         AbstractState {
             stack: Vec::new(),
             instantiation,

@@ -13,7 +13,7 @@ fn test_reference_of_reference() {
     m.signatures[0] = Signature(vec![Reference(Box::new(Reference(Box::new(
         SignatureToken::Bool,
     ))))]);
-    let errors = SignatureChecker::verify_module(&m.freeze().unwrap());
+    let errors = SignatureChecker::verify_module(&m);
     assert!(errors.is_err());
 }
 
@@ -30,7 +30,6 @@ proptest! {
     ) {
         let context = SignatureRefMutation::new(&mut module, mutations);
         let expected_violations = context.apply();
-        let module = module.freeze().expect("should satisfy bounds checker");
 
         let result = SignatureChecker::verify_module(&module);
 
@@ -44,7 +43,6 @@ proptest! {
     ) {
         let context = FieldRefMutation::new(&mut module, mutations);
         let expected_violations = context.apply();
-        let module = module.freeze().expect("should satisfy bounds checker");
 
         let result = SignatureChecker::verify_module(&module);
 
@@ -117,5 +115,5 @@ fn no_verify_locals_good() {
             },
         ],
     };
-    assert!(verify_module(&compiled_module_good.freeze().unwrap()).is_ok());
+    assert!(verify_module(&compiled_module_good).is_ok());
 }

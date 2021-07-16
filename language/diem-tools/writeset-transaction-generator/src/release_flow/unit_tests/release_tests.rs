@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::release_flow::create::create_release_writeset;
+use bytecode_verifier::verify_module;
 use diem_types::{
     access_path::AccessPath,
     transaction::{ChangeSet, WriteSetPayload},
@@ -26,12 +27,12 @@ fn release_test() {
     for i in 0..10 {
         let mut module = empty_module();
         module.identifiers[0] = Identifier::new(format!("test_{:?}", i)).unwrap();
-        let compiled_module = module.freeze().unwrap();
+        verify_module(&module).expect("invalid module");
 
         let mut bytes = vec![];
-        compiled_module.serialize(&mut bytes).unwrap();
-        modules_and_bytes.push((bytes.clone(), compiled_module.clone()));
-        modules.push(compiled_module);
+        module.serialize(&mut bytes).unwrap();
+        modules_and_bytes.push((bytes.clone(), module.clone()));
+        modules.push(module);
         modules_bytes.push(bytes);
     }
 
@@ -39,7 +40,8 @@ fn release_test() {
     let replace_module = {
         let mut module = basic_test_module();
         module.identifiers[0] = Identifier::new(format!("test_{:?}", 9)).unwrap();
-        module.freeze().unwrap()
+        verify_module(&module).expect("invalid module");
+        module
     };
     let mut replace_module_bytes = vec![];
     replace_module.serialize(&mut replace_module_bytes).unwrap();

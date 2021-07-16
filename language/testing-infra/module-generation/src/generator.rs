@@ -51,7 +51,7 @@ pub fn generate_modules(
                 .unwrap()
                 .0;
             Pad::pad(table_size, &mut module, options.clone());
-            module.freeze().unwrap()
+            module
         })
         .collect();
 
@@ -61,7 +61,7 @@ pub fn generate_modules(
         .unwrap()
         .0;
     Pad::pad(table_size, &mut compiled_root, options);
-    (compiled_root.freeze().unwrap(), compiled_callees)
+    (compiled_root, compiled_callees)
 }
 
 pub fn generate_verified_modules(

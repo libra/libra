@@ -14,8 +14,8 @@ proptest! {
 
 #[test]
 fn valid_primitives() {
-    let mut module_mut = empty_module();
-    module_mut.constant_pool = vec![
+    let mut module = empty_module();
+    module.constant_pool = vec![
         Constant {
             type_: SignatureToken::Bool,
             data: vec![0],
@@ -37,7 +37,6 @@ fn valid_primitives() {
             data: vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
     ];
-    let module = module_mut.freeze().unwrap();
     assert!(constants::verify_module(&module).is_ok());
 }
 
@@ -66,8 +65,8 @@ fn valid_vectors() {
         (0..0xFFFF).for_each(|_| items.extend(item.clone()));
         items
     };
-    let mut module_mut = empty_module();
-    module_mut.constant_pool = vec![
+    let mut module = empty_module();
+    module.constant_pool = vec![
         // empty
         Constant {
             type_: tvec(SignatureToken::Bool),
@@ -141,7 +140,6 @@ fn valid_vectors() {
             ])),
         },
     ];
-    let module = module_mut.freeze().unwrap();
     assert!(constants::verify_module(&module).is_ok());
 }
 
@@ -204,10 +202,10 @@ fn invalid_type(type_: SignatureToken, data: Vec<u8>) {
 }
 
 fn error(type_: SignatureToken, data: Vec<u8>, code: StatusCode) {
-    let mut module_mut = empty_module();
-    module_mut.constant_pool = vec![Constant { type_, data }];
+    let mut module = empty_module();
+    module.constant_pool = vec![Constant { type_, data }];
     assert!(
-        constants::verify_module(&module_mut.freeze().unwrap())
+        constants::verify_module(&module)
             .unwrap_err()
             .major_status()
             == code

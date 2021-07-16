@@ -223,8 +223,9 @@ impl CompiledModuleStrategyGen {
 
                     //
                     // self module handle index
+                    let self_idx = self_idx_gen.index(module_handles_len);
                     let self_module_handle_idx =
-                        ModuleHandleIndex(self_idx_gen.index(module_handles_len) as TableIndex);
+                        ModuleHandleIndex(self_idx as TableIndex);
 
                     //
                     // Friend Declarations
@@ -237,7 +238,10 @@ impl CompiledModuleStrategyGen {
                             name: IdentifierIndex(name_gen.index(identifiers_len) as TableIndex),
                         })
                         .collect();
-                    let friend_decls = friend_decl_set.into_iter().collect();
+                    let friend_decls = friend_decl_set.into_iter()
+                        // A module can't be friends with itself.
+                        .filter(|f| f == &module_handles[self_idx] )
+                        .collect();
 
                     //
                     // struct handles
@@ -349,8 +353,6 @@ impl CompiledModuleStrategyGen {
                         address_identifiers,
                         constant_pool,
                     }
-                    .freeze()
-                    .expect("valid modules should satisfy the bounds checker")
                 },
             )
     }

@@ -31,7 +31,7 @@ pub mod test_utils {
             module.serialize(&mut buf).unwrap();
             buf
         };
-        modules.push((bytes, module.freeze().unwrap()));
+        modules.push((bytes, module));
         // TODO: See if there's a module that we can remove and if we can modify an existing module
         modules
     }

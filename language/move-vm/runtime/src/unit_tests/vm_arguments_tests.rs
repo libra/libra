@@ -206,9 +206,7 @@ fn make_module_with_function(
                 code: vec![Bytecode::LdU64(0), Bytecode::Abort],
             }),
         }],
-    }
-    .freeze()
-    .unwrap();
+    };
     (module, function_name)
 }
 
@@ -744,7 +742,7 @@ fn check_script_function() {
 
 #[test]
 fn call_missing_item() {
-    let module = empty_module().freeze().unwrap();
+    let module = empty_module();
     let id = &module.self_id();
     let function_name = IdentStr::new("foo").unwrap();
     // mising module
