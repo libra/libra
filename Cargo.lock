@@ -3248,6 +3248,7 @@ dependencies = [
  "rand 0.8.3",
  "rand_core 0.6.2",
  "reqwest",
+ "serde",
  "serde_json",
  "structopt 0.3.21",
  "tempfile",
