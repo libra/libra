@@ -38,31 +38,55 @@ impl VerifyingBatch {
         }
     }
 
-    pub(crate) fn num_subrequests(&self) -> usize {
-        self.requests
+    pub(crate) fn num_subrequests(&self, request_trusted_state: &TrustedState) -> usize {
+        let num_client_requests = self
+            .requests
             .iter()
             .map(|request| request.subrequests.len())
-            .sum::<usize>()
+            .sum::<usize>();
+        num_client_requests
             + 1 /* get_state_proof */
+            + request_trusted_state.need_accumulator() as usize /* get_accumulator_consistency_proof */
     }
 
-    pub(crate) fn collect_requests(&self, request_version: Version) -> Vec<MethodRequest> {
+    pub(crate) fn collect_requests(
+        &self,
+        request_trusted_state: &TrustedState,
+    ) -> Vec<MethodRequest> {
+        let request_version = request_trusted_state.version();
         let mut requests = self
             .requests
             .iter()
             .flat_map(|request| request.subrequests.iter().cloned())
             .collect::<Vec<_>>();
+
+        // if we don't have a verified accumulator summary yet, we'll need to
+        // request one (this might be our first request ever).
+        if request_trusted_state.need_accumulator() {
+            requests.push(MethodRequest::get_accumulator_consistency_proof(
+                None,
+                Some(request_version),
+            ));
+        }
+
+        // always append a state proof request so we can ratchet to the server's
+        // current state.
         requests.push(MethodRequest::get_state_proof(request_version));
+
         requests
     }
 
-    pub(crate) fn validate_responses(
+    pub(crate) fn verify_responses(
         self,
         request_trusted_state: &TrustedState,
         mut responses: Vec<Result<Response<MethodResponse>>>,
-    ) -> Result<(Option<TrustedState>, Vec<Result<Response<MethodResponse>>>)> {
+    ) -> Result<(
+        Option<TrustedState>,
+        Option<Vec<Result<Response<MethodResponse>>>>,
+    )> {
+        let request_version = request_trusted_state.version();
         // make sure we get the exact number of responses back as we expect
-        let num_subrequests = self.num_subrequests();
+        let num_subrequests = self.num_subrequests(request_trusted_state);
         if num_subrequests != responses.len() {
             return Err(Error::rpc_response(format!(
                 "expected {} responses, received {} responses in batch",
@@ -81,7 +105,7 @@ impl VerifyingBatch {
         // check the response metadata matches the state proof
         verify_latest_li_matches_state(state_proof.latest_ledger_info(), &state)?;
 
-        // check that all responses fulfilled at the same chain state
+        // check that all other responses fulfilled at the same chain state
         for response in responses.iter().flatten() {
             if response.state() != &state {
                 return Err(Error::rpc_response(format!(
@@ -93,21 +117,33 @@ impl VerifyingBatch {
             }
         }
 
+        // if this is our first request, we also expect the initial accumulator
+        let maybe_accumulator = if request_trusted_state.need_accumulator() {
+            // note: the .unwrap() is ok since we just checked that we have enough responses above
+            let response = responses.pop().unwrap()?.into_inner();
+            let consistency_proof_view = response.try_into_get_accumulator_consistency_proof()?;
+            let consistency_proof = AccumulatorConsistencyProof::try_from(&consistency_proof_view)
+                .map_err(Error::decode)?;
+            let accumulator_summary = TransactionAccumulatorSummary::try_from_genesis_proof(
+                consistency_proof,
+                request_version,
+            )
+            .map_err(Error::invalid_proof)?;
+            Some(accumulator_summary)
+        } else {
+            None
+        };
+
         // try to verify and ratchet our trusted state using the state proof
         let new_state = request_trusted_state
-            .verify_and_ratchet(&state_proof, None)
+            .verify_and_ratchet(&state_proof, maybe_accumulator.as_ref())
             .map_err(Error::invalid_proof)?
             .new_state();
 
         // remote says we're too far behind and need to sync. we have to throw
         // out the batch since we can't verify any proofs
         if state_proof.epoch_changes().more {
-            // TODO(philiphayes): what is the right behaviour here? it would obv.
-            // be more convenient to just call `self.sync` here and then retry,
-            // but maybe a client would like to control the syncs itself?
-            return Err(Error::unknown(
-                "our client is too far behind, we need to sync",
-            ));
+            return Ok((new_state, None));
         }
 
         // unflatten subresponses, verify, and collect into one response per request
@@ -127,7 +163,7 @@ impl VerifyingBatch {
             })
             .collect::<Vec<_>>();
 
-        Ok((new_state, validated_responses))
+        Ok((new_state, Some(validated_responses)))
     }
 }
 

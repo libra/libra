@@ -312,6 +312,7 @@ fn arb_batch(
     accounts: &[AccountAddress],
     event_handles: &[EventHandle],
     current_state_version: u64,
+    verifying_client: VerifyingClient<InMemoryStorage>,
 ) -> impl Strategy<Value = Vec<MethodRequest>> {
     vec(
         arb_request(accounts, event_handles, current_state_version),
@@ -320,8 +321,7 @@ fn arb_batch(
     .prop_filter(
         "batch rejected: actual size too large; won't be accepted by the JSON-RPC server",
         move |batch| {
-            let actual_batch_size =
-                VerifyingClient::<InMemoryStorage>::actual_batch_size(batch.as_slice());
+            let actual_batch_size = verifying_client.actual_batch_size(batch.as_slice());
             actual_batch_size <= max_batch_size
         },
     )
@@ -365,13 +365,22 @@ impl PublicUsageTest for VerifyingClientEquivalence {
 
         // Generate random requests and ensure that both verifying and non-verifying
         // clients handle each request identically.
-        proptest!(|(request in arb_request(&accounts, &event_handles, env.latest_observed_version()))| {
+        let request_strategy =
+            arb_request(&accounts, &event_handles, env.latest_observed_version());
+        proptest!(|(request in request_strategy)| {
             let (recv_nv, recv_v) = rt.block_on(env.request(request));
             assert_responses_equal(recv_nv, recv_v);
         });
 
         // Do the same but with random request batches instead of single requests.
-        proptest!(|(batch in arb_batch(env.max_batch_size, &accounts, &event_handles, env.latest_observed_version()))| {
+        let batch_strategy = arb_batch(
+            env.max_batch_size,
+            &accounts,
+            &event_handles,
+            env.latest_observed_version(),
+            env.verifying_client.clone(),
+        );
+        proptest!(|(batch in batch_strategy)| {
             let (recv_nv, recv_v) = rt.block_on(env.batch(batch));
             assert_batches_equal(recv_nv, recv_v);
         });

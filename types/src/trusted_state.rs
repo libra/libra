@@ -123,6 +123,10 @@ impl TrustedState {
         }
     }
 
+    pub fn need_accumulator(&self) -> bool {
+        self.accumulator_summary().is_none()
+    }
+
     /// Verify and ratchet forward our trusted state using an [`EpochChangeProof`]
     /// (that moves us into the latest epoch), a [`LedgerInfoWithSignatures`]
     /// inside that epoch, and an [`AccumulatorConsistencyProof`] from our current

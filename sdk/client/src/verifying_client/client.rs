@@ -63,7 +63,7 @@ use std::{
 /// same ledger version if they want to avoid an inconsistent ledger view.
 ///
 /// [Diem JSON-RPC client]: https://github.com/diem/diem/blob/master/json-rpc/json-rpc-spec.md
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct VerifyingClient<S> {
     inner: Client,
     trusted_state_store: Arc<RwLock<TrustedStateStore<S>>>,
@@ -445,8 +445,9 @@ impl<S: Storage> VerifyingClient<S> {
         response
     }
 
-    pub fn actual_batch_size(requests: &[MethodRequest]) -> usize {
-        VerifyingBatch::from_batch(requests.to_vec()).num_subrequests()
+    pub fn actual_batch_size(&self, requests: &[MethodRequest]) -> usize {
+        VerifyingBatch::from_batch(requests.to_vec())
+            .num_subrequests(self.trusted_state_store.read().unwrap().trusted_state())
     }
 
     pub async fn batch(
@@ -454,27 +455,32 @@ impl<S: Storage> VerifyingClient<S> {
         requests: Vec<MethodRequest>,
     ) -> Result<Vec<Result<Response<MethodResponse>>>> {
         let request_trusted_state = self.trusted_state();
-        let request_version = request_trusted_state.version();
-
-        // if we haven't built an accumulator yet, we need to do a sync first.
-        if request_trusted_state.accumulator_summary().is_none() {
-            // TODO(philiphayes): sync fallback
-            return Err(Error::unknown(
-                "our client is too far behind, we need to sync",
-            ));
-        }
 
         // transform each request into verifying sub-request batches
         let batch = VerifyingBatch::from_batch(requests);
         // flatten and collect sub-request batches into flat list of requests
-        let requests = batch.collect_requests(request_version);
+        let requests = batch.collect_requests(&request_trusted_state);
         // actually send the batch
         let responses = self.inner.batch(requests).await?;
         // validate responses and state proof w.r.t. request trusted state
-        let (new_state, responses) = batch.validate_responses(&request_trusted_state, responses)?;
+        let (new_state, maybe_responses) =
+            batch.verify_responses(&request_trusted_state, responses)?;
         // try to ratchet our trusted state in our state store
         self.ratchet(new_state)?;
 
+        let responses = maybe_responses.ok_or_else(|| Error::unknown("need sync"))?;
+
         Ok(responses)
+    }
+}
+
+// Need to implement this manually since `S: Storage` might not be Clone, which
+// prevents the automatic #[derive(Clone)] from working.
+impl<S> Clone for VerifyingClient<S> {
+    fn clone(&self) -> Self {
+        Self {
+            inner: self.inner.clone(),
+            trusted_state_store: self.trusted_state_store.clone(),
+        }
     }
 }
