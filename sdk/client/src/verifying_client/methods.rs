@@ -154,12 +154,7 @@ impl VerifyingBatch {
             .map(|request| {
                 let n = request.subrequests.len();
                 let subresponses = responses_iter.by_ref().take(n).collect();
-                request.validate_subresponses(
-                    request_trusted_state.version(),
-                    &state,
-                    &state_proof,
-                    subresponses,
-                )
+                request.validate_subresponses(&state, &state_proof, subresponses)
             })
             .collect::<Vec<_>>();
 
@@ -189,18 +184,8 @@ fn verify_latest_li_matches_state(latest_li: &LedgerInfo, state: &State) -> Resu
 
 #[derive(Clone, Copy)]
 struct RequestContext<'a> {
-    #[allow(dead_code)]
-    start_version: Version,
-
     state: &'a State,
-
     state_proof: &'a StateProof,
-
-    #[allow(dead_code)]
-    request: &'a MethodRequest,
-
-    #[allow(dead_code)]
-    subrequests: &'a [MethodRequest],
 }
 
 type RequestCallback =
@@ -237,11 +222,8 @@ impl VerifyingRequest {
         Self::new(self.request, self.subrequests, callback)
     }
 
-    // TODO(philiphayes): this would be easier if the Error's were cloneable...
-
     fn validate_subresponses(
         self,
-        start_version: Version,
         state: &State,
         state_proof: &StateProof,
         subresponses: Vec<Result<Response<MethodResponse>>>,
@@ -255,16 +237,9 @@ impl VerifyingRequest {
             )));
         }
 
-        let ctxt = RequestContext {
-            start_version,
-            state,
-            state_proof,
-            request: &self.request,
-            subrequests: &self.subrequests.as_slice(),
-        };
+        let ctxt = RequestContext { state, state_proof };
 
         // TODO(philiphayes): coalesce the Result's somehow so we don't lose error info.
-
         let subresponses_only = subresponses
             .into_iter()
             .map(|result| result.map(Response::into_inner))
