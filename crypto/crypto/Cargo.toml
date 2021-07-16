@@ -34,6 +34,7 @@ x25519-dalek = { version = "0.1.0", package = "x25519-dalek-fiat", default-featu
 aes-gcm = "0.8.0"
 diem-crypto-derive = { path = "../crypto-derive", version = "0.0.2" }
 bcs = "0.1.2"
+p256 = "0.9.0"
 
 [dev-dependencies]
 bitvec = "0.19.4"
@@ -49,13 +50,14 @@ trybuild = "1.0.41"
 diem-workspace-hack = { path = "../../common/workspace-hack" }
 
 [features]
-default = ["fiat"]
+default = ["fiat", "p256/ecdsa"]
 assert-private-keys-not-cloneable = []
 cloneable-private-keys = []
 fuzzing = ["proptest", "proptest-derive", "cloneable-private-keys"]
 fiat = ["curve25519-dalek/fiat_u64_backend", "ed25519-dalek/fiat_u64_backend", "x25519-dalek/fiat_u64_backend"]
 u64 = ["curve25519-dalek/u64_backend", "ed25519-dalek/u64_backend", "x25519-dalek/u64_backend"]
 u32 = ["curve25519-dalek/u32_backend", "ed25519-dalek/u32_backend", "x25519-dalek/u32_backend"]
+# crypto-experimental = ["p256/ecdsa"]
 
 [[bench]]
 name = "noise"

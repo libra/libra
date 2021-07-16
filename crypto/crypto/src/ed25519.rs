@@ -87,7 +87,7 @@ pub struct Ed25519Signature(ed25519_dalek::Signature);
 
 impl Ed25519PrivateKey {
     /// The length of the Ed25519PrivateKey
-    pub const LENGTH: usize = ed25519_dalek::SECRET_KEY_LENGTH;
+    pub const LENGTH: usize = ED25519_PRIVATE_KEY_LENGTH;
 
     /// Serialize an Ed25519PrivateKey.
     pub fn to_bytes(&self) -> [u8; ED25519_PRIVATE_KEY_LENGTH] {
@@ -170,7 +170,7 @@ impl Ed25519PublicKey {
 
 impl Ed25519Signature {
     /// The length of the Ed25519Signature
-    pub const LENGTH: usize = ed25519_dalek::SIGNATURE_LENGTH;
+    pub const LENGTH: usize = ED25519_SIGNATURE_LENGTH;
 
     /// Serialize an Ed25519Signature.
     pub fn to_bytes(&self) -> [u8; ED25519_SIGNATURE_LENGTH] {
@@ -551,11 +551,11 @@ use proptest::prelude::*;
 #[cfg(any(test, feature = "fuzzing"))]
 impl proptest::arbitrary::Arbitrary for Ed25519PublicKey {
     type Parameters = ();
-    type Strategy = BoxedStrategy<Self>;
-
     fn arbitrary_with(_args: Self::Parameters) -> Self::Strategy {
         crate::test_utils::uniform_keypair_strategy::<Ed25519PrivateKey, Ed25519PublicKey>()
             .prop_map(|v| v.public_key)
             .boxed()
     }
+
+    type Strategy = BoxedStrategy<Self>;
 }
