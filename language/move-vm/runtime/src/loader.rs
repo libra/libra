@@ -600,12 +600,43 @@ impl Loader {
         Ok((func, type_params, parameter_tys, return_tys))
     }
 
-    // Entry point for module publishing (`MoveVM::publish_module`).
+    // Entry point for module publishing (`MoveVM::publish_module_bundle`).
+    //
+    // All modules in the bundle to be published must be loadable. This function performs all
+    // verification steps to load these modules without actually loading them into the code cache.
+    pub(crate) fn verify_module_bundle_for_publication(
+        &self,
+        modules: &[CompiledModule],
+        data_store: &mut impl DataStore,
+    ) -> VMResult<()> {
+        let mut bundle_unverified: BTreeSet<_> = modules.iter().map(|m| m.self_id()).collect();
+        let mut bundle_verified = BTreeMap::new();
+        for module in modules {
+            let module_id = module.self_id();
+            bundle_unverified.remove(&module_id);
+
+            self.verify_module_for_publication(
+                &module,
+                &bundle_verified,
+                &bundle_unverified,
+                data_store,
+            )?;
+            bundle_verified.insert(module_id.clone(), module.clone());
+        }
+        Ok(())
+    }
+
     // A module to be published must be loadable.
     // This step performs all verification steps to load the module without loading it.
     // The module is not added to the code cache. It is simply published to the data cache.
     // See `verify_script()` for script verification steps.
-    pub(crate) fn verify_module_for_publication(
+    //
+    // If a module `M` is published together with a bundle of modules (i.e., a vector of modules),
+    // - the `bundle_verified` argument tracks the modules that have already been verified in the
+    //   bundle. Basically, this represents the modules appears before `M` in the bundle vector.
+    // - the `bundle_unverified` argument tracks the modules that have not been verified when `M`
+    //   is being verified, i.e., the modules appears after `M` in the bundle vector.
+    fn verify_module_for_publication(
         &self,
         module: &CompiledModule,
         bundle_verified: &BTreeMap<ModuleId, CompiledModule>,
@@ -658,20 +689,26 @@ impl Loader {
         bytecode_verifier::verify_module(&module)?;
         self.check_natives(&module)?;
 
-        let (bundle_deps, cached_deps): (Vec<_>, Vec<_>) = module
-            .immediate_dependencies()
-            .into_iter()
-            .partition(|module_id| bundle_verified.contains_key(module_id));
+        // All immediate dependencies of the module being verified should be either in the code
+        // cache or in the verified portion of the bundle (e.g., verified before this module).
+        let mut bundle_deps = vec![];
+        let mut cached_deps = vec![];
+        for module_id in module.immediate_dependencies() {
+            match bundle_verified.get(&module_id) {
+                None => cached_deps.push(module_id),
+                Some(module) => bundle_deps.push(module),
+            }
+        }
+
         let loaded_imm_deps = if verify_no_missing_modules {
             self.load_dependencies_verify_no_missing_dependencies(cached_deps, data_store)?
         } else {
             self.load_dependencies_expect_no_missing_dependencies(cached_deps, data_store)?
         };
-        let all_imm_deps = loaded_imm_deps.iter().map(|module| module.module()).chain(
-            bundle_deps
-                .iter()
-                .map(|module_id| bundle_verified.get(module_id).unwrap()),
-        );
+        let all_imm_deps = loaded_imm_deps
+            .iter()
+            .map(|module| module.module())
+            .chain(bundle_deps.into_iter());
         dependencies::verify_module(module, all_imm_deps)
     }
 
@@ -693,8 +730,13 @@ impl Loader {
             },
             |module_id| {
                 if bundle_unverified.contains(module_id) {
+                    // If the module under verification declares a friend which is also in the
+                    // bundle (and positioned after this module in the bundle), we defer the cyclic
+                    // relation checking when we verify that module.
                     Ok(vec![])
                 } else {
+                    // Otherwise, we get all the information we need to verify whether this module
+                    // creates a cyclic relation.
                     bundle_verified
                         .get(module_id)
                         .or_else(|| module_cache.modules.get(module_id).map(|m| m.module()))

@@ -25,7 +25,7 @@ use move_core_types::{
 use move_vm_types::{
     data_store::DataStore, gas_schedule::GasStatus, loaded_data::runtime_types::Type, values::Value,
 };
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 use tracing::warn;
 
 /// An instantiation of the MoveVM.
@@ -125,21 +125,8 @@ impl VMRuntime {
         }
 
         // Perform bytecode and loading verification. Modules must be sorted in topological order.
-        let mut verified_module_ids = vec![];
-        let mut bundle_verified = BTreeMap::new();
-        for module in compiled_modules {
-            let module_id = module.self_id();
-            bundle_unverified.remove(&module_id);
-
-            self.loader.verify_module_for_publication(
-                &module,
-                &bundle_verified,
-                &bundle_unverified,
-                data_store,
-            )?;
-            bundle_verified.insert(module_id.clone(), module);
-            verified_module_ids.push(module_id);
-        }
+        self.loader
+            .verify_module_bundle_for_publication(&compiled_modules, data_store)?;
 
         // NOTE: we want to (informally) argue that all modules pass the linking check before being
         // published to the data store.
@@ -195,8 +182,8 @@ impl VMRuntime {
         // none of the module can be published/updated.
 
         // All modules verified, publish them to data cache
-        for (module_id, blob) in verified_module_ids.into_iter().zip(modules.into_iter()) {
-            data_store.publish_module(&module_id, blob)?;
+        for (module, blob) in compiled_modules.into_iter().zip(modules.into_iter()) {
+            data_store.publish_module(&module.self_id(), blob)?;
         }
         Ok(())
     }
