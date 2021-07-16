@@ -1,0 +1,19 @@
+SourceManifest {
+    package: PackageInfo {
+        name: Identifier(
+            "name",
+        ),
+        version: (
+            0,
+            1,
+            2,
+        ),
+        authors: [],
+        license: None,
+    },
+    addresses: None,
+    dev_address_assignments: None,
+    build: None,
+    dependencies: {},
+    dev_dependencies: {},
+}

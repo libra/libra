@@ -1,0 +1,219 @@
+SourceManifest {
+    package: PackageInfo {
+        name: Identifier(
+            "name",
+        ),
+        version: (
+            0,
+            1,
+            2,
+        ),
+        authors: [
+            "some author",
+        ],
+        license: Some(
+            "\"license\"",
+        ),
+    },
+    addresses: Some(
+        {
+            Identifier(
+                "C",
+            ): Some(
+                00000000000000000000000000000001,
+            ),
+            Identifier(
+                "CoreAddr",
+            ): Some(
+                00000000000000000000000000000001,
+            ),
+            Identifier(
+                "OtherD",
+            ): None,
+            Identifier(
+                "Std",
+            ): None,
+        },
+    ),
+    dev_address_assignments: Some(
+        {
+            Identifier(
+                "DevCoreAddr",
+            ): 00000000000000000000000000000001,
+            Identifier(
+                "DevStd",
+            ): 00000000000000000000000000000002,
+        },
+    ),
+    build: Some(
+        BuildInfo {
+            source_version: Some(
+                (
+                    0,
+                    0,
+                    0,
+                ),
+            ),
+        },
+    ),
+    dependencies: {
+        Identifier(
+            "A",
+        ): Dependency {
+            local: Some(
+                "../a",
+            ),
+            subst: None,
+            version: None,
+            digest: None,
+        },
+        Identifier(
+            "B",
+        ): Dependency {
+            local: Some(
+                "../b",
+            ),
+            subst: Some(
+                {
+                    Identifier(
+                        "a",
+                    ): Assign(
+                        000000000000000000000000DEADBEEF,
+                    ),
+                },
+            ),
+            version: Some(
+                (
+                    0,
+                    0,
+                    1,
+                ),
+            ),
+            digest: None,
+        },
+        Identifier(
+            "C",
+        ): Dependency {
+            local: Some(
+                "../some_path",
+            ),
+            subst: Some(
+                {
+                    Identifier(
+                        "a",
+                    ): Assign(
+                        0000000000000000000000000000CAFE,
+                    ),
+                    Identifier(
+                        "d",
+                    ): Assign(
+                        00000000000000000000000000000004,
+                    ),
+                },
+            ),
+            version: Some(
+                (
+                    0,
+                    0,
+                    2,
+                ),
+            ),
+            digest: None,
+        },
+        Identifier(
+            "D",
+        ): Dependency {
+            local: Some(
+                "../some_path",
+            ),
+            subst: Some(
+                {
+                    Identifier(
+                        "C",
+                    ): RenameFrom(
+                        Identifier(
+                            "B",
+                        ),
+                    ),
+                    Identifier(
+                        "a",
+                    ): Assign(
+                        0000000000000000000000000000CAFE,
+                    ),
+                },
+            ),
+            version: Some(
+                (
+                    0,
+                    0,
+                    2,
+                ),
+            ),
+            digest: None,
+        },
+        Identifier(
+            "E",
+        ): Dependency {
+            local: Some(
+                "../some_path",
+            ),
+            subst: Some(
+                {
+                    Identifier(
+                        "C",
+                    ): RenameFrom(
+                        Identifier(
+                            "B",
+                        ),
+                    ),
+                    Identifier(
+                        "OtherD",
+                    ): RenameFrom(
+                        Identifier(
+                            "d",
+                        ),
+                    ),
+                    Identifier(
+                        "a",
+                    ): Assign(
+                        0000000000000000000000000000CAFE,
+                    ),
+                },
+            ),
+            version: Some(
+                (
+                    0,
+                    0,
+                    2,
+                ),
+            ),
+            digest: None,
+        },
+    },
+    dev_dependencies: {
+        Identifier(
+            "F",
+        ): Dependency {
+            local: Some(
+                "../some_path",
+            ),
+            subst: Some(
+                {
+                    Identifier(
+                        "a",
+                    ): Assign(
+                        0000000000000000000000000000CAFE,
+                    ),
+                },
+            ),
+            version: Some(
+                (
+                    0,
+                    0,
+                    2,
+                ),
+            ),
+            digest: None,
+        },
+    },
+}

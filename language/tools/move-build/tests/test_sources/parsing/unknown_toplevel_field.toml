@@ -1,0 +1,30 @@
+[package]
+name = "name"
+version = "0.1.2"
+license = "license"
+authors = ["some author"]
+
+[unknown_field]
+
+[addresses]
+Std = "_"
+CoreAddr = "0x1"
+C = "0x1"
+OtherD = "_"
+
+[dev-addresses]
+DevStd = "0x2"
+DevCoreAddr = "0x1"
+
+[build]
+source_version = "0.0.0"
+
+[dependencies]
+A = { local = "../a" }
+B = { local = "../b", addr_subst = { "a" = "0xDEADBEEF" }, version = "0.0.1" }
+C = { local = "../some_path", addr_subst = { "a" = "0xCAFE", "d" = "0x4" }, version = "0.0.2" }
+D = { local = "../some_path", addr_subst = { "a" = "0xCAFE", "C" = "B" }, version = "0.0.2" }
+E = { local = "../some_path", addr_subst = { "a" = "0xCAFE", "C" = "B", "OtherD" = "d" }, version = "0.0.2" }
+
+[dev-dependencies]
+F = { local = "../some_path", addr_subst = { "a" = "0xCAFE" }, version = "0.0.2" }

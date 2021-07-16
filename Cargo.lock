@@ -1242,6 +1242,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "crev-recursive-digest"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a2311e13cb92890481e096346c189285b63ca513d1a9735c947e878f15729a9"
+dependencies = [
+ "digest 0.8.1",
+ "thiserror",
+ "walkdir",
+]
+
+[[package]]
 name = "criterion"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4562,6 +4573,35 @@ dependencies = [
  "ref-cast",
  "serde_json",
  "variant_count",
+]
+
+[[package]]
+name = "move-build"
+version = "0.1.0"
+dependencies = [
+ "abigen",
+ "anyhow",
+ "bcs",
+ "bytecode-source-map",
+ "colored",
+ "crev-recursive-digest",
+ "datatest-stable",
+ "diem-workspace-hack",
+ "docgen",
+ "errmapgen",
+ "move-binary-format",
+ "move-command-line-common",
+ "move-core-types",
+ "move-ir-types",
+ "move-lang",
+ "petgraph",
+ "serde",
+ "serde_json",
+ "sha2",
+ "structopt 0.3.21",
+ "thiserror",
+ "toml",
+ "walkdir",
 ]
 
 [[package]]

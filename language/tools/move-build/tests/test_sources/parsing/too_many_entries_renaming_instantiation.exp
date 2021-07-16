@@ -1,0 +1,3 @@
+Error parsing '[dependencies]' section of manifest: Malformed dependency substitution B = "0x1"
+R = "0x2"
+. Expected a string, but encountered a table

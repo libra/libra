@@ -1,0 +1,1 @@
+Error parsing '[package]' section of manifest: Version is malformed. Versions must be of the form <u64>.<u64>.<u64>, but found '00.2'

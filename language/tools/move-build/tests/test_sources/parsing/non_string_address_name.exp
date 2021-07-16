@@ -1,0 +1,2 @@
+Error parsing '[addresses]' section of manifest: Invalid address name b = "0x1"
+ encountered. Expected a string but found a table
