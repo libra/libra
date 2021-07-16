@@ -17,6 +17,7 @@ Publishing a new module 00000000000000000000000000000002::A (wrote 89 bytes)
 Publishing a new module 00000000000000000000000000000002::B (wrote 97 bytes)
 Wrote 186 bytes of module ID's and code
 Command `sandbox view storage/0x00000000000000000000000000000002/modules/A.mv`:
+// Move bytecode v3
 module 2.A {
 
 
@@ -25,6 +26,7 @@ public(friend) foo() {
 }
 }
 Command `sandbox view storage/0x00000000000000000000000000000002/modules/B.mv`:
+// Move bytecode v3
 module 2.B {
 
 
