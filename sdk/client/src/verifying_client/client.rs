@@ -7,7 +7,7 @@ use crate::{
     request::MethodRequest,
     response::{MethodResponse, Response},
     verifying_client::{
-        methods::{verify_latest_li_matches_state, VerifyingBatch},
+        methods::VerifyingBatch,
         state_store::{Storage, TrustedStateStore},
     },
 };
@@ -18,14 +18,11 @@ use diem_json_rpc_types::views::{
 use diem_types::{
     account_address::AccountAddress,
     event::EventKey,
-    proof::{AccumulatorConsistencyProof, TransactionAccumulatorSummary},
-    state_proof::StateProof,
     transaction::{SignedTransaction, Transaction, Version},
     trusted_state::TrustedState,
     waypoint::Waypoint,
 };
 use std::{
-    convert::TryFrom,
     fmt::Debug,
     sync::{Arc, RwLock},
     time::Duration,
@@ -186,104 +183,17 @@ impl<S: Storage> VerifyingClient<S> {
     /// `Ok(true)` if, after verification, we still need to sync more. Returns
     /// `Ok(false)` if we have finished syncing.
     pub async fn sync_one_step(&self) -> Result<bool> {
-        let request_trusted_state = self.trusted_state();
-        let need_initial_accumulator = request_trusted_state.accumulator_summary().is_none();
-        let current_version = request_trusted_state.version();
-
-        // request a state proof from remote and an optional initial transaction
-        // accumulator if we're just starting out from an epoch waypoint.
-        let (state_proof, maybe_accumulator) = self
-            .get_state_proof_and_maybe_accumulator(current_version, need_initial_accumulator)
-            .await?;
-
-        // try to ratchet our trusted state using the state proof
-        self.verify_and_ratchet(
-            &request_trusted_state,
-            &state_proof,
-            maybe_accumulator.as_ref(),
-        )?;
-
-        // return true if we need to sync more epoch changes
-        Ok(state_proof.epoch_changes().more)
-    }
-
-    async fn get_state_proof_and_maybe_accumulator(
-        &self,
-        current_version: Version,
-        need_initial_accumulator: bool,
-    ) -> Result<(StateProof, Option<TransactionAccumulatorSummary>)> {
-        let (state_proof_view, state, maybe_consistency_proof_view) = if !need_initial_accumulator {
-            // just request the state proof, since we don't need the initial accumulator
-            let (state_proof_view, state) = self
-                .inner
-                .get_state_proof(current_version)
-                .await?
-                .into_parts();
-            (state_proof_view, state, None)
-        } else {
-            // request both a state proof and an initial accumulator from genesis
-            // to the current version.
-            let batch = vec![
-                MethodRequest::get_accumulator_consistency_proof(None, Some(current_version)),
-                MethodRequest::get_state_proof(current_version),
-            ];
-            let resps = self.inner.batch(batch).await?;
-            let mut resps_iter = resps.into_iter();
-
-            // inner client guarantees us that # responses matches # requests
-            let (resp1, state1) = resps_iter.next().unwrap()?.into_parts();
-            let (resp2, state2) = resps_iter.next().unwrap()?.into_parts();
-
-            if state1 != state2 {
-                return Err(Error::rpc_response(format!(
-                    "expected batch response states equal: state1={:?}, state2={:?}",
-                    state1, state2
-                )));
+        // batch([]) is effectively just a get_state_proof request
+        match self.batch(vec![]).await {
+            Ok(_) => Ok(false),
+            Err(err) => {
+                if err.is_need_sync() {
+                    Ok(true)
+                } else {
+                    Err(err)
+                }
             }
-
-            let consistency_proof_view = resp1.try_into_get_accumulator_consistency_proof()?;
-            let state_proof_view = resp2.try_into_get_state_proof()?;
-            (state_proof_view, state1, Some(consistency_proof_view))
-        };
-
-        // deserialize responses
-        let state_proof = StateProof::try_from(&state_proof_view).map_err(Error::decode)?;
-        let maybe_accumulator = maybe_consistency_proof_view
-            .map(|consistency_proof_view| {
-                let consistency_proof =
-                    AccumulatorConsistencyProof::try_from(&consistency_proof_view)
-                        .map_err(Error::decode)?;
-                TransactionAccumulatorSummary::try_from_genesis_proof(
-                    consistency_proof,
-                    current_version,
-                )
-                .map_err(Error::invalid_proof)
-            })
-            .transpose()?;
-
-        // check the response metadata matches the state proof
-        verify_latest_li_matches_state(state_proof.latest_ledger_info(), &state)?;
-
-        Ok((state_proof, maybe_accumulator))
-    }
-
-    /// Verify and ratchet forward a request's trusted state using a state proof
-    /// and potentially persisting the new trusted state if it is the newest.
-    pub fn verify_and_ratchet(
-        &self,
-        request_trusted_state: &TrustedState,
-        state_proof: &StateProof,
-        maybe_accumulator: Option<&TransactionAccumulatorSummary>,
-    ) -> Result<()> {
-        // Verify the response's state proof starting from the trusted state when
-        // we first made the request. If successful, this means the potential new
-        // trusted state is at least a descendent of the request trusted state,
-        // though not necessarily the globally most-recent trusted state.
-        let change = request_trusted_state
-            .verify_and_ratchet(state_proof, maybe_accumulator)
-            .map_err(Error::invalid_proof)?;
-
-        self.ratchet(change.new_state())
+        }
     }
 
     /// Try to compare-and-swap a verified trusted state change into the state store.
@@ -468,8 +378,8 @@ impl<S: Storage> VerifyingClient<S> {
         // try to ratchet our trusted state in our state store
         self.ratchet(new_state)?;
 
-        let responses = maybe_responses.ok_or_else(|| Error::unknown("need sync"))?;
-
+        let responses = maybe_responses
+            .ok_or_else(|| Error::need_sync("too far behind server, need to sync more"))?;
         Ok(responses)
     }
 }

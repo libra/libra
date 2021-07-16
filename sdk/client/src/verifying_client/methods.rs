@@ -169,7 +169,7 @@ impl VerifyingBatch {
 
 /// Check that certain metadata (version and timestamp) in a `LedgerInfo` matches
 /// the response `State`.
-pub(crate) fn verify_latest_li_matches_state(latest_li: &LedgerInfo, state: &State) -> Result<()> {
+fn verify_latest_li_matches_state(latest_li: &LedgerInfo, state: &State) -> Result<()> {
     if latest_li.version() != state.version {
         return Err(Error::invalid_proof(format!(
             "latest LedgerInfo version ({}) doesn't match response version ({})",
