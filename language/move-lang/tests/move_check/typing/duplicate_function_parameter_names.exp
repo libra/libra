@@ -1,11 +1,8 @@
-error: 
-
-   ┌── tests/move_check/typing/duplicate_function_parameter_names.move:2:21 ───
-   │
- 2 │     fun foo(x: u64, x: u64) {}
-   │                     ^ Duplicate parameter with name 'x'
-   ·
- 2 │     fun foo(x: u64, x: u64) {}
-   │             - Previously declared here
-   │
+error[E02001]: duplicate declaration, item, or annotation
+  ┌─ tests/move_check/typing/duplicate_function_parameter_names.move:2:21
+  │
+2 │     fun foo(x: u64, x: u64) {}
+  │             -       ^ Duplicate parameter with name 'x'
+  │             │        
+  │             Previously declared here
 

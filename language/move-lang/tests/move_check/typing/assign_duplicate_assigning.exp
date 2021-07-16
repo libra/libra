@@ -1,33 +1,24 @@
-error: 
+error[E02001]: duplicate declaration, item, or annotation
+  ┌─ tests/move_check/typing/assign_duplicate_assigning.move:6:13
+  │
+6 │         (x, x) = (0, 0);
+  │          -  ^ Duplicate usage of local 'x' in a given assignment
+  │          │   
+  │          Previously assigned here
 
-   ┌── tests/move_check/typing/assign_duplicate_assigning.move:6:13 ───
-   │
- 6 │         (x, x) = (0, 0);
-   │             ^ Duplicate usage of local 'x' in a given assignment
-   ·
- 6 │         (x, x) = (0, 0);
-   │          - Previously assigned here
-   │
+error[E02001]: duplicate declaration, item, or annotation
+  ┌─ tests/move_check/typing/assign_duplicate_assigning.move:8:15
+  │
+8 │         (f, R{f}, f) = (0, R { f: 0 }, 0);
+  │          -    ^ Duplicate usage of local 'f' in a given assignment
+  │          │     
+  │          Previously assigned here
 
-error: 
-
-   ┌── tests/move_check/typing/assign_duplicate_assigning.move:8:15 ───
-   │
- 8 │         (f, R{f}, f) = (0, R { f: 0 }, 0);
-   │               ^ Duplicate usage of local 'f' in a given assignment
-   ·
- 8 │         (f, R{f}, f) = (0, R { f: 0 }, 0);
-   │          - Previously assigned here
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/assign_duplicate_assigning.move:8:19 ───
-   │
- 8 │         (f, R{f}, f) = (0, R { f: 0 }, 0);
-   │                   ^ Duplicate usage of local 'f' in a given assignment
-   ·
- 8 │         (f, R{f}, f) = (0, R { f: 0 }, 0);
-   │          - Previously assigned here
-   │
+error[E02001]: duplicate declaration, item, or annotation
+  ┌─ tests/move_check/typing/assign_duplicate_assigning.move:8:19
+  │
+8 │         (f, R{f}, f) = (0, R { f: 0 }, 0);
+  │          -        ^ Duplicate usage of local 'f' in a given assignment
+  │          │         
+  │          Previously assigned here
 

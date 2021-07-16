@@ -1,32 +1,24 @@
-error: 
+error[E04016]: too few arguments
+  ┌─ tests/move_check/typing/pack_missing_field.move:7:10
+  │
+7 │         (S { } : S);
+  │          ^^^^^ Missing argument for field 'f' in '0x8675309::M::S'
 
-   ┌── tests/move_check/typing/pack_missing_field.move:7:10 ───
+error[E04016]: too few arguments
+  ┌─ tests/move_check/typing/pack_missing_field.move:8:37
+  │
+8 │         R {s:_, f:_, n1:_, n2:_} = (R { s: S{f: 0}, n1: Nat{f: 0}, f: 0, } : R);
+  │                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Missing argument for field 'n2' in '0x8675309::M::R'
+
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/pack_missing_field.move:14:37
    │
- 7 │         (S { } : S);
-   │          ^^^^^ Missing argument for field 'f' in '0x8675309::M::S'
+14 │         R {s:_, f:_, n1:_, n2:_} = (R { s, n2, n1 }: R);
+   │                                     ^^^^^^^^^^^^^^^ Missing argument for field 'f' in '0x8675309::M::R'
+
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/pack_missing_field.move:16:28
    │
-
-error: 
-
-   ┌── tests/move_check/typing/pack_missing_field.move:8:37 ───
-   │
- 8 │         R {s:_, f:_, n1:_, n2:_} = (R { s: S{f: 0}, n1: Nat{f: 0}, f: 0, } : R);
-   │                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Missing argument for field 'n2' in '0x8675309::M::R'
-   │
-
-error: 
-
-    ┌── tests/move_check/typing/pack_missing_field.move:14:37 ───
-    │
- 14 │         R {s:_, f:_, n1:_, n2:_} = (R { s, n2, n1 }: R);
-    │                                     ^^^^^^^^^^^^^^^ Missing argument for field 'f' in '0x8675309::M::R'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/pack_missing_field.move:16:28 ───
-    │
- 16 │         (Nat { f: Nat { f: Nat { }}}: Nat<Nat<Nat<S>>>);
-    │                            ^^^^^^^ Missing argument for field 'f' in '0x8675309::M::Nat'
-    │
+16 │         (Nat { f: Nat { f: Nat { }}}: Nat<Nat<Nat<S>>>);
+   │                            ^^^^^^^ Missing argument for field 'f' in '0x8675309::M::Nat'
 

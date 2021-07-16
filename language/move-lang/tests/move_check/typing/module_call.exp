@@ -1,3 +1,12 @@
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call.move:43:18
+   │
+43 │         let () = X::bing(X::baz(X::bar(X::foo())));
+   │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │                  │      │
+   │                  │      Found 1 argument(s) here
+   │                  Invalid call of '0x2::X::bing'. The call expected 3 argument(s) but got 1
+
 error[E04007]: incompatible types
    ┌─ tests/move_check/typing/module_call.move:43:18
    │
@@ -10,6 +19,15 @@ error[E04007]: incompatible types
 43 │         let () = X::bing(X::baz(X::bar(X::foo())));
    │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::X::bing'. Invalid argument for parameter 'b'
 
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call.move:43:26
+   │
+43 │         let () = X::bing(X::baz(X::bar(X::foo())));
+   │                          ^^^^^^^^^^^^^^^^^^^^^^^^
+   │                          │     │
+   │                          │     Found 1 argument(s) here
+   │                          Invalid call of '0x2::X::baz'. The call expected 2 argument(s) but got 1
+
 error[E04004]: expected a single non-reference type
    ┌─ tests/move_check/typing/module_call.move:43:26
    │
@@ -18,6 +36,15 @@ error[E04004]: expected a single non-reference type
    ·
 43 │         let () = X::bing(X::baz(X::bar(X::foo())));
    │                          ^^^^^^^^^^^^^^^^^^^^^^^^ Invalid type argument
+
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call.move:44:18
+   │
+44 │         let () = X::bing (X::baz (X::bar (X::foo())));
+   │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │                  │       │
+   │                  │       Found 1 argument(s) here
+   │                  Invalid call of '0x2::X::bing'. The call expected 3 argument(s) but got 1
 
 error[E04007]: incompatible types
    ┌─ tests/move_check/typing/module_call.move:44:18
@@ -31,6 +58,15 @@ error[E04007]: incompatible types
 44 │         let () = X::bing (X::baz (X::bar (X::foo())));
    │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::X::bing'. Invalid argument for parameter 'b'
 
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call.move:44:27
+   │
+44 │         let () = X::bing (X::baz (X::bar (X::foo())));
+   │                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │                           │      │
+   │                           │      Found 1 argument(s) here
+   │                           Invalid call of '0x2::X::baz'. The call expected 2 argument(s) but got 1
+
 error[E04004]: expected a single non-reference type
    ┌─ tests/move_check/typing/module_call.move:44:27
    │
@@ -39,6 +75,15 @@ error[E04004]: expected a single non-reference type
    ·
 44 │         let () = X::bing (X::baz (X::bar (X::foo())));
    │                           ^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid type argument
+
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call.move:45:18
+   │
+45 │         let () = X::bing (X::baz (X::bar(1)));
+   │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │                  │       │
+   │                  │       Found 1 argument(s) here
+   │                  Invalid call of '0x2::X::bing'. The call expected 3 argument(s) but got 1
 
 error[E04007]: incompatible types
    ┌─ tests/move_check/typing/module_call.move:45:18
@@ -52,6 +97,15 @@ error[E04007]: incompatible types
 45 │         let () = X::bing (X::baz (X::bar(1)));
    │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::X::bing'. Invalid argument for parameter 'b'
 
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call.move:45:27
+   │
+45 │         let () = X::bing (X::baz (X::bar(1)));
+   │                           ^^^^^^^^^^^^^^^^^^
+   │                           │      │
+   │                           │      Found 1 argument(s) here
+   │                           Invalid call of '0x2::X::baz'. The call expected 2 argument(s) but got 1
+
 error[E04004]: expected a single non-reference type
    ┌─ tests/move_check/typing/module_call.move:45:27
    │
@@ -60,6 +114,15 @@ error[E04004]: expected a single non-reference type
    ·
 45 │         let () = X::bing (X::baz (X::bar(1)));
    │                           ^^^^^^^^^^^^^^^^^^ Invalid type argument
+
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call.move:46:18
+   │
+46 │         let () = X::bing (X::baz (@0x0, 1));
+   │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │                  │       │
+   │                  │       Found 1 argument(s) here
+   │                  Invalid call of '0x2::X::bing'. The call expected 3 argument(s) but got 1
 
 error[E04007]: incompatible types
    ┌─ tests/move_check/typing/module_call.move:46:18
@@ -73,6 +136,15 @@ error[E04007]: incompatible types
 46 │         let () = X::bing (X::baz (@0x0, 1));
    │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::X::bing'. Invalid argument for parameter 'b'
 
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call.move:51:18
+   │
+51 │         let () = bing(baz(bar(foo())));
+   │                  ^^^^^^^^^^^^^^^^^^^^^
+   │                  │   │
+   │                  │   Found 1 argument(s) here
+   │                  Invalid call of '0x2::M::bing'. The call expected 3 argument(s) but got 1
+
 error[E04007]: incompatible types
    ┌─ tests/move_check/typing/module_call.move:51:18
    │
@@ -85,6 +157,15 @@ error[E04007]: incompatible types
 51 │         let () = bing(baz(bar(foo())));
    │                  ^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::M::bing'. Invalid argument for parameter 'b'
 
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call.move:51:23
+   │
+51 │         let () = bing(baz(bar(foo())));
+   │                       ^^^^^^^^^^^^^^^
+   │                       │  │
+   │                       │  Found 1 argument(s) here
+   │                       Invalid call of '0x2::M::baz'. The call expected 2 argument(s) but got 1
+
 error[E04004]: expected a single non-reference type
    ┌─ tests/move_check/typing/module_call.move:51:23
    │
@@ -93,6 +174,15 @@ error[E04004]: expected a single non-reference type
    ·
 51 │         let () = bing(baz(bar(foo())));
    │                       ^^^^^^^^^^^^^^^ Invalid type argument
+
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call.move:52:18
+   │
+52 │         let () = bing (baz (bar (foo())));
+   │                  ^^^^^^^^^^^^^^^^^^^^^^^^
+   │                  │    │
+   │                  │    Found 1 argument(s) here
+   │                  Invalid call of '0x2::M::bing'. The call expected 3 argument(s) but got 1
 
 error[E04007]: incompatible types
    ┌─ tests/move_check/typing/module_call.move:52:18
@@ -106,6 +196,15 @@ error[E04007]: incompatible types
 52 │         let () = bing (baz (bar (foo())));
    │                  ^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::M::bing'. Invalid argument for parameter 'b'
 
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call.move:52:24
+   │
+52 │         let () = bing (baz (bar (foo())));
+   │                        ^^^^^^^^^^^^^^^^^
+   │                        │   │
+   │                        │   Found 1 argument(s) here
+   │                        Invalid call of '0x2::M::baz'. The call expected 2 argument(s) but got 1
+
 error[E04004]: expected a single non-reference type
    ┌─ tests/move_check/typing/module_call.move:52:24
    │
@@ -114,6 +213,15 @@ error[E04004]: expected a single non-reference type
    ·
 52 │         let () = bing (baz (bar (foo())));
    │                        ^^^^^^^^^^^^^^^^^ Invalid type argument
+
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call.move:53:18
+   │
+53 │         let () = bing (baz (bar(1)));
+   │                  ^^^^^^^^^^^^^^^^^^^
+   │                  │    │
+   │                  │    Found 1 argument(s) here
+   │                  Invalid call of '0x2::M::bing'. The call expected 3 argument(s) but got 1
 
 error[E04007]: incompatible types
    ┌─ tests/move_check/typing/module_call.move:53:18
@@ -127,6 +235,15 @@ error[E04007]: incompatible types
 53 │         let () = bing (baz (bar(1)));
    │                  ^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::M::bing'. Invalid argument for parameter 'b'
 
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call.move:53:24
+   │
+53 │         let () = bing (baz (bar(1)));
+   │                        ^^^^^^^^^^^^
+   │                        │   │
+   │                        │   Found 1 argument(s) here
+   │                        Invalid call of '0x2::M::baz'. The call expected 2 argument(s) but got 1
+
 error[E04004]: expected a single non-reference type
    ┌─ tests/move_check/typing/module_call.move:53:24
    │
@@ -135,6 +252,15 @@ error[E04004]: expected a single non-reference type
    ·
 53 │         let () = bing (baz (bar(1)));
    │                        ^^^^^^^^^^^^ Invalid type argument
+
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call.move:54:18
+   │
+54 │         let () = bing (baz (@0x0, 1));
+   │                  ^^^^^^^^^^^^^^^^^^^^
+   │                  │    │
+   │                  │    Found 1 argument(s) here
+   │                  Invalid call of '0x2::M::bing'. The call expected 3 argument(s) but got 1
 
 error[E04007]: incompatible types
    ┌─ tests/move_check/typing/module_call.move:54:18
@@ -147,158 +273,4 @@ error[E04007]: incompatible types
    ·
 54 │         let () = bing (baz (@0x0, 1));
    │                  ^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::M::bing'. Invalid argument for parameter 'b'
-
-error: 
-
-    ┌── tests/move_check/typing/module_call.move:43:18 ───
-    │
- 43 │         let () = X::bing(X::baz(X::bar(X::foo())));
-    │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::X::bing'. The call expected 3 argument(s) but got 1
-    ·
- 43 │         let () = X::bing(X::baz(X::bar(X::foo())));
-    │                         -------------------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call.move:43:26 ───
-    │
- 43 │         let () = X::bing(X::baz(X::bar(X::foo())));
-    │                          ^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::X::baz'. The call expected 2 argument(s) but got 1
-    ·
- 43 │         let () = X::bing(X::baz(X::bar(X::foo())));
-    │                                ------------------ Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call.move:44:18 ───
-    │
- 44 │         let () = X::bing (X::baz (X::bar (X::foo())));
-    │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::X::bing'. The call expected 3 argument(s) but got 1
-    ·
- 44 │         let () = X::bing (X::baz (X::bar (X::foo())));
-    │                          ---------------------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call.move:44:27 ───
-    │
- 44 │         let () = X::bing (X::baz (X::bar (X::foo())));
-    │                           ^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::X::baz'. The call expected 2 argument(s) but got 1
-    ·
- 44 │         let () = X::bing (X::baz (X::bar (X::foo())));
-    │                                  ------------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call.move:45:18 ───
-    │
- 45 │         let () = X::bing (X::baz (X::bar(1)));
-    │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::X::bing'. The call expected 3 argument(s) but got 1
-    ·
- 45 │         let () = X::bing (X::baz (X::bar(1)));
-    │                          -------------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call.move:45:27 ───
-    │
- 45 │         let () = X::bing (X::baz (X::bar(1)));
-    │                           ^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::X::baz'. The call expected 2 argument(s) but got 1
-    ·
- 45 │         let () = X::bing (X::baz (X::bar(1)));
-    │                                  ----------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call.move:46:18 ───
-    │
- 46 │         let () = X::bing (X::baz (@0x0, 1));
-    │                  ^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::X::bing'. The call expected 3 argument(s) but got 1
-    ·
- 46 │         let () = X::bing (X::baz (@0x0, 1));
-    │                          ------------------ Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call.move:51:18 ───
-    │
- 51 │         let () = bing(baz(bar(foo())));
-    │                  ^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::M::bing'. The call expected 3 argument(s) but got 1
-    ·
- 51 │         let () = bing(baz(bar(foo())));
-    │                      ----------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call.move:51:23 ───
-    │
- 51 │         let () = bing(baz(bar(foo())));
-    │                       ^^^^^^^^^^^^^^^ Invalid call of '0x2::M::baz'. The call expected 2 argument(s) but got 1
-    ·
- 51 │         let () = bing(baz(bar(foo())));
-    │                          ------------ Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call.move:52:18 ───
-    │
- 52 │         let () = bing (baz (bar (foo())));
-    │                  ^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::M::bing'. The call expected 3 argument(s) but got 1
-    ·
- 52 │         let () = bing (baz (bar (foo())));
-    │                       ------------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call.move:52:24 ───
-    │
- 52 │         let () = bing (baz (bar (foo())));
-    │                        ^^^^^^^^^^^^^^^^^ Invalid call of '0x2::M::baz'. The call expected 2 argument(s) but got 1
-    ·
- 52 │         let () = bing (baz (bar (foo())));
-    │                            ------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call.move:53:18 ───
-    │
- 53 │         let () = bing (baz (bar(1)));
-    │                  ^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::M::bing'. The call expected 3 argument(s) but got 1
-    ·
- 53 │         let () = bing (baz (bar(1)));
-    │                       -------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call.move:53:24 ───
-    │
- 53 │         let () = bing (baz (bar(1)));
-    │                        ^^^^^^^^^^^^ Invalid call of '0x2::M::baz'. The call expected 2 argument(s) but got 1
-    ·
- 53 │         let () = bing (baz (bar(1)));
-    │                            -------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call.move:54:18 ───
-    │
- 54 │         let () = bing (baz (@0x0, 1));
-    │                  ^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x2::M::bing'. The call expected 3 argument(s) but got 1
-    ·
- 54 │         let () = bing (baz (@0x0, 1));
-    │                       --------------- Found 1 argument(s) here
-    │
 

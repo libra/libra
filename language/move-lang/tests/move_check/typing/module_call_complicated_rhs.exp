@@ -1,3 +1,21 @@
+error[E04017]: too many arguments
+   ┌─ tests/move_check/typing/module_call_complicated_rhs.move:11:9
+   │
+11 │         foo (if (cond) () else ());
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │         │   │
+   │         │   Found 1 argument(s) here
+   │         Invalid call of '0x8675309::M::foo'. The call expected 0 argument(s) but got 1
+
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call_complicated_rhs.move:13:9
+   │
+13 │         baz (if (cond) (false, @0x0) else (true, @0x1));
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │         │   │
+   │         │   Found 1 argument(s) here
+   │         Invalid call of '0x8675309::M::baz'. The call expected 2 argument(s) but got 1
+
 error[E04004]: expected a single non-reference type
    ┌─ tests/move_check/typing/module_call_complicated_rhs.move:13:9
    │
@@ -6,6 +24,24 @@ error[E04004]: expected a single non-reference type
    │         │                                 │
    │         │                                 Expected a single non-reference type, but found: '(bool, address)'
    │         Invalid type argument
+
+error[E04017]: too many arguments
+   ┌─ tests/move_check/typing/module_call_complicated_rhs.move:17:9
+   │
+17 │         foo(if (cond) () else ());
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^
+   │         │  │
+   │         │  Found 1 argument(s) here
+   │         Invalid call of '0x8675309::M::foo'. The call expected 0 argument(s) but got 1
+
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call_complicated_rhs.move:19:9
+   │
+19 │         baz(if (cond) (false, @0x0) else (true, @0x1));
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │         │  │
+   │         │  Found 1 argument(s) here
+   │         Invalid call of '0x8675309::M::baz'. The call expected 2 argument(s) but got 1
 
 error[E04004]: expected a single non-reference type
    ┌─ tests/move_check/typing/module_call_complicated_rhs.move:19:9
@@ -16,6 +52,33 @@ error[E04004]: expected a single non-reference type
    │         │                                Expected a single non-reference type, but found: '(bool, address)'
    │         Invalid type argument
 
+error[E04017]: too many arguments
+   ┌─ tests/move_check/typing/module_call_complicated_rhs.move:23:9
+   │
+23 │         foo({});
+   │         ^^^^^^^
+   │         │  │
+   │         │  Found 1 argument(s) here
+   │         Invalid call of '0x8675309::M::foo'. The call expected 0 argument(s) but got 1
+
+error[E04017]: too many arguments
+   ┌─ tests/move_check/typing/module_call_complicated_rhs.move:24:9
+   │
+24 │         foo({ let _x = 0; });
+   │         ^^^^^^^^^^^^^^^^^^^^
+   │         │  │
+   │         │  Found 1 argument(s) here
+   │         Invalid call of '0x8675309::M::foo'. The call expected 0 argument(s) but got 1
+
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call_complicated_rhs.move:31:9
+   │
+31 │         baz({ (a, x) });
+   │         ^^^^^^^^^^^^^^^
+   │         │  │
+   │         │  Found 1 argument(s) here
+   │         Invalid call of '0x8675309::M::baz'. The call expected 2 argument(s) but got 1
+
 error[E04004]: expected a single non-reference type
    ┌─ tests/move_check/typing/module_call_complicated_rhs.move:31:9
    │
@@ -24,6 +87,15 @@ error[E04004]: expected a single non-reference type
    │         │     │
    │         │     Expected a single non-reference type, but found: '(address, u64)'
    │         Invalid type argument
+
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call_complicated_rhs.move:32:9
+   │
+32 │         baz({ let a = false; (a, x) });
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │         │  │
+   │         │  Found 1 argument(s) here
+   │         Invalid call of '0x8675309::M::baz'. The call expected 2 argument(s) but got 1
 
 error[E04004]: expected a single non-reference type
    ┌─ tests/move_check/typing/module_call_complicated_rhs.move:32:9
@@ -34,6 +106,33 @@ error[E04004]: expected a single non-reference type
    │         │                    Expected a single non-reference type, but found: '(bool, u64)'
    │         Invalid type argument
 
+error[E04017]: too many arguments
+   ┌─ tests/move_check/typing/module_call_complicated_rhs.move:36:9
+   │
+36 │         foo({});
+   │         ^^^^^^^
+   │         │  │
+   │         │  Found 1 argument(s) here
+   │         Invalid call of '0x8675309::M::foo'. The call expected 0 argument(s) but got 1
+
+error[E04017]: too many arguments
+   ┌─ tests/move_check/typing/module_call_complicated_rhs.move:37:9
+   │
+37 │         foo({ let _x = 0; });
+   │         ^^^^^^^^^^^^^^^^^^^^
+   │         │  │
+   │         │  Found 1 argument(s) here
+   │         Invalid call of '0x8675309::M::foo'. The call expected 0 argument(s) but got 1
+
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call_complicated_rhs.move:44:9
+   │
+44 │         baz({ (a, x) });
+   │         ^^^^^^^^^^^^^^^
+   │         │  │
+   │         │  Found 1 argument(s) here
+   │         Invalid call of '0x8675309::M::baz'. The call expected 2 argument(s) but got 1
+
 error[E04004]: expected a single non-reference type
    ┌─ tests/move_check/typing/module_call_complicated_rhs.move:44:9
    │
@@ -43,6 +142,15 @@ error[E04004]: expected a single non-reference type
    │         │     Expected a single non-reference type, but found: '(address, u64)'
    │         Invalid type argument
 
+error[E04016]: too few arguments
+   ┌─ tests/move_check/typing/module_call_complicated_rhs.move:45:9
+   │
+45 │         baz({ let a = false; (a, x) });
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │         │  │
+   │         │  Found 1 argument(s) here
+   │         Invalid call of '0x8675309::M::baz'. The call expected 2 argument(s) but got 1
+
 error[E04004]: expected a single non-reference type
    ┌─ tests/move_check/typing/module_call_complicated_rhs.move:45:9
    │
@@ -51,136 +159,4 @@ error[E04004]: expected a single non-reference type
    │         │                    │
    │         │                    Expected a single non-reference type, but found: '(bool, u64)'
    │         Invalid type argument
-
-error: 
-
-    ┌── tests/move_check/typing/module_call_complicated_rhs.move:11:9 ───
-    │
- 11 │         foo (if (cond) () else ());
-    │         ^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x8675309::M::foo'. The call expected 0 argument(s) but got 1
-    ·
- 11 │         foo (if (cond) () else ());
-    │             ---------------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call_complicated_rhs.move:13:9 ───
-    │
- 13 │         baz (if (cond) (false, @0x0) else (true, @0x1));
-    │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x8675309::M::baz'. The call expected 2 argument(s) but got 1
-    ·
- 13 │         baz (if (cond) (false, @0x0) else (true, @0x1));
-    │             ------------------------------------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call_complicated_rhs.move:17:9 ───
-    │
- 17 │         foo(if (cond) () else ());
-    │         ^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x8675309::M::foo'. The call expected 0 argument(s) but got 1
-    ·
- 17 │         foo(if (cond) () else ());
-    │            ---------------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call_complicated_rhs.move:19:9 ───
-    │
- 19 │         baz(if (cond) (false, @0x0) else (true, @0x1));
-    │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x8675309::M::baz'. The call expected 2 argument(s) but got 1
-    ·
- 19 │         baz(if (cond) (false, @0x0) else (true, @0x1));
-    │            ------------------------------------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call_complicated_rhs.move:23:9 ───
-    │
- 23 │         foo({});
-    │         ^^^^^^^ Invalid call of '0x8675309::M::foo'. The call expected 0 argument(s) but got 1
-    ·
- 23 │         foo({});
-    │            ---- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call_complicated_rhs.move:24:9 ───
-    │
- 24 │         foo({ let _x = 0; });
-    │         ^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x8675309::M::foo'. The call expected 0 argument(s) but got 1
-    ·
- 24 │         foo({ let _x = 0; });
-    │            ----------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call_complicated_rhs.move:31:9 ───
-    │
- 31 │         baz({ (a, x) });
-    │         ^^^^^^^^^^^^^^^ Invalid call of '0x8675309::M::baz'. The call expected 2 argument(s) but got 1
-    ·
- 31 │         baz({ (a, x) });
-    │            ------------ Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call_complicated_rhs.move:32:9 ───
-    │
- 32 │         baz({ let a = false; (a, x) });
-    │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x8675309::M::baz'. The call expected 2 argument(s) but got 1
-    ·
- 32 │         baz({ let a = false; (a, x) });
-    │            --------------------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call_complicated_rhs.move:36:9 ───
-    │
- 36 │         foo({});
-    │         ^^^^^^^ Invalid call of '0x8675309::M::foo'. The call expected 0 argument(s) but got 1
-    ·
- 36 │         foo({});
-    │            ---- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call_complicated_rhs.move:37:9 ───
-    │
- 37 │         foo({ let _x = 0; });
-    │         ^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x8675309::M::foo'. The call expected 0 argument(s) but got 1
-    ·
- 37 │         foo({ let _x = 0; });
-    │            ----------------- Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call_complicated_rhs.move:44:9 ───
-    │
- 44 │         baz({ (a, x) });
-    │         ^^^^^^^^^^^^^^^ Invalid call of '0x8675309::M::baz'. The call expected 2 argument(s) but got 1
-    ·
- 44 │         baz({ (a, x) });
-    │            ------------ Found 1 argument(s) here
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/module_call_complicated_rhs.move:45:9 ───
-    │
- 45 │         baz({ let a = false; (a, x) });
-    │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call of '0x8675309::M::baz'. The call expected 2 argument(s) but got 1
-    ·
- 45 │         baz({ let a = false; (a, x) });
-    │            --------------------------- Found 1 argument(s) here
-    │
 

@@ -198,9 +198,13 @@ impl Diagnostic {
 #[macro_export]
 macro_rules! diag {
     ($code: expr, $primary: expr $(,)?) => {{
+        #[allow(unused)]
+        use crate::errors::diagnostic_codes::*;
         crate::errors::new::Diagnostic::new($code, $primary, std::iter::empty::<(Loc, String)>())
     }};
     ($code: expr, $primary: expr, $($secondary: expr),+ $(,)?) => {{
+        #[allow(unused)]
+        use crate::errors::diagnostic_codes::*;
         crate::errors::new::Diagnostic::new($code, $primary, vec![$($secondary, )*])
     }};
 }

@@ -7,6 +7,15 @@ error[E04004]: expected a single non-reference type
   │                     Invalid field type
   │                     Expected a single non-reference type, but found: '(0x42::M0::Foo, 0x42::M0::Foo)'
 
+error[E04018]: cyclic data
+  ┌─ tests/move_check/typing/recursive_structs_malformed.move:4:27
+  │
+4 │     struct Foo { f: (Foo, Foo) }
+  │                           ^^^
+  │                           │
+  │                           Invalid field containing 'Foo' in struct 'Foo'.
+  │                           Using this struct creates a cycle: 'Foo' contains 'Foo'
+
 error[E04004]: expected a single non-reference type
   ┌─ tests/move_check/typing/recursive_structs_malformed.move:5:21
   │
@@ -15,6 +24,15 @@ error[E04004]: expected a single non-reference type
   │                     │
   │                     Invalid field type
   │                     Expected a single non-reference type, but found: '&0x42::M0::Bar'
+
+error[E04018]: cyclic data
+  ┌─ tests/move_check/typing/recursive_structs_malformed.move:5:22
+  │
+5 │     struct Bar { f: &Bar }
+  │                      ^^^
+  │                      │
+  │                      Invalid field containing 'Bar' in struct 'Bar'.
+  │                      Using this struct creates a cycle: 'Bar' contains 'Bar'
 
 error[E04004]: expected a single non-reference type
   ┌─ tests/move_check/typing/recursive_structs_malformed.move:6:21
@@ -25,36 +43,12 @@ error[E04004]: expected a single non-reference type
   │                     │      Expected a single non-reference type, but found: '(&0x42::M0::Baz, &mut 0x42::M0::Baz)'
   │                     Invalid type argument
 
-error: 
-
-   ┌── tests/move_check/typing/recursive_structs_malformed.move:4:27 ───
-   │
- 4 │     struct Foo { f: (Foo, Foo) }
-   │                           ^^^ Invalid field containing 'Foo' in struct 'Foo'.
-   ·
- 4 │     struct Foo { f: (Foo, Foo) }
-   │                           --- Using this struct creates a cycle: 'Foo' contains 'Foo'
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/recursive_structs_malformed.move:5:22 ───
-   │
- 5 │     struct Bar { f: &Bar }
-   │                      ^^^ Invalid field containing 'Bar' in struct 'Bar'.
-   ·
- 5 │     struct Bar { f: &Bar }
-   │                      --- Using this struct creates a cycle: 'Bar' contains 'Bar'
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/recursive_structs_malformed.move:6:40 ───
-   │
- 6 │     struct Baz { f: vector<(&Baz, &mut Baz)> }
-   │                                        ^^^ Invalid field containing 'Baz' in struct 'Baz'.
-   ·
- 6 │     struct Baz { f: vector<(&Baz, &mut Baz)> }
-   │                                        --- Using this struct creates a cycle: 'Baz' contains 'Baz'
-   │
+error[E04018]: cyclic data
+  ┌─ tests/move_check/typing/recursive_structs_malformed.move:6:40
+  │
+6 │     struct Baz { f: vector<(&Baz, &mut Baz)> }
+  │                                        ^^^
+  │                                        │
+  │                                        Invalid field containing 'Baz' in struct 'Baz'.
+  │                                        Using this struct creates a cycle: 'Baz' contains 'Baz'
 

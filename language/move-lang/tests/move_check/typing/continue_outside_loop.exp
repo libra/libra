@@ -1,8 +1,6 @@
-error: 
-
-   ┌── tests/move_check/typing/continue_outside_loop.move:6:9 ───
-   │
- 6 │         continue
-   │         ^^^^^^^^ Invalid usage of 'continue'. 'continue' can only be used inside a loop body
-   │
+error[E04014]: invalid loop control
+  ┌─ tests/move_check/typing/continue_outside_loop.move:6:9
+  │
+6 │         continue
+  │         ^^^^^^^^ Invalid usage of 'continue'. 'continue' can only be used inside a loop body
 

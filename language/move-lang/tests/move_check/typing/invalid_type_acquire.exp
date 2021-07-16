@@ -28,6 +28,27 @@ error[E02011]: invalid 'acquires' item
 21 │         S,
    │         ^ Invalid acquires item. Expected a struct with the 'key' ability.
 
+error[E04010]: cannot infer type
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:30:9
+   │
+30 │         destroy(account, move_from(a));
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Could not infer this type. Try adding an annotation
+
+error[E04010]: cannot infer type
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:30:26
+   │
+30 │         destroy(account, move_from(a));
+   │                          ^^^^^^^^^^^^ Could not infer this type. Try adding an annotation
+
+error[E04009]: expected specific type
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:31:26
+   │
+31 │         destroy(account, move_from<T>(a));
+   │                          ^^^^^^^^^^^^^^^
+   │                          │         │
+   │                          │         Expected a struct type. Global storage operations are restricted to struct types declared in the current module. Found the type parameter: 'T'
+   │                          Invalid call to move_from.
+
 error[E05001]: ability constraint not satisfied
    ┌─ tests/move_check/typing/invalid_type_acquire.move:32:26
    │
@@ -36,6 +57,15 @@ error[E05001]: ability constraint not satisfied
    │                          │         │
    │                          │         The type 'u64' does not have the ability 'key'
    │                          Invalid call of 'move_from'
+
+error[E04001]: restricted visibility
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:33:26
+   │
+33 │         destroy(account, move_from<X::R>(a));
+   │                          ^^^^^^^^^^^^^^^^^^
+   │                          │         │
+   │                          │         The type '0x2::X::R' was not declared in the current module. Global storage access is internal to the module'
+   │                          Invalid call to move_from.
 
 error[E05001]: ability constraint not satisfied
    ┌─ tests/move_check/typing/invalid_type_acquire.move:34:26
@@ -49,6 +79,30 @@ error[E05001]: ability constraint not satisfied
    │                          │         The type '0x2::M::S' does not have the ability 'key'
    │                          Invalid call of 'move_from'
 
+error[E04020]: missing acquires annotation
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:34:26
+   │
+34 │         destroy(account, move_from<S>(a));
+   │                          ^^^^^^^^^^^^^^^
+   │                          │         │
+   │                          │         The call acquires '0x2::M::S', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
+   │                          Invalid call to move_from.
+
+error[E04010]: cannot infer type
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:36:9
+   │
+36 │         borrow_global(a);
+   │         ^^^^^^^^^^^^^^^^ Could not infer this type. Try adding an annotation
+
+error[E04009]: expected specific type
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:37:9
+   │
+37 │         borrow_global<T>(a);
+   │         ^^^^^^^^^^^^^^^^^^^
+   │         │             │
+   │         │             Expected a struct type. Global storage operations are restricted to struct types declared in the current module. Found the type parameter: 'T'
+   │         Invalid call to borrow_global.
+
 error[E05001]: ability constraint not satisfied
    ┌─ tests/move_check/typing/invalid_type_acquire.move:38:9
    │
@@ -57,6 +111,15 @@ error[E05001]: ability constraint not satisfied
    │         │             │
    │         │             The type 'u64' does not have the ability 'key'
    │         Invalid call of 'borrow_global'
+
+error[E04001]: restricted visibility
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:39:9
+   │
+39 │         borrow_global<X::R>(a);
+   │         ^^^^^^^^^^^^^^^^^^^^^^
+   │         │             │
+   │         │             The type '0x2::X::R' was not declared in the current module. Global storage access is internal to the module'
+   │         Invalid call to borrow_global.
 
 error[E05001]: ability constraint not satisfied
    ┌─ tests/move_check/typing/invalid_type_acquire.move:40:9
@@ -70,6 +133,30 @@ error[E05001]: ability constraint not satisfied
    │         │             The type '0x2::M::S' does not have the ability 'key'
    │         Invalid call of 'borrow_global'
 
+error[E04020]: missing acquires annotation
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:40:9
+   │
+40 │         borrow_global<S>(a);
+   │         ^^^^^^^^^^^^^^^^^^^
+   │         │             │
+   │         │             The call acquires '0x2::M::S', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
+   │         Invalid call to borrow_global.
+
+error[E04010]: cannot infer type
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:42:9
+   │
+42 │         borrow_global_mut(a);
+   │         ^^^^^^^^^^^^^^^^^^^^ Could not infer this type. Try adding an annotation
+
+error[E04009]: expected specific type
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:43:9
+   │
+43 │         borrow_global_mut<T>(a);
+   │         ^^^^^^^^^^^^^^^^^^^^^^^
+   │         │                 │
+   │         │                 Expected a struct type. Global storage operations are restricted to struct types declared in the current module. Found the type parameter: 'T'
+   │         Invalid call to borrow_global_mut.
+
 error[E05001]: ability constraint not satisfied
    ┌─ tests/move_check/typing/invalid_type_acquire.move:44:9
    │
@@ -78,6 +165,15 @@ error[E05001]: ability constraint not satisfied
    │         │                 │
    │         │                 The type 'u64' does not have the ability 'key'
    │         Invalid call of 'borrow_global_mut'
+
+error[E04001]: restricted visibility
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:45:9
+   │
+45 │         borrow_global_mut<X::R>(a);
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │         │                 │
+   │         │                 The type '0x2::X::R' was not declared in the current module. Global storage access is internal to the module'
+   │         Invalid call to borrow_global_mut.
 
 error[E05001]: ability constraint not satisfied
    ┌─ tests/move_check/typing/invalid_type_acquire.move:46:9
@@ -91,6 +187,30 @@ error[E05001]: ability constraint not satisfied
    │         │                 The type '0x2::M::S' does not have the ability 'key'
    │         Invalid call of 'borrow_global_mut'
 
+error[E04020]: missing acquires annotation
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:46:9
+   │
+46 │         borrow_global_mut<S>(a);
+   │         ^^^^^^^^^^^^^^^^^^^^^^^
+   │         │                 │
+   │         │                 The call acquires '0x2::M::S', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
+   │         Invalid call to borrow_global_mut.
+
+error[E04010]: cannot infer type
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:48:9
+   │
+48 │         exists(a);
+   │         ^^^^^^^^^ Could not infer this type. Try adding an annotation
+
+error[E04009]: expected specific type
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:49:9
+   │
+49 │         exists<T>(a);
+   │         ^^^^^^^^^^^^
+   │         │      │
+   │         │      Expected a struct type. Global storage operations are restricted to struct types declared in the current module. Found the type parameter: 'T'
+   │         Invalid call to exists.
+
 error[E05001]: ability constraint not satisfied
    ┌─ tests/move_check/typing/invalid_type_acquire.move:50:9
    │
@@ -99,6 +219,15 @@ error[E05001]: ability constraint not satisfied
    │         │      │
    │         │      The type 'u64' does not have the ability 'key'
    │         Invalid call of 'exists'
+
+error[E04001]: restricted visibility
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:51:9
+   │
+51 │         exists<X::R>(a);
+   │         ^^^^^^^^^^^^^^^
+   │         │      │
+   │         │      The type '0x2::X::R' was not declared in the current module. Global storage access is internal to the module'
+   │         Invalid call to exists.
 
 error[E05001]: ability constraint not satisfied
    ┌─ tests/move_check/typing/invalid_type_acquire.move:52:9
@@ -112,6 +241,27 @@ error[E05001]: ability constraint not satisfied
    │         │      The type '0x2::M::S' does not have the ability 'key'
    │         Invalid call of 'exists'
 
+error[E04010]: cannot infer type
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:54:9
+   │
+54 │         move_to(account, any());
+   │         ^^^^^^^^^^^^^^^^^^^^^^^ Could not infer this type. Try adding an annotation
+
+error[E04010]: cannot infer type
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:54:26
+   │
+54 │         move_to(account, any());
+   │                          ^^^^^ Could not infer this type. Try adding an annotation
+
+error[E04009]: expected specific type
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:55:9
+   │
+55 │         move_to<T>(account, any());
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │         │       │
+   │         │       Expected a struct type. Global storage operations are restricted to struct types declared in the current module. Found the type parameter: 'T'
+   │         Invalid call to move_to.
+
 error[E05001]: ability constraint not satisfied
    ┌─ tests/move_check/typing/invalid_type_acquire.move:56:9
    │
@@ -120,6 +270,15 @@ error[E05001]: ability constraint not satisfied
    │         │       │
    │         │       The type 'u64' does not have the ability 'key'
    │         Invalid call of 'move_to'
+
+error[E04001]: restricted visibility
+   ┌─ tests/move_check/typing/invalid_type_acquire.move:57:9
+   │
+57 │         move_to<X::R>(account, any());
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   │         │       │
+   │         │       The type '0x2::X::R' was not declared in the current module. Global storage access is internal to the module'
+   │         Invalid call to move_to.
 
 error[E05001]: ability constraint not satisfied
    ┌─ tests/move_check/typing/invalid_type_acquire.move:58:9
@@ -132,203 +291,4 @@ error[E05001]: ability constraint not satisfied
    │         │       │
    │         │       The type '0x2::M::S' does not have the ability 'key'
    │         Invalid call of 'move_to'
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:30:9 ───
-    │
- 30 │         destroy(account, move_from(a));
-    │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Could not infer this type. Try adding an annotation
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:30:26 ───
-    │
- 30 │         destroy(account, move_from(a));
-    │                          ^^^^^^^^^^^^ Could not infer this type. Try adding an annotation
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:31:26 ───
-    │
- 31 │         destroy(account, move_from<T>(a));
-    │                          ^^^^^^^^^^^^^^^ Invalid call to move_from.
-    ·
- 31 │         destroy(account, move_from<T>(a));
-    │                                    - Expected a struct type. Global storage operations are restricted to struct types declared in the current module. Found the type parameter: 'T'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:33:26 ───
-    │
- 33 │         destroy(account, move_from<X::R>(a));
-    │                          ^^^^^^^^^^^^^^^^^^ Invalid call to move_from.
-    ·
- 33 │         destroy(account, move_from<X::R>(a));
-    │                                    ---- The type '0x2::X::R' was not declared in the current module. Global storage access is internal to the module'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:34:26 ───
-    │
- 34 │         destroy(account, move_from<S>(a));
-    │                          ^^^^^^^^^^^^^^^ Invalid call to move_from.
-    ·
- 34 │         destroy(account, move_from<S>(a));
-    │                                    - The call acquires '0x2::M::S', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:36:9 ───
-    │
- 36 │         borrow_global(a);
-    │         ^^^^^^^^^^^^^^^^ Could not infer this type. Try adding an annotation
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:37:9 ───
-    │
- 37 │         borrow_global<T>(a);
-    │         ^^^^^^^^^^^^^^^^^^^ Invalid call to borrow_global.
-    ·
- 37 │         borrow_global<T>(a);
-    │                       - Expected a struct type. Global storage operations are restricted to struct types declared in the current module. Found the type parameter: 'T'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:39:9 ───
-    │
- 39 │         borrow_global<X::R>(a);
-    │         ^^^^^^^^^^^^^^^^^^^^^^ Invalid call to borrow_global.
-    ·
- 39 │         borrow_global<X::R>(a);
-    │                       ---- The type '0x2::X::R' was not declared in the current module. Global storage access is internal to the module'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:40:9 ───
-    │
- 40 │         borrow_global<S>(a);
-    │         ^^^^^^^^^^^^^^^^^^^ Invalid call to borrow_global.
-    ·
- 40 │         borrow_global<S>(a);
-    │                       - The call acquires '0x2::M::S', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:42:9 ───
-    │
- 42 │         borrow_global_mut(a);
-    │         ^^^^^^^^^^^^^^^^^^^^ Could not infer this type. Try adding an annotation
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:43:9 ───
-    │
- 43 │         borrow_global_mut<T>(a);
-    │         ^^^^^^^^^^^^^^^^^^^^^^^ Invalid call to borrow_global_mut.
-    ·
- 43 │         borrow_global_mut<T>(a);
-    │                           - Expected a struct type. Global storage operations are restricted to struct types declared in the current module. Found the type parameter: 'T'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:45:9 ───
-    │
- 45 │         borrow_global_mut<X::R>(a);
-    │         ^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call to borrow_global_mut.
-    ·
- 45 │         borrow_global_mut<X::R>(a);
-    │                           ---- The type '0x2::X::R' was not declared in the current module. Global storage access is internal to the module'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:46:9 ───
-    │
- 46 │         borrow_global_mut<S>(a);
-    │         ^^^^^^^^^^^^^^^^^^^^^^^ Invalid call to borrow_global_mut.
-    ·
- 46 │         borrow_global_mut<S>(a);
-    │                           - The call acquires '0x2::M::S', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:48:9 ───
-    │
- 48 │         exists(a);
-    │         ^^^^^^^^^ Could not infer this type. Try adding an annotation
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:49:9 ───
-    │
- 49 │         exists<T>(a);
-    │         ^^^^^^^^^^^^ Invalid call to exists.
-    ·
- 49 │         exists<T>(a);
-    │                - Expected a struct type. Global storage operations are restricted to struct types declared in the current module. Found the type parameter: 'T'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:51:9 ───
-    │
- 51 │         exists<X::R>(a);
-    │         ^^^^^^^^^^^^^^^ Invalid call to exists.
-    ·
- 51 │         exists<X::R>(a);
-    │                ---- The type '0x2::X::R' was not declared in the current module. Global storage access is internal to the module'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:54:9 ───
-    │
- 54 │         move_to(account, any());
-    │         ^^^^^^^^^^^^^^^^^^^^^^^ Could not infer this type. Try adding an annotation
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:54:26 ───
-    │
- 54 │         move_to(account, any());
-    │                          ^^^^^ Could not infer this type. Try adding an annotation
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:55:9 ───
-    │
- 55 │         move_to<T>(account, any());
-    │         ^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call to move_to.
-    ·
- 55 │         move_to<T>(account, any());
-    │                 - Expected a struct type. Global storage operations are restricted to struct types declared in the current module. Found the type parameter: 'T'
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/invalid_type_acquire.move:57:9 ───
-    │
- 57 │         move_to<X::R>(account, any());
-    │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call to move_to.
-    ·
- 57 │         move_to<X::R>(account, any());
-    │                 ---- The type '0x2::X::R' was not declared in the current module. Global storage access is internal to the module'
-    │
 

@@ -1,16 +1,12 @@
-error: 
+error[E04001]: restricted visibility
+   ┌─ tests/move_check/typing/global_builtins_script.move:16:5
+   │
+16 │     borrow_global<M::R>(@0x1);
+   │     ^^^^^^^^^^^^^^^^^^^^^^^^^ Global storage operator cannot be used from a 'script' function
 
-    ┌── tests/move_check/typing/global_builtins_script.move:16:5 ───
-    │
- 16 │     borrow_global<M::R>(@0x1);
-    │     ^^^^^^^^^^^^^^^^^^^^^^^^^ Global storage operator cannot be used from a 'script' function
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/global_builtins_script.move:17:5 ───
-    │
- 17 │     move_to(&account, r);
-    │     ^^^^^^^^^^^^^^^^^^^^ Global storage operator cannot be used from a 'script' function
-    │
+error[E04001]: restricted visibility
+   ┌─ tests/move_check/typing/global_builtins_script.move:17:5
+   │
+17 │     move_to(&account, r);
+   │     ^^^^^^^^^^^^^^^^^^^^ Global storage operator cannot be used from a 'script' function
 

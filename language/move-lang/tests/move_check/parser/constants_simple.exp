@@ -1,38 +1,30 @@
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/parser/constants_simple.move:5:21
+  │
+5 │     const C1: u64 = u();
+  │                     ^^^ Module calls are not supported in constants
+
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/parser/constants_simple.move:7:22
+  │
+7 │     const C3: bool = loop ();
+  │                      ^^^^^^^ 'loop' expressions are not supported in constants
+
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/parser/constants_simple.move:8:20
+  │
+8 │     const C4: u8 = if (cond) 0 else 1;
+  │                    ^^^^^^^^^^^^^^^^^^ 'if' expressions are not supported in constants
+
 error[E03009]: unbound variable
   ┌─ tests/move_check/parser/constants_simple.move:8:24
   │
 8 │     const C4: u8 = if (cond) 0 else 1;
   │                        ^^^^ Invalid variable usage. Unbound variable 'cond'
 
-error: 
-
-   ┌── tests/move_check/parser/constants_simple.move:5:21 ───
-   │
- 5 │     const C1: u64 = u();
-   │                     ^^^ Module calls are not supported in constants
-   │
-
-error: 
-
-   ┌── tests/move_check/parser/constants_simple.move:7:22 ───
-   │
- 7 │     const C3: bool = loop ();
-   │                      ^^^^^^^ 'loop' expressions are not supported in constants
-   │
-
-error: 
-
-   ┌── tests/move_check/parser/constants_simple.move:8:20 ───
-   │
- 8 │     const C4: u8 = if (cond) 0 else 1;
-   │                    ^^^^^^^^^^^^^^^^^^ 'if' expressions are not supported in constants
-   │
-
-error: 
-
-   ┌── tests/move_check/parser/constants_simple.move:9:38 ───
-   │
- 9 │     const C5: vector<vector<bool>> = abort 0;
-   │                                      ^^^^^^^ 'abort' expressions are not supported in constants
-   │
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/parser/constants_simple.move:9:38
+  │
+9 │     const C5: vector<vector<bool>> = abort 0;
+  │                                      ^^^^^^^ 'abort' expressions are not supported in constants
 

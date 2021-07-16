@@ -28,11 +28,9 @@ error[E05001]: ability constraint not satisfied
   │         Cannot ignore values without the 'drop' ability. The value must be used
   │         The type '(u64, 0x8675309::M::S, 0x8675309::M::Box<_>)' does not have the ability 'drop'
 
-error: 
-
-   ┌── tests/move_check/typing/exp_list_resource_drop.move:9:18 ───
-   │
- 9 │         (0, S{}, Box {});
-   │                  ^^^^^^ Could not infer this type. Try adding an annotation
-   │
+error[E04010]: cannot infer type
+  ┌─ tests/move_check/typing/exp_list_resource_drop.move:9:18
+  │
+9 │         (0, S{}, Box {});
+  │                  ^^^^^^ Could not infer this type. Try adding an annotation
 

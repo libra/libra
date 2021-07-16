@@ -1,11 +1,9 @@
-error: 
-
-   ┌── tests/move_check/translated_ir_tests/move/generics/instantiation_loops/nested_types_2.move:6:9 ───
-   │
- 6 │         foo<R<u64, S<S<T>>>>()
-   │         ^^^^^^^^^^^^^^^^^^^^^^ Invalid call to '0x8675309::M::foo'
-   ·
- 6 │         foo<R<u64, S<S<T>>>>()
-   │             --------------- The type parameter 'foo::T' was instantiated with the type '0x8675309::M::R<u64, 0x8675309::M::S<0x8675309::M::S<T>>>', which contains the type parameter 'foo::T'. This recursive call causes the instantiation to recurse infinitely
-   │
+error[E04019]: cyclic type instantiation
+  ┌─ tests/move_check/translated_ir_tests/move/generics/instantiation_loops/nested_types_2.move:6:9
+  │
+6 │         foo<R<u64, S<S<T>>>>()
+  │         ^^^^^^^^^^^^^^^^^^^^^^
+  │         │   │
+  │         │   The type parameter 'foo::T' was instantiated with the type '0x8675309::M::R<u64, 0x8675309::M::S<0x8675309::M::S<T>>>', which contains the type parameter 'foo::T'. This recursive call causes the instantiation to recurse infinitely
+  │         Invalid call to '0x8675309::M::foo'
 

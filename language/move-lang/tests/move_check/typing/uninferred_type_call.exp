@@ -1,8 +1,6 @@
-error: 
-
-   ┌── tests/move_check/typing/uninferred_type_call.move:3:9 ───
-   │
- 3 │         foo()
-   │         ^^^^^ Could not infer this type. Try adding an annotation
-   │
+error[E04010]: cannot infer type
+  ┌─ tests/move_check/typing/uninferred_type_call.move:3:9
+  │
+3 │         foo()
+  │         ^^^^^ Could not infer this type. Try adding an annotation
 

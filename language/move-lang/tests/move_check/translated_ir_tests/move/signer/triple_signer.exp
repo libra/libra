@@ -1,33 +1,24 @@
-error: 
+error[E04011]: invalid script signature
+   ┌─ tests/move_check/translated_ir_tests/move/signer/triple_signer.move:13:9
+   │
+13 │     fun t1(_s: signer, _s2: signer, u: u64, _s3: signer) {
+   │         ^^                                       ------ 'signer's must be a prefix of the arguments to a script--they must come before any non-signer types
+   │         │                                         
+   │         Invalid parameter for script function 't1'
 
-    ┌── tests/move_check/translated_ir_tests/move/signer/triple_signer.move:13:9 ───
-    │
- 13 │     fun t1(_s: signer, _s2: signer, u: u64, _s3: signer) {
-    │         ^^ Invalid parameter for script function 't1'
-    ·
- 13 │     fun t1(_s: signer, _s2: signer, u: u64, _s3: signer) {
-    │                                                  ------ 'signer's must be a prefix of the arguments to a script--they must come before any non-signer types
-    │
+error[E04011]: invalid script signature
+   ┌─ tests/move_check/translated_ir_tests/move/signer/triple_signer.move:18:9
+   │
+18 │     fun t2(_u: u64, _s2: signer) {
+   │         ^^               ------ 'signer's must be a prefix of the arguments to a script--they must come before any non-signer types
+   │         │                 
+   │         Invalid parameter for script function 't2'
 
-error: 
-
-    ┌── tests/move_check/translated_ir_tests/move/signer/triple_signer.move:18:9 ───
-    │
- 18 │     fun t2(_u: u64, _s2: signer) {
-    │         ^^ Invalid parameter for script function 't2'
-    ·
- 18 │     fun t2(_u: u64, _s2: signer) {
-    │                          ------ 'signer's must be a prefix of the arguments to a script--they must come before any non-signer types
-    │
-
-error: 
-
-    ┌── tests/move_check/translated_ir_tests/move/signer/triple_signer.move:23:9 ───
-    │
- 23 │     fun t2(_s: signer, _u: u64, _s2: signer) {
-    │         ^^ Invalid parameter for script function 't2'
-    ·
- 23 │     fun t2(_s: signer, _u: u64, _s2: signer) {
-    │                                      ------ 'signer's must be a prefix of the arguments to a script--they must come before any non-signer types
-    │
+error[E04011]: invalid script signature
+   ┌─ tests/move_check/translated_ir_tests/move/signer/triple_signer.move:23:9
+   │
+23 │     fun t2(_s: signer, _u: u64, _s2: signer) {
+   │         ^^                           ------ 'signer's must be a prefix of the arguments to a script--they must come before any non-signer types
+   │         │                             
+   │         Invalid parameter for script function 't2'
 

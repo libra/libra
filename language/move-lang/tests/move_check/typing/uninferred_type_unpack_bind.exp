@@ -1,16 +1,12 @@
-error: 
+error[E04010]: cannot infer type
+  ┌─ tests/move_check/typing/uninferred_type_unpack_bind.move:5:13
+  │
+5 │         let S{} = S{};
+  │             ^^^ Could not infer this type. Try adding an annotation
 
-   ┌── tests/move_check/typing/uninferred_type_unpack_bind.move:5:13 ───
-   │
- 5 │         let S{} = S{};
-   │             ^^^ Could not infer this type. Try adding an annotation
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/uninferred_type_unpack_bind.move:5:19 ───
-   │
- 5 │         let S{} = S{};
-   │                   ^^^ Could not infer this type. Try adding an annotation
-   │
+error[E04010]: cannot infer type
+  ┌─ tests/move_check/typing/uninferred_type_unpack_bind.move:5:19
+  │
+5 │         let S{} = S{};
+  │                   ^^^ Could not infer this type. Try adding an annotation
 

@@ -1,44 +1,36 @@
-error: 
-
-    ┌── tests/move_check/typing/missing_acquire.move:8:9 ───
-    │
-  8 │         r1(a);
-    │         ^^^^^ Invalid call to '0x8675309::M::r1'
-    ·
- 14 │     fun r1(a: address) acquires R1 {
-    │                                 -- The call acquires '0x8675309::M::R1', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
-    │
-
-error: 
-
-   ┌── tests/move_check/typing/missing_acquire.move:9:9 ───
+error[E04020]: missing acquires annotation
+   ┌─ tests/move_check/typing/missing_acquire.move:8:9
    │
- 9 │         borrow_global<R1>(a);
-   │         ^^^^^^^^^^^^^^^^^^^^ Invalid call to borrow_global.
+ 8 │         r1(a);
+   │         ^^^^^ Invalid call to '0x8675309::M::r1'
    ·
- 9 │         borrow_global<R1>(a);
-   │                       -- The call acquires '0x8675309::M::R1', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
+14 │     fun r1(a: address) acquires R1 {
+   │                                 -- The call acquires '0x8675309::M::R1', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
+
+error[E04020]: missing acquires annotation
+  ┌─ tests/move_check/typing/missing_acquire.move:9:9
+  │
+9 │         borrow_global<R1>(a);
+  │         ^^^^^^^^^^^^^^^^^^^^
+  │         │             │
+  │         │             The call acquires '0x8675309::M::R1', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
+  │         Invalid call to borrow_global.
+
+error[E04020]: missing acquires annotation
+   ┌─ tests/move_check/typing/missing_acquire.move:10:9
    │
+10 │         borrow_global_mut<R1>(a);
+   │         ^^^^^^^^^^^^^^^^^^^^^^^^
+   │         │                 │
+   │         │                 The call acquires '0x8675309::M::R1', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
+   │         Invalid call to borrow_global_mut.
 
-error: 
-
-    ┌── tests/move_check/typing/missing_acquire.move:10:9 ───
-    │
- 10 │         borrow_global_mut<R1>(a);
-    │         ^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call to borrow_global_mut.
-    ·
- 10 │         borrow_global_mut<R1>(a);
-    │                           -- The call acquires '0x8675309::M::R1', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/missing_acquire.move:11:16 ───
-    │
- 11 │         R1{} = move_from<R1>(a);
-    │                ^^^^^^^^^^^^^^^^ Invalid call to move_from.
-    ·
- 11 │         R1{} = move_from<R1>(a);
-    │                          -- The call acquires '0x8675309::M::R1', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
-    │
+error[E04020]: missing acquires annotation
+   ┌─ tests/move_check/typing/missing_acquire.move:11:16
+   │
+11 │         R1{} = move_from<R1>(a);
+   │                ^^^^^^^^^^^^^^^^
+   │                │         │
+   │                │         The call acquires '0x8675309::M::R1', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
+   │                Invalid call to move_from.
 

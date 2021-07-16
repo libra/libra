@@ -1,38 +1,26 @@
-error: 
-
-    ┌── tests/move_check/translated_ir_tests/move/generics/instantiation_loops/mutually_recursive_three_args_type_con_shifting.move:9:9 ───
-    │
-  9 │         h<T1, T2, S<T3>>()
-    │         ^^^^^^^^^^^^^^^^^^ Invalid call to '0x8675309::M::h'
-    ·
-  9 │         h<T1, T2, S<T3>>()
-    │                   ----- The type parameter 'f::T3' was instantiated with the type '0x8675309::M::S<T3>', which contains the type parameter 'h::T3'. A cycle of recursive calls causes the instantiation to recurse infinitely
-    ·
- 13 │         f<T1, T2, T3>()
-    │         --------------- 'h<_, _, h::T3>' calls 'f<_, _, h::T3>'
-    ·
-  5 │         g<T2, T3, T1>()
-    │         --------------- 'f<_, _, h::T3>' calls 'g<_, h::T3, _>'
-    ·
-  9 │         h<T1, T2, S<T3>>()
-    │         ------------------ 'g<_, h::T3, _>' calls 'h<_, h::T3, _>'
-    ·
- 13 │         f<T1, T2, T3>()
-    │         --------------- 'h<_, h::T3, _>' calls 'f<_, h::T3, _>'
-    ·
-  5 │         g<T2, T3, T1>()
-    │         --------------- 'f<_, h::T3, _>' calls 'g<h::T3, _, _>'
-    ·
-  9 │         h<T1, T2, S<T3>>()
-    │         ------------------ 'g<h::T3, _, _>' calls 'h<h::T3, _, _>'
-    ·
- 13 │         f<T1, T2, T3>()
-    │         --------------- 'h<h::T3, _, _>' calls 'f<h::T3, _, _>'
-    ·
-  5 │         g<T2, T3, T1>()
-    │         --------------- 'f<h::T3, _, _>' calls 'g<_, _, h::T3>'
-    ·
-  9 │         h<T1, T2, S<T3>>()
-    │         ------------------ 'g<_, _, h::T3>' calls 'h<_, _, 0x8675309::M::S<h::T3>>'
-    │
+error[E04019]: cyclic type instantiation
+   ┌─ tests/move_check/translated_ir_tests/move/generics/instantiation_loops/mutually_recursive_three_args_type_con_shifting.move:9:9
+   │
+ 5 │         g<T2, T3, T1>()
+   │         ---------------
+   │         │
+   │         'f<_, _, h::T3>' calls 'g<_, h::T3, _>'
+   │         'f<h::T3, _, _>' calls 'g<_, _, h::T3>'
+   │         'f<_, h::T3, _>' calls 'g<h::T3, _, _>'
+   ·
+ 9 │         h<T1, T2, S<T3>>()
+   │         ^^^^^^^^^^^^^^^^^^
+   │         │         │
+   │         │         The type parameter 'f::T3' was instantiated with the type '0x8675309::M::S<T3>', which contains the type parameter 'h::T3'. A cycle of recursive calls causes the instantiation to recurse infinitely
+   │         Invalid call to '0x8675309::M::h'
+   │         'g<_, _, h::T3>' calls 'h<_, _, 0x8675309::M::S<h::T3>>'
+   │         'g<h::T3, _, _>' calls 'h<h::T3, _, _>'
+   │         'g<_, h::T3, _>' calls 'h<_, h::T3, _>'
+   ·
+13 │         f<T1, T2, T3>()
+   │         ---------------
+   │         │
+   │         'h<_, _, h::T3>' calls 'f<_, _, h::T3>'
+   │         'h<h::T3, _, _>' calls 'f<h::T3, _, _>'
+   │         'h<_, h::T3, _>' calls 'f<_, h::T3, _>'
 

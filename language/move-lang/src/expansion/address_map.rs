@@ -3,7 +3,6 @@
 
 use crate::{
     diag,
-    errors::diagnostic_codes::*,
     parser::ast::{self as P},
     shared::{unique_map::UniqueMap, *},
     FullyCompiledProgram,

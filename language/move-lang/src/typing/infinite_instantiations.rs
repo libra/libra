@@ -3,7 +3,7 @@
 
 use super::core::{self, Subst, TParamSubst};
 use crate::{
-    errors::*,
+    errors::{diagnostic_codes::TypeSafety, new::Diagnostic},
     expansion::ast::ModuleIdent,
     naming::ast::{self as N, TParam, Type, Type_},
     parser::ast::FunctionName,
@@ -176,7 +176,7 @@ fn module<'a>(
     petgraph_scc(&graph)
         .into_iter()
         .filter(|scc| scc_edges!(&graph, scc).any(|(_, e, _)| e == Edge::Nested))
-        .for_each(|scc| compilation_env.add_error_deprecated(cycle_error(context, &graph, scc)))
+        .for_each(|scc| compilation_env.add_diag(cycle_error(context, &graph, scc)))
 }
 
 //**************************************************************************************************
@@ -280,7 +280,11 @@ fn exp_list_item(context: &mut Context, item: &T::ExpListItem) {
 // Errors
 //**************************************************************************************************
 
-fn cycle_error(context: &Context, graph: &DiGraphMap<&TParam, Edge>, scc: Vec<&TParam>) -> Error {
+fn cycle_error(
+    context: &Context,
+    graph: &DiGraphMap<&TParam, Edge>,
+    scc: Vec<&TParam>,
+) -> Diagnostic {
     let critical_edge = scc_edges!(graph, &scc).find(|(_, e, _)| e == &Edge::Nested);
     // tail -> head
     let (critical_tail, _, critical_head) = critical_edge.unwrap();
@@ -324,7 +328,7 @@ fn cycle_error(context: &Context, graph: &DiGraphMap<&TParam, Edge>, scc: Vec<&T
         case = case,
     );
 
-    let mut error = vec![(call_loc, call_msg), (ty_loc, tparam_msg)];
+    let mut secondary_labels = vec![(ty_loc, tparam_msg)];
 
     if cycle_nodes.len() > 1 {
         let (mut subst, init_call) = {
@@ -365,11 +369,15 @@ fn cycle_error(context: &Context, graph: &DiGraphMap<&TParam, Edge>, scc: Vec<&T
                     &cycle_calls[prev(i)]
                 };
                 let msg = format!("'{}' calls '{}'", prev_call, next_call);
-                error.push((*loc, msg))
+                secondary_labels.push((*loc, msg))
             });
     }
 
-    error
+    Diagnostic::new(
+        TypeSafety::CyclicInstantiation,
+        (call_loc, call_msg),
+        secondary_labels,
+    )
 }
 
 fn make_subst(

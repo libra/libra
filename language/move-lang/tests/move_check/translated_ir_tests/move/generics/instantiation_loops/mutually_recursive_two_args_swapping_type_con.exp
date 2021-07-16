@@ -1,23 +1,17 @@
-error: 
-
-   ┌── tests/move_check/translated_ir_tests/move/generics/instantiation_loops/mutually_recursive_two_args_swapping_type_con.move:9:9 ───
-   │
- 9 │         f<T1, S<T2>, u64>()
-   │         ^^^^^^^^^^^^^^^^^^^ Invalid call to '0x8675309::M::f'
-   ·
- 9 │         f<T1, S<T2>, u64>()
-   │               ----- The type parameter 'g::T2' was instantiated with the type '0x8675309::M::S<T2>', which contains the type parameter 'f::T2'. A cycle of recursive calls causes the instantiation to recurse infinitely
-   ·
- 5 │         g<T2, T1>()
-   │         ----------- 'f<_, f::T2, _>' calls 'g<f::T2, _>'
-   ·
- 9 │         f<T1, S<T2>, u64>()
-   │         ------------------- 'g<f::T2, _>' calls 'f<f::T2, _, _>'
-   ·
- 5 │         g<T2, T1>()
-   │         ----------- 'f<f::T2, _, _>' calls 'g<_, f::T2>'
-   ·
- 9 │         f<T1, S<T2>, u64>()
-   │         ------------------- 'g<_, f::T2>' calls 'f<_, 0x8675309::M::S<f::T2>, _>'
-   │
+error[E04019]: cyclic type instantiation
+  ┌─ tests/move_check/translated_ir_tests/move/generics/instantiation_loops/mutually_recursive_two_args_swapping_type_con.move:9:9
+  │
+5 │         g<T2, T1>()
+  │         -----------
+  │         │
+  │         'f<_, f::T2, _>' calls 'g<f::T2, _>'
+  │         'f<f::T2, _, _>' calls 'g<_, f::T2>'
+  ·
+9 │         f<T1, S<T2>, u64>()
+  │         ^^^^^^^^^^^^^^^^^^^
+  │         │     │
+  │         │     The type parameter 'g::T2' was instantiated with the type '0x8675309::M::S<T2>', which contains the type parameter 'f::T2'. A cycle of recursive calls causes the instantiation to recurse infinitely
+  │         Invalid call to '0x8675309::M::f'
+  │         'g<_, f::T2>' calls 'f<_, 0x8675309::M::S<f::T2>, _>'
+  │         'g<f::T2, _>' calls 'f<f::T2, _, _>'
 

@@ -1,22 +1,18 @@
-error: 
+error[E04016]: too few arguments
+  ┌─ tests/move_check/translated_ir_tests/move/signer/move_to_missing_resource.move:4:9
+  │
+4 │         move_to<R>(s)
+  │         ^^^^^^^^^^^^^
+  │         │         │
+  │         │         Found 1 argument(s) here
+  │         Invalid call of 'move_to'. The call expected 2 argument(s) but got 1
 
-   ┌── tests/move_check/translated_ir_tests/move/signer/move_to_missing_resource.move:4:9 ───
+error[E04016]: too few arguments
+   ┌─ tests/move_check/translated_ir_tests/move/signer/move_to_missing_resource.move:14:14
    │
- 4 │         move_to<R>(s)
-   │         ^^^^^^^^^^^^^ Invalid call of 'move_to'. The call expected 2 argument(s) but got 1
-   ·
- 4 │         move_to<R>(s)
-   │                   --- Found 1 argument(s) here
-   │
-
-error: 
-
-    ┌── tests/move_check/translated_ir_tests/move/signer/move_to_missing_resource.move:14:14 ───
-    │
- 14 │         () = move_to<R<bool>>(s);
-    │              ^^^^^^^^^^^^^^^^^^^ Invalid call of 'move_to'. The call expected 2 argument(s) but got 1
-    ·
- 14 │         () = move_to<R<bool>>(s);
-    │                              --- Found 1 argument(s) here
-    │
+14 │         () = move_to<R<bool>>(s);
+   │              ^^^^^^^^^^^^^^^^^^^
+   │              │               │
+   │              │               Found 1 argument(s) here
+   │              Invalid call of 'move_to'. The call expected 2 argument(s) but got 1
 

@@ -28,11 +28,9 @@ error[E03005]: unbound unscoped name
 15 │         F { No };
    │             ^^ Unbound constant 'No'
 
-error: 
-
-    ┌── tests/move_check/expansion/invalid_local_name.move:19:13 ───
-    │
- 19 │         let _No;
-    │             ^^^ Could not infer this type. Try adding an annotation
-    │
+error[E04010]: cannot infer type
+   ┌─ tests/move_check/expansion/invalid_local_name.move:19:13
+   │
+19 │         let _No;
+   │             ^^^ Could not infer this type. Try adding an annotation
 

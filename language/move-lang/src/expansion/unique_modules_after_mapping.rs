@@ -4,7 +4,6 @@
 use crate::{
     compiled_unit::CompiledModuleIdent,
     diag,
-    errors::diagnostic_codes::*,
     expansion::ast::{self as E, Address, ModuleIdent, ModuleIdent_},
     parser::ast::ModuleName,
     shared::{unique_map::UniqueMap, *},

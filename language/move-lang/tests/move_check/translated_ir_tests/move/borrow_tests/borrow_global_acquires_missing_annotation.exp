@@ -1,11 +1,9 @@
-error: 
-
-   ┌── tests/move_check/translated_ir_tests/move/borrow_tests/borrow_global_acquires_missing_annotation.move:6:9 ───
-   │
- 6 │         borrow_global_mut<T1>(Signer::address_of(account));
-   │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Invalid call to borrow_global_mut.
-   ·
- 6 │         borrow_global_mut<T1>(Signer::address_of(account));
-   │                           -- The call acquires '0x8675309::A::T1', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
-   │
+error[E04020]: missing acquires annotation
+  ┌─ tests/move_check/translated_ir_tests/move/borrow_tests/borrow_global_acquires_missing_annotation.move:6:9
+  │
+6 │         borrow_global_mut<T1>(Signer::address_of(account));
+  │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  │         │                 │
+  │         │                 The call acquires '0x8675309::A::T1', but the 'acquires' list for the current function does not contain this type. It must be present in the calling context's acquires list
+  │         Invalid call to borrow_global_mut.
 

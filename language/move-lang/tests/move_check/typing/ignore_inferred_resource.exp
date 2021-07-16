@@ -10,11 +10,9 @@ error[E05001]: ability constraint not satisfied
   │         Cannot ignore values without the 'drop' ability. The value must be used
   │         The type '0x8675309::M::S<_>' does not have the ability 'drop'
 
-error: 
-
-   ┌── tests/move_check/typing/ignore_inferred_resource.move:4:9 ───
-   │
- 4 │         S{};
-   │         ^^^ Could not infer this type. Try adding an annotation
-   │
+error[E04010]: cannot infer type
+  ┌─ tests/move_check/typing/ignore_inferred_resource.move:4:9
+  │
+4 │         S{};
+  │         ^^^ Could not infer this type. Try adding an annotation
 

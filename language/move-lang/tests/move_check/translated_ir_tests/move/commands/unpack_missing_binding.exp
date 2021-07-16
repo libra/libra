@@ -1,8 +1,6 @@
-error: 
-
-    ┌── tests/move_check/translated_ir_tests/move/commands/unpack_missing_binding.move:11:13 ───
-    │
- 11 │         let T { i, x, b: flag } = t;
-    │             ^^^^^^^^^^^^^^^^^^^ Missing binding for field 'y' in '0x8675309::Test::T'
-    │
+error[E04016]: too few arguments
+   ┌─ tests/move_check/translated_ir_tests/move/commands/unpack_missing_binding.move:11:13
+   │
+11 │         let T { i, x, b: flag } = t;
+   │             ^^^^^^^^^^^^^^^^^^^ Missing binding for field 'y' in '0x8675309::Test::T'
 

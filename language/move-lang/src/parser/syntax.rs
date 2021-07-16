@@ -6,10 +6,7 @@ use move_ir_types::location::*;
 
 use crate::{
     diag,
-    errors::{
-        diagnostic_codes::*,
-        new::{Diagnostic, Diagnostics},
-    },
+    errors::new::{Diagnostic, Diagnostics},
     parser::{ast::*, lexer::*},
     shared::*,
 };

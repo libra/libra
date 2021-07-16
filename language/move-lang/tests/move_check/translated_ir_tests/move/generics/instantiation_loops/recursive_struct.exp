@@ -1,55 +1,45 @@
-error: 
+error[E04018]: cyclic data
+  ┌─ tests/move_check/translated_ir_tests/move/generics/instantiation_loops/recursive_struct.move:4:21
+  │
+4 │     struct Foo { f: Foo }
+  │                     ^^^
+  │                     │
+  │                     Invalid field containing 'Foo' in struct 'Foo'.
+  │                     Using this struct creates a cycle: 'Foo' contains 'Foo'
 
-   ┌── tests/move_check/translated_ir_tests/move/generics/instantiation_loops/recursive_struct.move:4:21 ───
+error[E04018]: cyclic data
+   ┌─ tests/move_check/translated_ir_tests/move/generics/instantiation_loops/recursive_struct.move:10:25
    │
- 4 │     struct Foo { f: Foo }
-   │                     ^^^ Invalid field containing 'Foo' in struct 'Foo'.
-   ·
- 4 │     struct Foo { f: Foo }
-   │                     --- Using this struct creates a cycle: 'Foo' contains 'Foo'
+10 │     struct Foo { f: Cup<Foo> }
+   │                         ^^^
+   │                         │
+   │                         Invalid field containing 'Foo' in struct 'Foo'.
+   │                         Using this struct creates a cycle: 'Foo' contains 'Foo'
+
+error[E04018]: cyclic data
+   ┌─ tests/move_check/translated_ir_tests/move/generics/instantiation_loops/recursive_struct.move:22:41
    │
+22 │     struct X has key, store { y: vector<Y> }
+   │                                         ^
+   │                                         │
+   │                                         Invalid field containing 'Y' in struct 'X'.
+   │                                         Using this struct creates a cycle: 'Y' contains 'X' contains 'Y'
 
-error: 
+error[E04018]: cyclic data
+   ┌─ tests/move_check/translated_ir_tests/move/generics/instantiation_loops/recursive_struct.move:41:29
+   │
+41 │     struct Foo { f: M1::Cup<Foo> }
+   │                             ^^^
+   │                             │
+   │                             Invalid field containing 'Foo' in struct 'Foo'.
+   │                             Using this struct creates a cycle: 'Foo' contains 'Foo'
 
-    ┌── tests/move_check/translated_ir_tests/move/generics/instantiation_loops/recursive_struct.move:10:25 ───
-    │
- 10 │     struct Foo { f: Cup<Foo> }
-    │                         ^^^ Invalid field containing 'Foo' in struct 'Foo'.
-    ·
- 10 │     struct Foo { f: Cup<Foo> }
-    │                         --- Using this struct creates a cycle: 'Foo' contains 'Foo'
-    │
-
-error: 
-
-    ┌── tests/move_check/translated_ir_tests/move/generics/instantiation_loops/recursive_struct.move:22:41 ───
-    │
- 22 │     struct X has key, store { y: vector<Y> }
-    │                                         ^ Invalid field containing 'Y' in struct 'X'.
-    ·
- 22 │     struct X has key, store { y: vector<Y> }
-    │                                         - Using this struct creates a cycle: 'Y' contains 'X' contains 'Y'
-    │
-
-error: 
-
-    ┌── tests/move_check/translated_ir_tests/move/generics/instantiation_loops/recursive_struct.move:41:29 ───
-    │
- 41 │     struct Foo { f: M1::Cup<Foo> }
-    │                             ^^^ Invalid field containing 'Foo' in struct 'Foo'.
-    ·
- 41 │     struct Foo { f: M1::Cup<Foo> }
-    │                             --- Using this struct creates a cycle: 'Foo' contains 'Foo'
-    │
-
-error: 
-
-    ┌── tests/move_check/translated_ir_tests/move/generics/instantiation_loops/recursive_struct.move:50:26 ───
-    │
- 50 │     struct C { d: vector<D> }
-    │                          ^ Invalid field containing 'D' in struct 'C'.
-    ·
- 50 │     struct C { d: vector<D> }
-    │                          - Using this struct creates a cycle: 'D' contains 'A' contains 'B' contains 'C' contains 'D'
-    │
+error[E04018]: cyclic data
+   ┌─ tests/move_check/translated_ir_tests/move/generics/instantiation_loops/recursive_struct.move:50:26
+   │
+50 │     struct C { d: vector<D> }
+   │                          ^
+   │                          │
+   │                          Invalid field containing 'D' in struct 'C'.
+   │                          Using this struct creates a cycle: 'D' contains 'A' contains 'B' contains 'C' contains 'D'
 

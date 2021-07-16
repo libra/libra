@@ -1,16 +1,12 @@
-error: 
+error[E04001]: restricted visibility
+   ┌─ tests/move_check/typing/mutate_field_internal.move:13:9
+   │
+13 │         X::s().f = 0;
+   │         ^^^^^^^^ Invalid access of field 'f' on '0x2::X::S'. Fields can only be accessed inside the struct's module
 
-    ┌── tests/move_check/typing/mutate_field_internal.move:13:9 ───
-    │
- 13 │         X::s().f = 0;
-    │         ^^^^^^^^ Invalid access of field 'f' on '0x2::X::S'. Fields can only be accessed inside the struct's module
-    │
-
-error: 
-
-    ┌── tests/move_check/typing/mutate_field_internal.move:15:9 ───
-    │
- 15 │         s.f = 0;
-    │         ^^^ Invalid access of field 'f' on '0x2::X::S'. Fields can only be accessed inside the struct's module
-    │
+error[E04001]: restricted visibility
+   ┌─ tests/move_check/typing/mutate_field_internal.move:15:9
+   │
+15 │         s.f = 0;
+   │         ^^^ Invalid access of field 'f' on '0x2::X::S'. Fields can only be accessed inside the struct's module
 

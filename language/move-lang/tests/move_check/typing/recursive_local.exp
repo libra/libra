@@ -1,3 +1,9 @@
+error[E04010]: cannot infer type
+  ┌─ tests/move_check/typing/recursive_local.move:4:13
+  │
+4 │         let x;
+  │             ^ Could not infer this type. Try adding an annotation
+
 error[E04008]: invalid type. recursive type found
   ┌─ tests/move_check/typing/recursive_local.move:5:9
   │
@@ -14,19 +20,9 @@ error[E04005]: expected a single type
   │         │    
   │         Invalid type for local
 
-error: 
-
-   ┌── tests/move_check/typing/recursive_local.move:4:13 ───
-   │
- 4 │         let x;
-   │             ^ Could not infer this type. Try adding an annotation
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/recursive_local.move:5:14 ───
-   │
- 5 │         x = (x, 0);
-   │              ^ Could not infer this type. Try adding an annotation
-   │
+error[E04010]: cannot infer type
+  ┌─ tests/move_check/typing/recursive_local.move:5:14
+  │
+5 │         x = (x, 0);
+  │              ^ Could not infer this type. Try adding an annotation
 

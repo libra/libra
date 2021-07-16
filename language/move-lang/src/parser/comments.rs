@@ -1,10 +1,7 @@
 // Copyright (c) The Diem Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use crate::{
-    diag,
-    errors::{diagnostic_codes::*, new::Diagnostics},
-};
+use crate::{diag, errors::new::Diagnostics};
 use codespan::{ByteIndex, Span};
 use move_ir_types::location::*;
 use std::{collections::BTreeMap, iter::Peekable, str::Chars};

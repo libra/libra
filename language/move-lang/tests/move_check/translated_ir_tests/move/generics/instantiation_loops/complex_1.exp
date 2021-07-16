@@ -1,40 +1,31 @@
-error: 
+error[E04019]: cyclic type instantiation
+   ┌─ tests/move_check/translated_ir_tests/move/generics/instantiation_loops/complex_1.move:10:9
+   │
+10 │         c<S<T2>, bool>()
+   │         ^^^^^^^^^^^^^^^^
+   │         │ │
+   │         │ The type parameter 'c::T1' was instantiated with the type '0x8675309::M::S<T2>', which contains the type parameter 'c::T2'. A cycle of recursive calls causes the instantiation to recurse infinitely
+   │         Invalid call to '0x8675309::M::c'
+   │         'b<_, c::T1>' calls 'c<0x8675309::M::S<c::T1>, _>'
+   ·
+14 │         c<u64, T1>();
+   │         ------------ 'c<c::T1, _>' calls 'c<_, c::T1>'
+15 │         d<T2>();
+   │         ------- 'c<_, c::T1>' calls 'd<c::T1>'
+   ·
+20 │         b<u64, T>()
+   │         ----------- 'd<c::T1>' calls 'b<_, c::T1>'
 
-    ┌── tests/move_check/translated_ir_tests/move/generics/instantiation_loops/complex_1.move:10:9 ───
-    │
- 10 │         c<S<T2>, bool>()
-    │         ^^^^^^^^^^^^^^^^ Invalid call to '0x8675309::M::c'
-    ·
- 10 │         c<S<T2>, bool>()
-    │           ----- The type parameter 'c::T1' was instantiated with the type '0x8675309::M::S<T2>', which contains the type parameter 'c::T2'. A cycle of recursive calls causes the instantiation to recurse infinitely
-    ·
- 14 │         c<u64, T1>();
-    │         ------------ 'c<c::T1, _>' calls 'c<_, c::T1>'
-    ·
- 15 │         d<T2>();
-    │         ------- 'c<_, c::T1>' calls 'd<c::T1>'
-    ·
- 20 │         b<u64, T>()
-    │         ----------- 'd<c::T1>' calls 'b<_, c::T1>'
-    ·
- 10 │         c<S<T2>, bool>()
-    │         ---------------- 'b<_, c::T1>' calls 'c<0x8675309::M::S<c::T1>, _>'
-    │
-
-error: 
-
-    ┌── tests/move_check/translated_ir_tests/move/generics/instantiation_loops/complex_1.move:31:9 ───
-    │
- 31 │         f<S<T>>()
-    │         ^^^^^^^^^ Invalid call to '0x8675309::M::f'
-    ·
- 31 │         f<S<T>>()
-    │           ---- The type parameter 'g::T' was instantiated with the type '0x8675309::M::S<T>', which contains the type parameter 'f::T'. These mutually recursive calls causes the instantiation to recurse infinitely
-    ·
- 27 │         g<T>()
-    │         ------ 'f<f::T>' calls 'g<f::T>'
-    ·
- 31 │         f<S<T>>()
-    │         --------- 'g<f::T>' calls 'f<0x8675309::M::S<f::T>>'
-    │
+error[E04019]: cyclic type instantiation
+   ┌─ tests/move_check/translated_ir_tests/move/generics/instantiation_loops/complex_1.move:31:9
+   │
+27 │         g<T>()
+   │         ------ 'f<f::T>' calls 'g<f::T>'
+   ·
+31 │         f<S<T>>()
+   │         ^^^^^^^^^
+   │         │ │
+   │         │ The type parameter 'g::T' was instantiated with the type '0x8675309::M::S<T>', which contains the type parameter 'f::T'. These mutually recursive calls causes the instantiation to recurse infinitely
+   │         Invalid call to '0x8675309::M::f'
+   │         'g<f::T>' calls 'f<0x8675309::M::S<f::T>>'
 

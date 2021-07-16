@@ -1,3 +1,27 @@
+error[E04012]: invalid type for constant
+  ┌─ tests/move_check/typing/constant_non_base_type.move:3:15
+  │
+3 │     const C1: &u64 = &0;
+  │               ^^^^
+  │               │
+  │               Unpermitted constant type
+  │               Found: '&u64'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
+
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/typing/constant_non_base_type.move:3:22
+  │
+3 │     const C1: &u64 = &0;
+  │                      ^^ References (and reference operations) are not supported in constants
+
+error[E04012]: invalid type for constant
+  ┌─ tests/move_check/typing/constant_non_base_type.move:4:15
+  │
+4 │     const C2: &mut u64 = &0;
+  │               ^^^^^^^^
+  │               │
+  │               Unpermitted constant type
+  │               Found: '&mut u64'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
+
 error[E04006]: invalid subtype
   ┌─ tests/move_check/typing/constant_non_base_type.move:4:15
   │
@@ -7,71 +31,33 @@ error[E04006]: invalid subtype
   │               Invalid constant signature
   │               Expected: '&mut u64'
 
-error: 
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/typing/constant_non_base_type.move:4:26
+  │
+4 │     const C2: &mut u64 = &0;
+  │                          ^^ References (and reference operations) are not supported in constants
 
-   ┌── tests/move_check/typing/constant_non_base_type.move:3:15 ───
-   │
- 3 │     const C1: &u64 = &0;
-   │               ^^^^ Unpermitted constant type
-   ·
- 3 │     const C1: &u64 = &0;
-   │               ---- Found: '&u64'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-   │
+error[E04012]: invalid type for constant
+  ┌─ tests/move_check/typing/constant_non_base_type.move:5:15
+  │
+5 │     const C3: () = ();
+  │               ^^
+  │               │
+  │               Unpermitted constant type
+  │               Found: '()'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
 
-error: 
+error[E04012]: invalid type for constant
+  ┌─ tests/move_check/typing/constant_non_base_type.move:6:15
+  │
+6 │     const C4: (address, bool) = (@0x0, false);
+  │               ^^^^^^^^^^^^^^^
+  │               │
+  │               Unpermitted constant type
+  │               Found: '(_, _)'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
 
-   ┌── tests/move_check/typing/constant_non_base_type.move:3:22 ───
-   │
- 3 │     const C1: &u64 = &0;
-   │                      ^^ References (and reference operations) are not supported in constants
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/constant_non_base_type.move:4:15 ───
-   │
- 4 │     const C2: &mut u64 = &0;
-   │               ^^^^^^^^ Unpermitted constant type
-   ·
- 4 │     const C2: &mut u64 = &0;
-   │               -------- Found: '&mut u64'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/constant_non_base_type.move:4:26 ───
-   │
- 4 │     const C2: &mut u64 = &0;
-   │                          ^^ References (and reference operations) are not supported in constants
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/constant_non_base_type.move:5:15 ───
-   │
- 5 │     const C3: () = ();
-   │               ^^ Unpermitted constant type
-   ·
- 5 │     const C3: () = ();
-   │               -- Found: '()'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/constant_non_base_type.move:6:15 ───
-   │
- 6 │     const C4: (address, bool) = (@0x0, false);
-   │               ^^^^^^^^^^^^^^^ Unpermitted constant type
-   ·
- 6 │     const C4: (address, bool) = (@0x0, false);
-   │               --------------- Found: '(_, _)'. But expected one of: 'u8', 'u64', 'u128', 'bool', 'address', 'vector<_>'
-   │
-
-error: 
-
-   ┌── tests/move_check/typing/constant_non_base_type.move:6:33 ───
-   │
- 6 │     const C4: (address, bool) = (@0x0, false);
-   │                                 ^^^^^^^^^^^^^ Expression lists are not supported in constants
-   │
+error[E04013]: invalid statement or expression in constant
+  ┌─ tests/move_check/typing/constant_non_base_type.move:6:33
+  │
+6 │     const C4: (address, bool) = (@0x0, false);
+  │                                 ^^^^^^^^^^^^^ Expression lists are not supported in constants
 
