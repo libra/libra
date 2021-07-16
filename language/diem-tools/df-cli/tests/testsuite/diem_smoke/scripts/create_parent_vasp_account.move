@@ -43,7 +43,7 @@ use DiemFramework::SlidingNonce;
 /// * `Script::create_recovery_address`
 /// * `Script::rotate_dual_attestation_info`
 
-fun create_parent_vasp_account<CoinType: store>(
+fun create_parent_vasp_account<CoinType>(
     tc_account: signer,
     sliding_nonce: u64,
     new_account_address: address,

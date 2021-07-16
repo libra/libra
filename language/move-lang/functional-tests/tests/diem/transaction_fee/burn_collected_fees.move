@@ -17,7 +17,7 @@ script {
 //! type-args: 0x1::XUS::XUS
 script {
 use DiemFramework::TransactionFee;
-fun burn_txn_fees<CoinType: store>(blessed_account: signer) {
+fun burn_txn_fees<CoinType>(blessed_account: signer) {
     TransactionFee::burn_fees<CoinType>(&blessed_account);
 }
 }
@@ -32,7 +32,7 @@ fun burn_txn_fees<CoinType: store>(blessed_account: signer) {
 //! type-args: 0x1::XUS::XUS
 script {
 use DiemFramework::TransactionFee;
-fun burn_txn_fees<CoinType: store>(blessed_account: signer) {
+fun burn_txn_fees<CoinType>(blessed_account: signer) {
     TransactionFee::burn_fees<CoinType>(&blessed_account);
 }
 }

@@ -1,0 +1,12 @@
+warning[W02013]: invalid non-phantom type parameter usage
+  ┌─ tests/move_check/typing/non_phantom_in_phantom_pos.move:5:15
+  │
+5 │     struct S2<T1, T2> {
+  │               ^^ The parameter 'T1' is only used as an argument to parameters declared as phantom. Consider adding a phantom declaration here
+
+warning[W02013]: invalid non-phantom type parameter usage
+   ┌─ tests/move_check/typing/non_phantom_in_phantom_pos.move:15:15
+   │
+15 │     struct S4<T1, T2> {
+   │               ^^ The parameter 'T1' is only used as an argument to parameters declared as phantom. Consider adding a phantom declaration here
+

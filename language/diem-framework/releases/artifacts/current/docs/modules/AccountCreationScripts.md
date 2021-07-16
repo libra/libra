@@ -136,7 +136,7 @@ This is emitted on the new Child VASPS's <code><a href="DiemAccount.md#0x1_DiemA
 * <code><a href="AccountAdministrationScripts.md#0x1_AccountAdministrationScripts_create_recovery_address">AccountAdministrationScripts::create_recovery_address</a></code>
 
 
-<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountCreationScripts.md#0x1_AccountCreationScripts_create_child_vasp_account">create_child_vasp_account</a>&lt;CoinType: store&gt;(parent_vasp: signer, child_address: address, auth_key_prefix: vector&lt;u8&gt;, add_all_currencies: bool, child_initial_balance: u64)
+<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountCreationScripts.md#0x1_AccountCreationScripts_create_child_vasp_account">create_child_vasp_account</a>&lt;CoinType&gt;(parent_vasp: signer, child_address: address, auth_key_prefix: vector&lt;u8&gt;, add_all_currencies: bool, child_initial_balance: u64)
 </code></pre>
 
 
@@ -145,7 +145,7 @@ This is emitted on the new Child VASPS's <code><a href="DiemAccount.md#0x1_DiemA
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountCreationScripts.md#0x1_AccountCreationScripts_create_child_vasp_account">create_child_vasp_account</a>&lt;CoinType: store&gt;(
+<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountCreationScripts.md#0x1_AccountCreationScripts_create_child_vasp_account">create_child_vasp_account</a>&lt;CoinType&gt;(
     parent_vasp: signer,
     child_address: address,
     auth_key_prefix: vector&lt;u8&gt;,
@@ -595,7 +595,7 @@ and the <code>rold_id</code> field being <code><a href="Roles.md#0x1_Roles_PAREN
 * <code><a href="AccountAdministrationScripts.md#0x1_AccountAdministrationScripts_rotate_dual_attestation_info">AccountAdministrationScripts::rotate_dual_attestation_info</a></code>
 
 
-<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountCreationScripts.md#0x1_AccountCreationScripts_create_parent_vasp_account">create_parent_vasp_account</a>&lt;CoinType: store&gt;(tc_account: signer, sliding_nonce: u64, new_account_address: address, auth_key_prefix: vector&lt;u8&gt;, human_name: vector&lt;u8&gt;, add_all_currencies: bool)
+<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountCreationScripts.md#0x1_AccountCreationScripts_create_parent_vasp_account">create_parent_vasp_account</a>&lt;CoinType&gt;(tc_account: signer, sliding_nonce: u64, new_account_address: address, auth_key_prefix: vector&lt;u8&gt;, human_name: vector&lt;u8&gt;, add_all_currencies: bool)
 </code></pre>
 
 
@@ -604,7 +604,7 @@ and the <code>rold_id</code> field being <code><a href="Roles.md#0x1_Roles_PAREN
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountCreationScripts.md#0x1_AccountCreationScripts_create_parent_vasp_account">create_parent_vasp_account</a>&lt;CoinType: store&gt;(
+<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountCreationScripts.md#0x1_AccountCreationScripts_create_parent_vasp_account">create_parent_vasp_account</a>&lt;CoinType&gt;(
     tc_account: signer,
     sliding_nonce: u64,
     new_account_address: address,
@@ -737,7 +737,7 @@ and the <code>rold_id</code> field being <code><a href="Roles.md#0x1_Roles_DESIG
 * <code><a href="AccountAdministrationScripts.md#0x1_AccountAdministrationScripts_rotate_dual_attestation_info">AccountAdministrationScripts::rotate_dual_attestation_info</a></code>
 
 
-<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountCreationScripts.md#0x1_AccountCreationScripts_create_designated_dealer">create_designated_dealer</a>&lt;Currency: store&gt;(tc_account: signer, sliding_nonce: u64, addr: address, auth_key_prefix: vector&lt;u8&gt;, human_name: vector&lt;u8&gt;, add_all_currencies: bool)
+<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountCreationScripts.md#0x1_AccountCreationScripts_create_designated_dealer">create_designated_dealer</a>&lt;Currency&gt;(tc_account: signer, sliding_nonce: u64, addr: address, auth_key_prefix: vector&lt;u8&gt;, human_name: vector&lt;u8&gt;, add_all_currencies: bool)
 </code></pre>
 
 
@@ -746,7 +746,7 @@ and the <code>rold_id</code> field being <code><a href="Roles.md#0x1_Roles_DESIG
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountCreationScripts.md#0x1_AccountCreationScripts_create_designated_dealer">create_designated_dealer</a>&lt;Currency: store&gt;(
+<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountCreationScripts.md#0x1_AccountCreationScripts_create_designated_dealer">create_designated_dealer</a>&lt;Currency&gt;(
     tc_account: signer,
     sliding_nonce: u64,
     addr: address,

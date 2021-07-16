@@ -14,7 +14,7 @@ module DiemFramework::AccountLimits {
     /// "unlimited" `LimitsDefinition` resource for accounts published at`@DiemRoot`, but other
     /// accounts may have different account limit definitons. In such cases, they will have a
     /// `LimitsDefinition` published under their (root) account.
-    struct LimitsDefinition<CoinType> has key {
+    struct LimitsDefinition<phantom CoinType> has key {
         /// The maximum inflow allowed during the specified time period.
         max_inflow: u64,
         /// The maximum outflow allowed during the specified time period.
@@ -34,7 +34,7 @@ module DiemFramework::AccountLimits {
     /// A struct holding account transaction information for the time window
     /// starting at `window_start` and lasting for the `time_period` specified
     /// in the limits definition at `limit_address`.
-    struct Window<CoinType> has key {
+    struct Window<phantom CoinType> has key {
         /// Time window start in microseconds
         window_start: u64,
         /// The inflow during this time window
@@ -71,7 +71,7 @@ module DiemFramework::AccountLimits {
     /// Determines if depositing `amount` of `CoinType` coins into the
     /// account at `addr` is amenable with their account limits.
     /// Returns false if this deposit violates the account limits.
-    public fun update_deposit_limits<CoinType: store>(
+    public fun update_deposit_limits<CoinType>(
         amount: u64,
         addr: address,
         _cap: &AccountLimitMutationCapability,
@@ -105,7 +105,7 @@ module DiemFramework::AccountLimits {
     /// Determine if withdrawing `amount` of `CoinType` coins from
     /// the account at `addr` would violate the account limits for that account.
     /// Returns `false` if this withdrawal violates account limits.
-    public fun update_withdrawal_limits<CoinType: store>(
+    public fun update_withdrawal_limits<CoinType>(
         amount: u64,
         addr: address,
         _cap: &AccountLimitMutationCapability,
@@ -136,7 +136,7 @@ module DiemFramework::AccountLimits {
     /// `Window` for each currency they can hold published at the top level.
     /// Root accounts for multi-account entities will hold this resource at
     /// their root/parent account.
-    public fun publish_window<CoinType: store>(
+    public fun publish_window<CoinType>(
         dr_account: &signer,
         to_limit: &signer,
         limit_address: address,
@@ -180,7 +180,7 @@ module DiemFramework::AccountLimits {
     /// TC account, or a caller with access to a `&AccountLimitMutationCapability` points a
     /// window to it. Additionally, the TC controls the values held within this
     /// resource once it's published.
-    public fun publish_unrestricted_limits<CoinType: store>(publish_account: &signer) {
+    public fun publish_unrestricted_limits<CoinType>(publish_account: &signer) {
         assert(
             !exists<LimitsDefinition<CoinType>>(Signer::address_of(publish_account)),
             Errors::already_published(ELIMITS_DEFINITION)
@@ -217,7 +217,7 @@ module DiemFramework::AccountLimits {
     /// If any of the field arguments is `0` the corresponding field is not updated.
     ///
     /// TODO: This should be specified.
-    public fun update_limits_definition<CoinType: store>(
+    public fun update_limits_definition<CoinType>(
         tc_account: &signer,
         limit_address: address,
         new_max_inflow: u64,
@@ -247,7 +247,7 @@ module DiemFramework::AccountLimits {
     ///   but the `limit_address` should remain the same, the current
     ///   `limit_address` needs to be passed in for `new_limit_address`.
     /// TODO(wrwg): specify
-    public fun update_window_info<CoinType: store>(
+    public fun update_window_info<CoinType>(
         tc_account: &signer,
         window_address: address,
         aggregate_balance: u64,
@@ -267,7 +267,7 @@ module DiemFramework::AccountLimits {
     /// If the time window starting at `window.window_start` and lasting for
     /// `limits_definition.time_period` has elapsed, resets the window and
     /// the inflow and outflow records.
-    fun reset_window<CoinType: store>(window: &mut Window<CoinType>, limits_definition: &LimitsDefinition<CoinType>) {
+    fun reset_window<CoinType>(window: &mut Window<CoinType>, limits_definition: &LimitsDefinition<CoinType>) {
         let current_time = DiemTimestamp::now_microseconds();
         assert(window.window_start <= MAX_U64 - limits_definition.time_period, Errors::limit_exceeded(EWINDOW));
         if (current_time > window.window_start + limits_definition.time_period) {
@@ -322,7 +322,7 @@ module DiemFramework::AccountLimits {
     /// specified the `limits_definition` passed in.
     /// If the receipt of `amount` doesn't violate the limits `amount` of
     /// `CoinType` is recorded as received in the given `receiving` window.
-    fun can_receive_and_update_window<CoinType: store>(
+    fun can_receive_and_update_window<CoinType>(
         amount: u64,
         receiving: &mut Window<CoinType>,
     ): bool acquires LimitsDefinition {
@@ -409,7 +409,7 @@ module DiemFramework::AccountLimits {
     /// in its `limits_definition`.
     /// If the withdrawal of `amount` doesn't violate the limits `amount` of
     /// `CoinType` is recorded as withdrawn in the given `sending` window.
-    fun can_withdraw_and_update_window<CoinType: store>(
+    fun can_withdraw_and_update_window<CoinType>(
         amount: u64,
         sending: &mut Window<CoinType>,
     ): bool acquires LimitsDefinition {
@@ -475,7 +475,7 @@ module DiemFramework::AccountLimits {
     }
 
     /// Determine whether the `LimitsDefinition` resource has no restrictions.
-    fun is_unrestricted<CoinType: store>(limits_def: &LimitsDefinition<CoinType>): bool {
+    fun is_unrestricted<CoinType>(limits_def: &LimitsDefinition<CoinType>): bool {
         limits_def.max_inflow == MAX_U64 &&
         limits_def.max_outflow == MAX_U64 &&
         limits_def.max_holding == MAX_U64 &&
@@ -496,15 +496,15 @@ module DiemFramework::AccountLimits {
         }
     }
 
-    public fun limits_definition_address<CoinType: store>(addr: address): address acquires Window {
+    public fun limits_definition_address<CoinType>(addr: address): address acquires Window {
         borrow_global<Window<CoinType>>(addr).limit_address
     }
 
-    public fun has_limits_published<CoinType: store>(addr: address): bool {
+    public fun has_limits_published<CoinType>(addr: address): bool {
         exists<LimitsDefinition<CoinType>>(addr)
     }
 
-    public fun has_window_published<CoinType: store>(addr: address): bool {
+    public fun has_window_published<CoinType>(addr: address): bool {
         exists<Window<CoinType>>(addr)
     }
     spec has_window_published {

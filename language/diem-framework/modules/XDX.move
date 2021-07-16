@@ -12,7 +12,7 @@ module DiemFramework::XDX {
     use DiemFramework::DiemTimestamp;
 
     /// The type tag representing the `XDX` currency on-chain.
-    struct XDX has store { }
+    struct XDX { }
 
     /// Note: Currently only holds the mint, burn, and preburn capabilities for
     /// XDX. Once the makeup of the XDX has been determined this resource will
@@ -93,7 +93,7 @@ module DiemFramework::XDX {
     }
 
     /// Returns true if `CoinType` is `XDX::XDX`
-    public fun is_xdx<CoinType: store>(): bool {
+    public fun is_xdx<CoinType>(): bool {
         Diem::is_currency<CoinType>() &&
             Diem::currency_code<CoinType>() == Diem::currency_code<XDX>()
     }

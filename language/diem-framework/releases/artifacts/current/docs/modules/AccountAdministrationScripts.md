@@ -139,7 +139,7 @@ already have a <code><a href="DiemAccount.md#0x1_DiemAccount_Balance">DiemAccoun
 * <code><a href="PaymentScripts.md#0x1_PaymentScripts_peer_to_peer_with_metadata">PaymentScripts::peer_to_peer_with_metadata</a></code>
 
 
-<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountAdministrationScripts.md#0x1_AccountAdministrationScripts_add_currency_to_account">add_currency_to_account</a>&lt;Currency: store&gt;(account: signer)
+<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountAdministrationScripts.md#0x1_AccountAdministrationScripts_add_currency_to_account">add_currency_to_account</a>&lt;Currency&gt;(account: signer)
 </code></pre>
 
 
@@ -148,7 +148,7 @@ already have a <code><a href="DiemAccount.md#0x1_DiemAccount_Balance">DiemAccoun
 <summary>Implementation</summary>
 
 
-<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountAdministrationScripts.md#0x1_AccountAdministrationScripts_add_currency_to_account">add_currency_to_account</a>&lt;Currency: store&gt;(account: signer) {
+<pre><code><b>public</b>(<b>script</b>) <b>fun</b> <a href="AccountAdministrationScripts.md#0x1_AccountAdministrationScripts_add_currency_to_account">add_currency_to_account</a>&lt;Currency&gt;(account: signer) {
     <a href="DiemAccount.md#0x1_DiemAccount_add_currency">DiemAccount::add_currency</a>&lt;Currency&gt;(&account);
 }
 </code></pre>

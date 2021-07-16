@@ -304,7 +304,7 @@ module DiemFramework::DualAttestation {
     }
 
     /// Helper which returns true if dual attestion is required for a deposit.
-    fun dual_attestation_required<Token: store>(
+    fun dual_attestation_required<Token>(
         payer: address, payee: address, deposit_value: u64
     ): bool acquires Limit {
         // travel rule applies for payments over a limit
@@ -446,7 +446,7 @@ module DiemFramework::DualAttestation {
     ///     published in `payee`'s `Credential` resource
     /// It aborts with an appropriate error code if dual attestation is required, but one or more of
     /// the conditions in (2) is not met.
-    public fun assert_payment_ok<Currency: store>(
+    public fun assert_payment_ok<Currency>(
         payer: address,
         payee: address,
         value: u64,

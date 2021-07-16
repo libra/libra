@@ -111,7 +111,7 @@ module DiemFramework::VASP {
     /// Return `true` if `addr` is a parent or child VASP whose parent VASP account contains an
     /// `AccountLimits<CoinType>` resource.
     /// Aborts if `addr` is not a VASP
-    public fun has_account_limits<CoinType: store>(addr: address): bool acquires ChildVASP {
+    public fun has_account_limits<CoinType>(addr: address): bool acquires ChildVASP {
         AccountLimits::has_window_published<CoinType>(parent_address(addr))
     }
 

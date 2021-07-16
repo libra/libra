@@ -126,6 +126,7 @@ codes!(
             { msg: "invalid 'friend' declaration", severity: NonblockingError },
         InvalidAcquiresItem: { msg: "invalid 'acquires' item", severity: NonblockingError },
         InvalidPhantomUse: { msg: "invalid phantom type parameter usage", severity: NonblockingError },
+        InvalidNonPhantomUse: { msg: "invalid non-phantom type parameter usage", severity: Warning },
     ],
     // errors name resolution, mostly expansion/translate and naming/translate
     NameResolution: [
@@ -164,6 +165,7 @@ codes!(
     // errors for any unused code or items
     UnusedItem: [
         Alias: { msg: "unused alias", severity: Warning },
+        StructTypeParam: { msg: "unused struct type parameter", severity: Warning }
     ],
 );
 
