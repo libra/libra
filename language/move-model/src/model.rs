@@ -878,7 +878,8 @@ impl GlobalEnv {
         self.global_invariants.get(&id)
     }
 
-    /// Return the global invariants which refer to the given memory.
+    /// Return the global invariants which refer to the given memory,
+    /// via either a direct match or an indirect instantiation.
     pub fn get_global_invariants_for_memory(
         &self,
         memory: &QualifiedInstId<StructId>,
@@ -891,13 +892,8 @@ impl GlobalEnv {
             assert_eq!(key.inst.len(), memory.inst.len());
             let unifier = TypeUnifier::new_vec(&memory.inst, &key.inst, true, true);
             let rel = unifier.unify(Variance::Allow);
-            match rel {
-                None => (),
-                Some((subst_lhs, _)) => {
-                    if subst_lhs.is_empty() {
-                        inv_ids.extend(val.clone());
-                    }
-                }
+            if rel.is_some() {
+                inv_ids.extend(val.clone());
             }
         }
         inv_ids
