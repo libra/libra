@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["EpochChangeProof","A vector of LedgerInfo with contiguous increasing epoch numbers to prove a sequence of epoch changes from the first LedgerInfo’s epoch."]],"trait":[["Verifier","The verification of the epoch change proof starts with verifier that is trusted by the client: could be either a waypoint (upon startup) or a known epoch info."]]});

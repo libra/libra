@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["StateProof","A convenience type for the collection of sub-proofs that consistitute a response to a `get_state_proof` request."]]});

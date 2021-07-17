@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `diem_vault_client` crate."><meta name="keywords" content="rust, rustlang, rust-lang, diem_vault_client"><title>diem_vault_client - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../diem_vault_client/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate diem_vault_client</p><div class="block version"><p>Version 0.1.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all diem_vault_client's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="diem_vault_client" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">diem_vault_client</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/diem_vault_client/lib.rs.html#4-1197" title="goto source code">[src]</a></span></h1><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<table><tr class="module-item"><td><a class="mod" href="dev/index.html" title="diem_vault_client::dev mod">dev</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="fuzzing/index.html" title="diem_vault_client::fuzzing mod">fuzzing</a></td><td class="docblock-short"></td></tr></table><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.BackupInfo.html" title="diem_vault_client::BackupInfo struct">BackupInfo</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.Client.html" title="diem_vault_client::Client struct">Client</a></td><td class="docblock-short"><p>Client provides a client around the restful interface to a Vault servce. Learn more
+here: https://www.vaultproject.io/api-docs/</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.KeyBackup.html" title="diem_vault_client::KeyBackup struct">KeyBackup</a></td><td class="docblock-short"><p>Key backup / restore format
+Example:
+{
+“policy”:{
+“name”:“local_owner_key__consensus”,
+“keys”:{
+“1”:{
+“key”:“C3R5O8uAfrgv7sJmCMSLEp1R2HmkZtwdfGT/xVvZVvgCGo6TkWga/ojplJFMM+i2805X3CV7IRyNBCSJcr4AqQ==”,
+“hmac_key”:null,
+“time”:“2020-05-29T06:27:38.1233515Z”,
+“ec_x”:null,
+“ec_y”:null,
+“ec_d”:null,
+“rsa_key”:null,
+“public_key”:“AhqOk5FoGv6I6ZSRTDPotvNOV9wleyEcjSwkiXK+AKk=”,
+“convergent_version”:0,
+“creation_time”:1590733658
+}
+},
+“derived”:false,
+“kdf”:0,
+“convergent_encryption”:false,
+“exportable”:true,
+“min_decryption_version”:1,
+“min_encryption_version”:0,
+“latest_version”:1,
+“archive_version”:1,
+“archive_min_version”:0,
+“min_available_version”:0,
+“deletion_allowed”:false,
+“convergent_version”:0,
+“type”:2,
+“backup_info”:{
+“time”:“2020-05-29T06:28:48.2937047Z”,
+“version”:1
+},
+“restore_info”:null,
+“allow_plaintext_backup”:true,
+“version_template”:“”,
+“storage_prefix”:“”
+}
+}</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.KeyBackupInfo.html" title="diem_vault_client::KeyBackupInfo struct">KeyBackupInfo</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.KeyBackupPolicy.html" title="diem_vault_client::KeyBackupPolicy struct">KeyBackupPolicy</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.PathPolicy.html" title="diem_vault_client::PathPolicy struct">PathPolicy</a></td><td class="docblock-short"><p>Represents the set of capabilities used within a policy.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Policy.html" title="diem_vault_client::Policy struct">Policy</a></td><td class="docblock-short"><p>This data structure is used to represent both policies read from Vault and written to Vault.
+Thus the same Policy read, can then be written back after amending. Vault stores the rules or
+per path policies in an encoded json blob, so that effectively means json within json, hence
+the unusual semantics below.
+{
+rules: json!{
+path: {
+‘auth/<em>’: { capabilities: [‘create’, ‘read’, ‘update’, ‘delete’, ‘list’, ‘sudo’] },
+‘sys/auth/</em>’: { capabilities: [‘create’, ‘read’, ‘update’, ‘delete’, ‘sudo’] },
+}
+}
+}
+Note: Vault claims rules is deprecated and policy should be used instead, but that doesn’t seem
+to work and makes the reading asymmetrical from the writing.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.PolicyPaths.html" title="diem_vault_client::PolicyPaths struct">PolicyPaths</a></td><td class="docblock-short"><p>Represents the policy for a given path.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ReadKey.html" title="diem_vault_client::ReadKey struct">ReadKey</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.ReadResponse.html" title="diem_vault_client::ReadResponse struct">ReadResponse</a></td><td class="docblock-short"><p>Provides a simple wrapper for all read APIs.</p>
+</td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<table><tr class="module-item"><td><a class="enum" href="enum.Capability.html" title="diem_vault_client::Capability enum">Capability</a></td><td class="docblock-short"><p>The various set of capabilities available to a policy within Vault.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.Error.html" title="diem_vault_client::Error enum">Error</a></td><td class="docblock-short"></td></tr></table><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<table><tr class="module-item"><td><a class="fn" href="fn.process_generic_response.html" title="diem_vault_client::process_generic_response fn">process_generic_response</a></td><td class="docblock-short"><p>Processes a generic response returned by a vault request. This function simply just checks
+that the response was not an error and calls response.into_string() to clear the ureq stream.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.process_policy_list_response.html" title="diem_vault_client::process_policy_list_response fn">process_policy_list_response</a></td><td class="docblock-short"><p>Processes the response returned by a policy list vault request.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.process_policy_read_response.html" title="diem_vault_client::process_policy_read_response fn">process_policy_read_response</a></td><td class="docblock-short"><p>Processes the response returned by a policy read vault request.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.process_secret_list_response.html" title="diem_vault_client::process_secret_list_response fn">process_secret_list_response</a></td><td class="docblock-short"><p>Processes the response returned by a secret list vault request.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.process_secret_read_response.html" title="diem_vault_client::process_secret_read_response fn">process_secret_read_response</a></td><td class="docblock-short"><p>Processes the response returned by a secret read vault request.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.process_token_create_response.html" title="diem_vault_client::process_token_create_response fn">process_token_create_response</a></td><td class="docblock-short"><p>Processes the response returned by a token create vault request.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.process_token_renew_response.html" title="diem_vault_client::process_token_renew_response fn">process_token_renew_response</a></td><td class="docblock-short"><p>Processes the response returned by a token renew vault request.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.process_transit_create_response.html" title="diem_vault_client::process_transit_create_response fn">process_transit_create_response</a></td><td class="docblock-short"><p>Processes the response returned by a transit key create vault request.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.process_transit_export_response.html" title="diem_vault_client::process_transit_export_response fn">process_transit_export_response</a></td><td class="docblock-short"><p>Processes the response returned by a transit key export vault request.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.process_transit_list_response.html" title="diem_vault_client::process_transit_list_response fn">process_transit_list_response</a></td><td class="docblock-short"><p>Processes the response returned by a transit key list vault request.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.process_transit_read_response.html" title="diem_vault_client::process_transit_read_response fn">process_transit_read_response</a></td><td class="docblock-short"><p>Processes the response returned by a transit key read vault request.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.process_transit_restore_response.html" title="diem_vault_client::process_transit_restore_response fn">process_transit_restore_response</a></td><td class="docblock-short"><p>Processes the response returned by a transit key restore vault request.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.process_transit_sign_response.html" title="diem_vault_client::process_transit_sign_response fn">process_transit_sign_response</a></td><td class="docblock-short"><p>Processes the response returned by a transit key sign vault request.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.process_unsealed_response.html" title="diem_vault_client::process_unsealed_response fn">process_unsealed_response</a></td><td class="docblock-short"><p>Processes the response returned by a seal-status() vault request.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="diem_vault_client" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script></body></html>

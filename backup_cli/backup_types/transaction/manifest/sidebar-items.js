@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["TransactionBackup","Transaction backup manifest, representing transactions in the [`first_version`, `last_version`] range (right side inclusive)."],["TransactionChunk","A chunk of a transaction backup manifest to represent the [`first_version`, `last_version`] range (right side inclusive)."]]});

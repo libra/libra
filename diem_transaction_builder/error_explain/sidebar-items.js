@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["get_explanation","Given the module ID and the abort code raised from that module, returns the human-readable explanation of that abort if possible."]]});

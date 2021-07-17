@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Credential",""],["Limit","Defines the dual attest limit in microDiem XDX"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["PreburnQueueResource","The preburn balance held under an account."]]});

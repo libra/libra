@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["CancelBurnEvent","Struct that represents a CancelBurnEvent."]]});

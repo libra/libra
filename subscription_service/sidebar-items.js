@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SubscriptionBundle",""],["SubscriptionService",""]],"type":[["ReconfigSubscription","A subscription service for on-chain reconfiguration notifications from state sync This is declared/implemented here instead of in `types/on_chain_config` because when `subscription_service` crate is a dependency of `types`, the build-dev fails"]]});

@@ -1,0 +1,87 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This module provides algorithms for accessing and updating a Merkle Accumulator structure persisted in a key-value store. Note that this doesn’t write to the storage directly, rather, it reads from it via the `HashReader` trait and yields writes via an in memory `HashMap`."><meta name="keywords" content="rust, rustlang, rust-lang, accumulator"><title>accumulator - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../accumulator/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate accumulator</p><div class="block version"><p>Version 0.1.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all accumulator's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="accumulator" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">accumulator</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/accumulator/lib.rs.html#4-470" title="goto source code">[src]</a></span></h1><div class="docblock"><p>This module provides algorithms for accessing and updating a Merkle Accumulator structure
+persisted in a key-value store. Note that this doesn’t write to the storage directly, rather,
+it reads from it via the <code>HashReader</code> trait and yields writes via an in memory <code>HashMap</code>.</p>
+<h1 id="merkle-accumulator" class="section-header"><a href="#merkle-accumulator">Merkle Accumulator</a></h1>
+<p>Given an ever growing (append only) series of “leaf” hashes, we construct an evolving Merkle
+Tree for which proofs of inclusion/exclusion of a leaf hash at a leaf index in a snapshot
+of the tree (represented by root hash) can be given.</p>
+<h1 id="leaf-nodes" class="section-header"><a href="#leaf-nodes">Leaf Nodes</a></h1>
+<p>Leaf nodes carry hash values to be stored and proved. They are only appended to the tree but
+never deleted or updated.</p>
+<h1 id="internal-nodes" class="section-header"><a href="#internal-nodes">Internal Nodes</a></h1>
+<p>A non-leaf node carries the hash value derived from both its left and right children.</p>
+<h1 id="placeholder-nodes" class="section-header"><a href="#placeholder-nodes">Placeholder Nodes</a></h1>
+<p>To make sure each Leaf node has a Merkle Proof towards the root, placeholder nodes are added so
+that along the route from a leaf to the root, each node has a sibling. Placeholder nodes have
+the hash value <code>ACCUMULATOR_PLACEHOLDER_HASH</code></p>
+<p>A placeholder node can appear as either a Leaf node or a non-Leaf node, but there is at most one
+placeholder leaf at any time.</p>
+<h1 id="frozen-nodes--non-frozen-nodes" class="section-header"><a href="#frozen-nodes--non-frozen-nodes">Frozen Nodes &amp; Non-frozen Nodes</a></h1>
+<p>As leaves are added to the tree, placeholder nodes get replaced by non-placeholder nodes, and
+when a node has all its descendants being non-placeholder, it becomes “Frozen” – its hash value
+won’t change again in the event of new leaves being added. All leaves appended (not counting the
+one possible placeholder leaf) are by definition Frozen.</p>
+<p>Other nodes, which have one or more placeholder descendants are Non-Frozen. As new elements are
+appended to the accumulator the hash value of these nodes will change.</p>
+<h1 id="leaf-count" class="section-header"><a href="#leaf-count">Leaf Count</a></h1>
+<p>Given a count of the number of leaves in a Merkle Accumulator it is possible to determine the
+shape of the accumulator – which nodes are filled and which nodes are placeholder nodes.</p>
+<p>Example:
+Logical view of a Merkle Accumulator with 5 leaves:</p>
+<pre><code class="language-text">           Non-fzn
+          /       \
+         /         \
+        /           \
+      Fzn2         Non-fzn
+     /   \           /   \
+    /     \         /     \
+   Fzn1    Fzn3  Non-fzn  [Placeholder]
+  /  \    /  \    /    \
+ L0  L1  L2  L3 L4   [Placeholder]
+</code></pre>
+<h1 id="position-and-physical-representation" class="section-header"><a href="#position-and-physical-representation">Position and Physical Representation</a></h1>
+<p>As a Merkle Accumulator tree expands to the right and upwards, we number newly frozen nodes
+monotonically. One way to do it is simply to use in-order index of nodes, and this is what
+we do for the in-memory representation. We call the stated numbers identifying nodes below
+simply “Position”, and unless otherwise stated, this is the in-order position.</p>
+<p>For writing to disk however, we write all the children of a node before the parent.
+Thus for disk write order, it is more convenient to use the post-order position as an index.
+And with that we can map a Merkle Accumulator into a key-value storage: key is the post-order
+position of a node, and the value is hash value it carries.</p>
+<p>We store only Frozen nodes, and generate non-Frozen nodes on the fly when accessing the tree.
+This way, the physical representation of the tree is append-only, i.e. once written to physical
+storage, nodes won’t be either modified or deleted.</p>
+<p>Here is what we persist for the logical tree in the above example:</p>
+<pre><code class="language-text">         Fzn2(6)
+        /      \
+       /        \
+   Fzn1(2)       Fzn3(5)
+  /     \       /     \
+ L0(0)  L1(1)  L2(3)  L3(4)  L4(7)
+</code></pre>
+<p>When the next leaf node is persisted, the physical representation will be:</p>
+<pre><code class="language-text">         Fzn2(6)
+        /      \
+       /        \
+   Fzn1(2)       Fzn3(5)       Fzn4(9)
+  /     \       /     \       /      \
+ L0(0)  L1(1)  L2(3)  L3(4)  L4(7)   L5(8)
+</code></pre>
+<p>The numbering corresponds to the post-order traversal of the tree.</p>
+<p>To think in key-value pairs:</p>
+<pre><code class="language-text">|&lt;-key-&gt;|&lt;--value--&gt;|
+|   0   | hash_L0   |
+|   1   | hash_L1   |
+|   2   | hash_Fzn1 |
+|  ...  |   ...     |
+</code></pre>
+</div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<table><tr class="module-item"><td><a class="mod" href="test_helpers/index.html" title="accumulator::test_helpers mod">test_helpers</a></td><td class="docblock-short"></td></tr></table><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.MerkleAccumulator.html" title="accumulator::MerkleAccumulator struct">MerkleAccumulator</a></td><td class="docblock-short"><p>In this live Merkle Accumulator algorithms.</p>
+</td></tr></table><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<table><tr class="module-item"><td><a class="trait" href="trait.HashReader.html" title="accumulator::HashReader trait">HashReader</a></td><td class="docblock-short"><p>Defines the interface between <code>MerkleAccumulator</code> and underlying storage.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="accumulator" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script></body></html>

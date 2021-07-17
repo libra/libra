@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["is_valid","Describes what identifiers are allowed."],["is_valid_identifier_char","Return true if this character can appear in a Move identifier."]],"struct":[["IdentStr","A borrowed identifier."],["Identifier","An owned identifier."]]});

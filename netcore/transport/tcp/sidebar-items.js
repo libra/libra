@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["resolve_and_connect","Note: we need to take ownership of this `NetworkAddress` (instead of just borrowing the `&[Protocol]` slice) so this future can be `Send + 'static`."]],"struct":[["TcpListenerStream",""],["TcpOutbound",""],["TcpSocket","A wrapper around a tokio TcpStream"],["TcpTransport","Transport to build TCP connections"]]});

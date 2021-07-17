@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["EncodingType",""],["KeyType",""]],"fn":[["load_key","Loads a key to a file hex string encoded"],["save_key","Saves a key to a file encoded in a string"]],"struct":[["ExtractPeerFromFile",""],["ExtractPeerFromStorage",""],["ExtractPeersFromKeys",""],["ExtractPrivateKey",""],["ExtractPublicKey",""],["GenerateKey",""]]});

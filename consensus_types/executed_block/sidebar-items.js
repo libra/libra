@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ExecutedBlock","ExecutedBlocks are managed in a speculative tree, the committed blocks form a chain. Besides block data, each executed block also has other derived meta data which could be regenerated from blocks."]]});

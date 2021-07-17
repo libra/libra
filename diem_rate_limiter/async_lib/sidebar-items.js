@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["AsyncRateLimiter","A rate limiter for `AsyncRead` or `AsyncWrite` interfaces to rate limit read/write bytes"]]});

@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This module provides an abstraction for positioning a node in a binary tree, A `Position` uniquely identifies the location of a node"><meta name="keywords" content="rust, rustlang, rust-lang, position"><title>diem_types::proof::position - Rust</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../diem_types/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a><p class="location">Module position</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li></ul></div><p class="location"><a href="../../index.html">diem_types</a>::<wbr><a href="../index.html">proof</a></p><div id="sidebar-vars" data-name="position" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Module <a href="../../index.html">diem_types</a>::<wbr><a href="../index.html">proof</a>::<wbr><a class="mod" href="">position</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../../src/diem_types/proof/position/mod.rs.html#4-535" title="goto source code">[src]</a></span></h1><div class="docblock"><p>This module provides an abstraction for positioning a node in a binary tree,
+A <code>Position</code> uniquely identifies the location of a node</p>
+<p>In this implementation, <code>Position</code> is represented by the in-order-traversal sequence number
+of the node.  The process of locating a node and jumping between nodes is done through
+in-order position calculation, which can be done with bit manipulation.</p>
+<p>For example</p>
+<pre><code class="language-text">     3
+    /  \
+   /    \
+  1      5 &lt;-[Node index, a.k.a, Position]
+ / \    / \
+0   2  4   6
+
+0   1  2   3 &lt;[Leaf index]
+</code></pre>
+<p>Note1: The in-order-traversal counts from 0
+Note2: The level of tree counts from leaf level, start from 0
+Note3: The leaf index starting from left-most leaf, starts from 0</p>
+</div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.AncestorIterator.html" title="diem_types::proof::position::AncestorIterator struct">AncestorIterator</a></td><td class="docblock-short"><p><code>AncestorIterator</code> generates current position and moves itself to its parent position for each
+iteration.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.AncestorSiblingIterator.html" title="diem_types::proof::position::AncestorSiblingIterator struct">AncestorSiblingIterator</a></td><td class="docblock-short"><p><code>AncestorSiblingIterator</code> generates current sibling position and moves itself to its parent
+position for each iteration.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.FrozenSubTreeIterator.html" title="diem_types::proof::position::FrozenSubTreeIterator struct">FrozenSubTreeIterator</a></td><td class="docblock-short"><p>Traverse leaves from left to right in groups that forms full subtrees, yielding root positions
+of such subtrees.
+Note that each 1-bit in num_leaves corresponds to a full subtree.
+For example, in the below tree of 5=0b101 leaves, the two 1-bits corresponds to Fzn2 and L4
+accordingly.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.FrozenSubtreeSiblingIterator.html" title="diem_types::proof::position::FrozenSubtreeSiblingIterator struct">FrozenSubtreeSiblingIterator</a></td><td class="docblock-short"><p>Given an accumulator of size <code>current_num_leaves</code>, <code>FrozenSubtreeSiblingIterator</code> yields the
+positions of required subtrees if we want to append these subtrees to the existing accumulator
+to generate a bigger one of size <code>new_num_leaves</code>.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Position.html" title="diem_types::proof::position::Position struct">Position</a></td><td class="docblock-short"></td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<table><tr class="module-item"><td><a class="enum" href="enum.NodeDirection.html" title="diem_types::proof::position::NodeDirection enum">NodeDirection</a></td><td class="docblock-short"></td></tr></table><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<table><tr class="module-item"><td><a class="fn" href="fn.inorder_to_postorder.html" title="diem_types::proof::position::inorder_to_postorder fn">inorder_to_postorder</a></td><td class="docblock-short"><p>Given <code>node</code>, an index in an in-order traversal of a perfect binary tree,
+what order would the node be visited in in post-order traversal?
+For example, consider this tree of in-order nodes.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.postorder_to_inorder.html" title="diem_types::proof::position::postorder_to_inorder fn">postorder_to_inorder</a></td><td class="docblock-short"></td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="diem_types" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script></body></html>

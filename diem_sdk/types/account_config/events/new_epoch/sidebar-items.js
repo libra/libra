@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["NewEpochEvent","Struct that represents a NewEpochEvent."]]});

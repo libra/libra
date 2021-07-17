@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["NewBlockEvent","Struct that represents a NewBlockEvent."]]});

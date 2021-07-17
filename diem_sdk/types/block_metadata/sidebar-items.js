@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["new_block_event_key",""]],"static":[["NEW_BLOCK_EVENT_PATH","The path to the new block event handle under a DiemBlock::BlockMetadata resource."]],"struct":[["BlockMetadata","Struct that will be persisted on chain to store the information of the current block."],["DiemBlockResource",""],["NewBlockEvent",""]]});

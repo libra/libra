@@ -1,0 +1,549 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crypto/crypto/src/x25519.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>x25519.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../diem_crypto/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="comment">// Copyright (c) The Diem Core Contributors</span>
+<span class="comment">// SPDX-License-Identifier: Apache-2.0</span>
+
+<span class="doccomment">//! An abstraction of x25519 elliptic curve keys required for</span>
+<span class="doccomment">//! [Diffie-Hellman key exchange](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange)</span>
+<span class="doccomment">//! in the Diem project.</span>
+<span class="doccomment">//! Ideally, only `x25519::PrivateKey` and `x25519::PublicKey` should be used throughout the</span>
+<span class="doccomment">//! codebase, until the bytes are actually used in cryptographic operations.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Examples</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use diem_crypto::{x25519, Uniform, test_utils::TEST_SEED};</span>
+<span class="doccomment">//! use rand::{rngs::StdRng, SeedableRng};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Derive an X25519 private key for testing.</span>
+<span class="doccomment">//! let mut rng: StdRng = SeedableRng::from_seed(TEST_SEED);</span>
+<span class="doccomment">//! let private_key = x25519::PrivateKey::generate(&amp;mut rng);</span>
+<span class="doccomment">//! let public_key = private_key.public_key();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Deserialize an hexadecimal private or public key</span>
+<span class="doccomment">//! use diem_crypto::traits::ValidCryptoMaterialStringExt;</span>
+<span class="doccomment">//! # fn main() -&gt; Result&lt;(), diem_crypto::traits::CryptoMaterialError&gt; {</span>
+<span class="doccomment">//! let private_key = &quot;404acc8ec6a0f18df7359a6ee7823f19dd95616b10fed8bdb0de030e891b945a&quot;;</span>
+<span class="doccomment">//! let private_key = x25519::PrivateKey::from_encoded_string(&amp;private_key)?;</span>
+<span class="doccomment">//! let public_key = &quot;080e287879c918794170e258bfaddd75acac5b3e350419044655e4983a487120&quot;;</span>
+<span class="doccomment">//! let public_key = x25519::PublicKey::from_encoded_string(&amp;public_key)?;</span>
+<span class="doccomment">//! # Ok(())</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">traits</span>::{<span class="self">self</span>, <span class="ident">CryptoMaterialError</span>, <span class="ident">ValidCryptoMaterial</span>, <span class="ident">ValidCryptoMaterialStringExt</span>},
+    <span class="ident">x25519</span>,
+};
+<span class="kw">use</span> <span class="ident">diem_crypto_derive</span>::{<span class="ident">DeserializeKey</span>, <span class="ident">SerializeKey</span>, <span class="ident">SilentDebug</span>, <span class="ident">SilentDisplay</span>};
+<span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">CryptoRng</span>, <span class="ident">RngCore</span>};
+<span class="kw">use</span> <span class="ident">std::convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>};
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;fuzzing&quot;</span>))]</span>
+<span class="kw">use</span> <span class="ident">proptest_derive::Arbitrary</span>;
+
+<span class="comment">//</span>
+<span class="comment">// Underlying Implementation</span>
+<span class="comment">// =========================</span>
+<span class="comment">//</span>
+<span class="comment">// We re-export the dalek-x25519 library,</span>
+<span class="comment">// This makes it easier to uniformalize build dalek-x25519 in diem-core.</span>
+<span class="comment">//</span>
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">x25519_dalek</span>;
+
+<span class="comment">//</span>
+<span class="comment">// Main types and constants</span>
+<span class="comment">// ========================</span>
+<span class="comment">//</span>
+
+<span class="doccomment">/// Size of a X25519 private key</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRIVATE_KEY_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+
+<span class="doccomment">/// Size of a X25519 public key</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PUBLIC_KEY_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+
+<span class="doccomment">/// Size of a X25519 shared secret</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHARED_SECRET_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+
+<span class="doccomment">/// This type should be used to deserialize a received private key</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">DeserializeKey</span>, <span class="ident">SilentDisplay</span>, <span class="ident">SilentDebug</span>, <span class="ident">SerializeKey</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;fuzzing&quot;</span>), <span class="ident">derive</span>(<span class="ident">Clone</span>))]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PrivateKey</span>(<span class="ident">x25519_dalek::StaticSecret</span>);
+
+<span class="doccomment">/// This type should be used to deserialize a received public key</span>
+<span class="attribute">#[<span class="ident">derive</span>(
+    <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">SerializeKey</span>, <span class="ident">DeserializeKey</span>,
+)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;fuzzing&quot;</span>), <span class="ident">derive</span>(<span class="ident">Arbitrary</span>))]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PublicKey</span>([<span class="ident">u8</span>; <span class="ident">PUBLIC_KEY_SIZE</span>]);
+
+<span class="comment">//</span>
+<span class="comment">// Handy implementations</span>
+<span class="comment">// =====================</span>
+<span class="comment">//</span>
+
+<span class="kw">impl</span> <span class="ident">PrivateKey</span> {
+    <span class="doccomment">/// Obtain the public key part of a private key</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PublicKey</span> {
+        <span class="kw">let</span> <span class="ident">public_key</span>: <span class="ident">x25519_dalek::PublicKey</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>).<span class="ident">into</span>();
+        <span class="ident">PublicKey</span>(<span class="ident">public_key</span>.<span class="ident">as_bytes</span>().<span class="ident">to_owned</span>())
+    }
+
+    <span class="doccomment">/// To perform a key exchange with another public key</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diffie_hellman</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">remote_public_key</span>: <span class="kw-2">&amp;</span><span class="ident">PublicKey</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="ident">SHARED_SECRET_SIZE</span>] {
+        <span class="kw">let</span> <span class="ident">remote_public_key</span> <span class="op">=</span> <span class="ident">x25519_dalek::PublicKey::from</span>(<span class="ident">remote_public_key</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">shared_secret</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">diffie_hellman</span>(<span class="kw-2">&amp;</span><span class="ident">remote_public_key</span>);
+        <span class="ident">shared_secret</span>.<span class="ident">as_bytes</span>().<span class="ident">to_owned</span>()
+    }
+
+    <span class="doccomment">/// Deserialize an X25119 PrivateKey given the sha512 pre-image of a hash</span>
+    <span class="doccomment">/// whose least significant half is a canonical X25519 scalar, following</span>
+    <span class="doccomment">/// the XEdDSA approach.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This will FAIL if the passed-in byte representation converts to a</span>
+    <span class="doccomment">/// non-canonical scalar in the X25519 sense (and thus cannot correspond to</span>
+    <span class="doccomment">/// a X25519 valid key without bit-mangling).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is meant to compensate for the poor key storage capabilities of some</span>
+    <span class="doccomment">/// key management solutions, and NOT to promote double usage of keys under</span>
+    <span class="doccomment">/// several schemes, which would lead to BAD vulnerabilities.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_ed25519_private_bytes</span>(<span class="ident">private_slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">CryptoMaterialError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">ed25519_secretkey</span> <span class="op">=</span> <span class="ident">ed25519_dalek::SecretKey::from_bytes</span>(<span class="ident">private_slice</span>)
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">CryptoMaterialError::DeserializationError</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">expanded_key</span> <span class="op">=</span> <span class="ident">ed25519_dalek::ExpandedSecretKey::from</span>(<span class="kw-2">&amp;</span><span class="ident">ed25519_secretkey</span>);
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">expanded_keypart</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>];
+        <span class="ident">expanded_keypart</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">expanded_key</span>.<span class="ident">to_bytes</span>()[..<span class="number">32</span>]);
+        <span class="kw">let</span> <span class="ident">potential_x25519</span> <span class="op">=</span> <span class="ident">x25519::PrivateKey::from</span>(<span class="ident">expanded_keypart</span>);
+
+        <span class="comment">// This checks for x25519 clamping &amp; reduction, which is an RFC requirement</span>
+        <span class="kw">if</span> <span class="ident">potential_x25519</span>.<span class="ident">to_bytes</span>()[..] <span class="op">!</span><span class="op">=</span> <span class="ident">expanded_key</span>.<span class="ident">to_bytes</span>()[..<span class="number">32</span>] {
+            <span class="prelude-val">Err</span>(<span class="ident">CryptoMaterialError::DeserializationError</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">potential_x25519</span>)
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">PublicKey</span> {
+    <span class="doccomment">/// Obtain a slice reference to the underlying bytearray</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+    }
+
+    <span class="doccomment">/// Deserialize an X25119 PublicKey from its representation as an</span>
+    <span class="doccomment">/// Ed25519PublicKey, following the XEdDSA approach. This is meant to</span>
+    <span class="doccomment">/// compensate for the poor key storage capabilities of key management</span>
+    <span class="doccomment">/// solutions, and NOT to promote double usage of keys under several</span>
+    <span class="doccomment">/// schemes, which would lead to BAD vulnerabilities.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_ed25519_public_bytes</span>(<span class="ident">ed25519_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">CryptoMaterialError</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">ed25519_bytes</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">32</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">CryptoMaterialError::DeserializationError</span>);
+        }
+        <span class="kw">let</span> <span class="ident">ed_point</span> <span class="op">=</span> <span class="ident">curve25519_dalek::edwards::CompressedEdwardsY::from_slice</span>(<span class="ident">ed25519_bytes</span>)
+            .<span class="ident">decompress</span>()
+            .<span class="ident">ok_or</span>(<span class="ident">CryptoMaterialError::DeserializationError</span>)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="ident">x25519::PublicKey::from</span>(<span class="ident">ed_point</span>.<span class="ident">to_montgomery</span>().<span class="ident">to_bytes</span>()))
+    }
+}
+
+<span class="comment">//</span>
+<span class="comment">// Traits implementations</span>
+<span class="comment">// ======================</span>
+<span class="comment">//</span>
+
+<span class="comment">// private key part</span>
+
+<span class="kw">impl</span> <span class="ident">std::convert::From</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">PRIVATE_KEY_SIZE</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PrivateKey</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">private_key_bytes</span>: [<span class="ident">u8</span>; <span class="ident">PRIVATE_KEY_SIZE</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span>(<span class="ident">x25519_dalek::StaticSecret::from</span>(<span class="ident">private_key_bytes</span>))
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">std::convert::TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PrivateKey</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">traits::CryptoMaterialError</span>;
+
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">private_key_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">private_key_bytes</span>: [<span class="ident">u8</span>; <span class="ident">PRIVATE_KEY_SIZE</span>] <span class="op">=</span> <span class="ident">private_key_bytes</span>
+            .<span class="ident">try_into</span>()
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">traits::CryptoMaterialError::DeserializationError</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">x25519_dalek::StaticSecret::from</span>(<span class="ident">private_key_bytes</span>)))
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">traits::PrivateKey</span> <span class="kw">for</span> <span class="ident">PrivateKey</span> {
+    <span class="kw">type</span> <span class="ident">PublicKeyMaterial</span> <span class="op">=</span> <span class="ident">PublicKey</span>;
+}
+
+<span class="kw">impl</span> <span class="ident">traits::Uniform</span> <span class="kw">for</span> <span class="ident">PrivateKey</span> {
+    <span class="kw">fn</span> <span class="ident">generate</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">R</span>: <span class="ident">RngCore</span> <span class="op">+</span> <span class="ident">CryptoRng</span>,
+    {
+        <span class="self">Self</span>(<span class="ident">x25519_dalek::StaticSecret::new</span>(<span class="ident">rng</span>))
+    }
+}
+
+<span class="comment">// TODO: should this be gated under test flag? (mimoo)</span>
+<span class="kw">impl</span> <span class="ident">traits::ValidCryptoMaterial</span> <span class="kw">for</span> <span class="ident">PrivateKey</span> {
+    <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>()
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;fuzzing&quot;</span>))]</span>
+<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">PrivateKey</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">to_bytes</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">to_bytes</span>()
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;fuzzing&quot;</span>))]</span>
+<span class="kw">impl</span> <span class="ident">proptest::arbitrary::Arbitrary</span> <span class="kw">for</span> <span class="ident">PrivateKey</span> {
+    <span class="kw">type</span> <span class="ident">Parameters</span> <span class="op">=</span> ();
+    <span class="kw">type</span> <span class="ident">Strategy</span> <span class="op">=</span> <span class="ident">proptest::strategy::BoxedStrategy</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+
+    <span class="kw">fn</span> <span class="ident">arbitrary_with</span>(<span class="ident">_args</span>: <span class="self">Self</span><span class="ident">::Parameters</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Strategy</span> {
+        <span class="kw">use</span> <span class="ident">proptest::strategy::Strategy</span> <span class="kw">as</span> <span class="kw">_</span>;
+        <span class="ident">proptest::arbitrary::any</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>()
+            .<span class="ident">prop_map</span>(<span class="ident">PrivateKey::from</span>)
+            .<span class="ident">boxed</span>()
+    }
+}
+
+<span class="comment">// public key part</span>
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PrivateKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">private_key</span>: <span class="kw-2">&amp;</span><span class="ident">PrivateKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident">private_key</span>.<span class="ident">public_key</span>()
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">std::convert::From</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">PUBLIC_KEY_SIZE</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">public_key_bytes</span>: [<span class="ident">u8</span>; <span class="ident">PUBLIC_KEY_SIZE</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span>(<span class="ident">public_key_bytes</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">std::convert::TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">traits::CryptoMaterialError</span>;
+
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">public_key_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">public_key_bytes</span>: [<span class="ident">u8</span>; <span class="ident">PUBLIC_KEY_SIZE</span>] <span class="op">=</span> <span class="ident">public_key_bytes</span>
+            .<span class="ident">try_into</span>()
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">traits::CryptoMaterialError::WrongLengthError</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">public_key_bytes</span>))
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">traits::PublicKey</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
+    <span class="kw">type</span> <span class="ident">PrivateKeyMaterial</span> <span class="op">=</span> <span class="ident">PrivateKey</span>;
+}
+
+<span class="kw">impl</span> <span class="ident">traits::ValidCryptoMaterial</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
+    <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">to_vec</span>()
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">hex::encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>))
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;x25519::PublicKey({})&quot;</span>, <span class="self">self</span>)
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;fuzzing&quot;</span>))]</span>
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::test_utils</span>::{<span class="self">self</span>, <span class="ident">KeyPair</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;fuzzing&quot;</span>))]</span>
+<span class="kw">use</span> <span class="ident">proptest::prelude</span>::<span class="kw-2">*</span>;
+
+<span class="doccomment">/// Produces a uniformly random ed25519 keypair from a seed</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;fuzzing&quot;</span>))]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keypair_strategy</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Strategy</span><span class="op">&lt;</span><span class="ident">Value</span> <span class="op">=</span> <span class="ident">KeyPair</span><span class="op">&lt;</span><span class="ident">PrivateKey</span>, <span class="ident">PublicKey</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="ident">test_utils::uniform_keypair_strategy</span>::<span class="op">&lt;</span><span class="ident">PrivateKey</span>, <span class="ident">PublicKey</span><span class="op">&gt;</span>()
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="diem_crypto" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

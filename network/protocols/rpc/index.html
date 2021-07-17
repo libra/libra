@@ -1,0 +1,44 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Implementation of the unary RPC protocol as per DiemNet wire protocol v1."><meta name="keywords" content="rust, rustlang, rust-lang, rpc"><title>network::protocols::rpc - Rust</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../network/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a><p class="location">Module rpc</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li></ul></div><p class="location"><a href="../../index.html">network</a>::<wbr><a href="../index.html">protocols</a></p><div id="sidebar-vars" data-name="rpc" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Module <a href="../../index.html">network</a>::<wbr><a href="../index.html">protocols</a>::<wbr><a class="mod" href="">rpc</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../../src/network/protocols/rpc/mod.rs.html#4-607" title="goto source code">[src]</a></span></h1><div class="docblock"><p>Implementation of the unary RPC protocol as per <a href="https://github.com/diem/diem/blob/main/specifications/network/messaging-v1.md">DiemNet wire protocol v1</a>.</p>
+<h2 id="design" class="section-header"><a href="#design">Design:</a></h2>
+<p>The unary RPC protocol is implemented here as two independent async completion
+queues: <a href="struct.InboundRpcs.html" title="InboundRpcs"><code>InboundRpcs</code></a> and <a href="struct.OutboundRpcs.html" title="OutboundRpcs"><code>OutboundRpcs</code></a>.</p>
+<p>The <code>InboundRpcs</code> queue is responsible for handling inbound rpc requests
+off-the-wire, forwarding the request to the application layer, waiting for
+the application layer’s response, and then enqueuing the rpc response to-be
+written over-the-wire.</p>
+<p>Likewise, the <code>OutboundRpcs</code> queue is responsible for handling outbound rpc
+requests from the application layer, enqueuing the request for writing onto
+the wire, waiting for a corresponding rpc response, and then notifying the
+requestor of the arrived response message.</p>
+<p>Both <code>InboundRpcs</code> and <code>OutboundRpcs</code> are owned and driven by the <a href="../../peer/struct.Peer.html"><code>Peer</code></a>
+actor. This has a few implications. First, it means that each connection has
+its own pair of local rpc completion queues; the queues are <em>not</em> shared
+across connections. Second, the queues don’t do any IO work. They’re purely
+driven by the owning <code>Peer</code> actor, who calls <code>handle_</code> methods on new
+<a href="../wire/messaging/v1/enum.NetworkMessage.html" title="NetworkMessage"><code>NetworkMessage</code></a> arrivals and polls for completed rpc requests. The queues
+also do not write to the wire directly; instead, they’re given a reference to
+the <a href="../../peer/struct.Peer.html"><code>Peer</code></a> actor’s write queue, which they can enqueue a new outbound
+<a href="../wire/messaging/v1/enum.NetworkMessage.html" title="NetworkMessage"><code>NetworkMessage</code></a> onto.</p>
+<h2 id="timeouts" class="section-header"><a href="#timeouts">Timeouts:</a></h2>
+<p>Both inbound and outbound requests have mandatory timeouts. The tasks in the
+async completion queues are each wrapped in a <code>timeout</code> future, which causes
+the task to complete with an error if the task isn’t fulfilled before the
+deadline.</p>
+<h2 id="limits" class="section-header"><a href="#limits">Limits:</a></h2>
+<p>We limit the number of pending inbound and outbound RPC tasks to ensure that
+resource usage is bounded.</p>
+</div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<table><tr class="module-item"><td><a class="mod" href="error/index.html" title="network::protocols::rpc::error mod">error</a></td><td class="docblock-short"><p>Rpc protocol errors</p>
+</td></tr></table><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.InboundRpcRequest.html" title="network::protocols::rpc::InboundRpcRequest struct">InboundRpcRequest</a></td><td class="docblock-short"><p>A wrapper struct for an inbound rpc request and its associated context.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.InboundRpcs.html" title="network::protocols::rpc::InboundRpcs struct">InboundRpcs</a></td><td class="docblock-short"><p><code>InboundRpcs</code> handles new inbound rpc requests off the wire, notifies the
+<code>PeerManager</code> of the new request, and stores the pending response on a queue.
+If the response eventually completes, <code>InboundRpc</code> records some metrics and
+enqueues the response message onto the outbound write queue.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.OutboundRpcRequest.html" title="network::protocols::rpc::OutboundRpcRequest struct">OutboundRpcRequest</a></td><td class="docblock-short"><p>A wrapper struct for an outbound rpc request and its associated context.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.OutboundRpcs.html" title="network::protocols::rpc::OutboundRpcs struct">OutboundRpcs</a></td><td class="docblock-short"><p><code>OutboundRpcs</code> handles new outbound rpc requests made from the application layer.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="network" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script></body></html>

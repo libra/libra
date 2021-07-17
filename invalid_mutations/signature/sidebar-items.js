@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["FieldRefMutation","Context for applying a list of `FieldRefMutation` instances."],["SignatureRefMutation",""]]});

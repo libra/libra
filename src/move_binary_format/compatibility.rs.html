@@ -1,0 +1,425 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `language/move-binary-format/src/compatibility.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>compatibility.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../move_binary_format/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="comment">// Copyright (c) The Diem Core Contributors</span>
+<span class="comment">// SPDX-License-Identifier: Apache-2.0</span>
+
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">file_format</span>::{<span class="ident">AbilitySet</span>, <span class="ident">StructTypeParameter</span>, <span class="ident">Visibility</span>},
+    <span class="ident">normalized::Module</span>,
+};
+<span class="kw">use</span> <span class="ident">std::collections::BTreeSet</span>;
+
+<span class="doccomment">/// The result of a linking and layout compatibility check. Here is what the different combinations</span>
+<span class="doccomment">/// mean:</span>
+<span class="doccomment">/// `{ struct: true, struct_layout: true }`: fully backward compatible</span>
+<span class="doccomment">/// `{ struct_and_function_linking: true, struct_layout: false }`: Dependent modules that reference functions or types in this module may not link. However, fixing, recompiling, and redeploying all dependent modules will work--no data migration needed.</span>
+<span class="doccomment">/// `{ type_and_function_linking: true, struct_layout: false }`: Attempting to read structs published by this module will now fail at runtime. However, dependent modules will continue to link. Requires data migration, but no changes to dependent modules.</span>
+<span class="doccomment">/// `{ type_and_function_linking: false, struct_layout: false }`: Everything is broken. Need both a data migration and changes to dependent modules.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Compatibility</span> {
+    <span class="doccomment">/// If false, dependent modules that reference functions or structs in this module may not link</span>
+    <span class="kw">pub</span> <span class="ident">struct_and_function_linking</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// If false, attempting to read structs previously published by this module will fail at runtime</span>
+    <span class="kw">pub</span> <span class="ident">struct_layout</span>: <span class="ident">bool</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Compatibility</span> {
+    <span class="doccomment">/// Return true if the two module s compared in the compatiblity check are both linking and</span>
+    <span class="doccomment">/// layout compatible.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_fully_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">struct_and_function_linking</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">struct_layout</span>
+    }
+
+    <span class="doccomment">/// Return compatibility assessment for `new_module` relative to old module `old_module`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="ident">old_module</span>: <span class="kw-2">&amp;</span><span class="ident">Module</span>, <span class="ident">new_module</span>: <span class="kw-2">&amp;</span><span class="ident">Module</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Compatibility</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">struct_and_function_linking</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">struct_layout</span> <span class="op">=</span> <span class="bool-val">true</span>;
+
+        <span class="comment">// module&#39;s name and address are unchanged</span>
+        <span class="kw">if</span> <span class="ident">old_module</span>.<span class="ident">address</span> <span class="op">!</span><span class="op">=</span> <span class="ident">new_module</span>.<span class="ident">address</span> <span class="op">|</span><span class="op">|</span> <span class="ident">old_module</span>.<span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">new_module</span>.<span class="ident">name</span> {
+            <span class="ident">struct_and_function_linking</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        }
+
+        <span class="comment">// old module&#39;s structs are a subset of the new module&#39;s structs</span>
+        <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">old_struct</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">old_module</span>.<span class="ident">structs</span> {
+            <span class="kw">let</span> <span class="ident">new_struct</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">new_module</span>.<span class="ident">structs</span>.<span class="ident">get</span>(<span class="ident">name</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">new_struct</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">new_struct</span>,
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="comment">// Struct not present in new . Existing modules that depend on this struct will fail to link with the new version of the module.</span>
+                    <span class="ident">struct_and_function_linking</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                    <span class="comment">// Note: we intentionally do *not* label this a layout compatibility violation.</span>
+                    <span class="comment">// Existing modules can still successfully read previously published values of</span>
+                    <span class="comment">// this struct `Parent::T`. That is, code like the function `foo` in</span>
+                    <span class="comment">// ```</span>
+                    <span class="comment">// struct S { t: Parent::T }</span>
+                    <span class="comment">// public fun foo(a: addr): S { move_from&lt;S&gt;(addr) }</span>
+                    <span class="comment">// ```</span>
+                    <span class="comment">// in module `Child` will continue to run without error. But values of type</span>
+                    <span class="comment">// `Parent::T` in `Child` are now &quot;orphaned&quot; in the sense that `Parent` no</span>
+                    <span class="comment">// longer exposes any API for reading/writing them.</span>
+                    <span class="kw">continue</span>;
+                }
+            };
+
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">struct_abilities_compatibile</span>(<span class="ident">old_struct</span>.<span class="ident">abilities</span>, <span class="ident">new_struct</span>.<span class="ident">abilities</span>)
+                <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">struct_type_parameters_compatibile</span>(
+                    <span class="kw-2">&amp;</span><span class="ident">old_struct</span>.<span class="ident">type_parameters</span>,
+                    <span class="kw-2">&amp;</span><span class="ident">new_struct</span>.<span class="ident">type_parameters</span>,
+                )
+            {
+                <span class="ident">struct_and_function_linking</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            }
+            <span class="kw">if</span> <span class="ident">new_struct</span>.<span class="ident">fields</span> <span class="op">!</span><span class="op">=</span> <span class="ident">old_struct</span>.<span class="ident">fields</span> {
+                <span class="comment">// Fields changed. Code in this module will fail at runtime if it tries to</span>
+                <span class="comment">// read a previously published struct value</span>
+                <span class="comment">// TODO: this is a stricter definition than required. We could in principle</span>
+                <span class="comment">// choose to label the following as compatible</span>
+                <span class="comment">// (1) changing the name (but not position or type) of a field. The VM does</span>
+                <span class="comment">//     not care about the name of a field (it&#39;s purely informational), but</span>
+                <span class="comment">//     clients presumably do.</span>
+                <span class="comment">// (2) changing the type of a field to a different, but layout and kind</span>
+                <span class="comment">//     compatible type. E.g. `struct S { b: bool }` to `struct S { b: B }`</span>
+                <span class="comment">// where</span>
+                <span class="comment">//     B is struct B { some_name: bool }. TODO: does this affect clients? I</span>
+                <span class="comment">//     think not--the serialization of the same data with these two types</span>
+                <span class="comment">//     will be the same.</span>
+                <span class="ident">struct_layout</span> <span class="op">=</span> <span class="bool-val">false</span>
+            }
+        }
+
+        <span class="comment">// The modules are considered as compatible function-wise when all the conditions are met:</span>
+        <span class="comment">//</span>
+        <span class="comment">// - old module&#39;s public functions are a subset of the new module&#39;s public functions</span>
+        <span class="comment">//   (i.e. we cannot remove or change public functions)</span>
+        <span class="comment">// - old module&#39;s script functions are a subset of the new module&#39;s script functions</span>
+        <span class="comment">//   (i.e. we cannot remove or change script functions)</span>
+        <span class="comment">// - for any friend function that is removed or changed in the old module</span>
+        <span class="comment">//   - if the function visibility is upgraded to public, it is OK</span>
+        <span class="comment">//   - otherwise, it is considered as incompatible.</span>
+        <span class="comment">//</span>
+        <span class="comment">// NOTE: it is possible to relax the compatibility checking for a friend function, i.e.,</span>
+        <span class="comment">// we can remove/change a friend function if the function is not used by any module in the</span>
+        <span class="comment">// friend list. But for simplicity, we decided to go to the more restrictive form now and</span>
+        <span class="comment">// we may revisit this in the future.</span>
+        <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">old_func</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">old_module</span>.<span class="ident">exposed_functions</span> {
+            <span class="kw">let</span> <span class="ident">new_func</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">new_module</span>.<span class="ident">exposed_functions</span>.<span class="ident">get</span>(<span class="ident">name</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">new_func</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">new_func</span>,
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">struct_and_function_linking</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                    <span class="kw">continue</span>;
+                }
+            };
+            <span class="kw">let</span> <span class="ident">is_vis_compatible</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">old_func</span>.<span class="ident">visibility</span>, <span class="ident">new_func</span>.<span class="ident">visibility</span>) {
+                (<span class="ident">Visibility::Public</span>, <span class="ident">Visibility::Public</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+                (<span class="ident">Visibility::Public</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+                (<span class="ident">Visibility::Script</span>, <span class="ident">Visibility::Script</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+                (<span class="ident">Visibility::Script</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+                (<span class="ident">Visibility::Friend</span>, <span class="ident">Visibility::Public</span>)
+                <span class="op">|</span> (<span class="ident">Visibility::Friend</span>, <span class="ident">Visibility::Friend</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+                (<span class="ident">Visibility::Friend</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+                (<span class="ident">Visibility::Private</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;A private function can never be exposed&quot;</span>),
+            };
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">is_vis_compatible</span>
+                <span class="op">|</span><span class="op">|</span> <span class="ident">old_func</span>.<span class="ident">parameters</span> <span class="op">!</span><span class="op">=</span> <span class="ident">new_func</span>.<span class="ident">parameters</span>
+                <span class="op">|</span><span class="op">|</span> <span class="ident">old_func</span>.<span class="ident">return_</span> <span class="op">!</span><span class="op">=</span> <span class="ident">new_func</span>.<span class="ident">return_</span>
+                <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">fun_type_parameters_compatibile</span>(
+                    <span class="kw-2">&amp;</span><span class="ident">old_func</span>.<span class="ident">type_parameters</span>,
+                    <span class="kw-2">&amp;</span><span class="ident">new_func</span>.<span class="ident">type_parameters</span>,
+                )
+            {
+                <span class="ident">struct_and_function_linking</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            }
+        }
+
+        <span class="comment">// check friend declarations compatibility</span>
+        <span class="comment">//</span>
+        <span class="comment">// - additions to the list are allowed</span>
+        <span class="comment">// - removals are not allowed</span>
+        <span class="comment">//</span>
+        <span class="comment">// NOTE: we may also relax this checking a bit in the future: we may allow the removal of</span>
+        <span class="comment">// a module removed from the friend list if the module does not call any friend function</span>
+        <span class="comment">// in this module.</span>
+        <span class="kw">let</span> <span class="ident">old_friend_module_ids</span>: <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">old_module</span>.<span class="ident">friends</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">new_friend_module_ids</span>: <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">new_module</span>.<span class="ident">friends</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>();
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">old_friend_module_ids</span>.<span class="ident">is_subset</span>(<span class="kw-2">&amp;</span><span class="ident">new_friend_module_ids</span>) {
+            <span class="ident">struct_and_function_linking</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        }
+
+        <span class="ident">Compatibility</span> {
+            <span class="ident">struct_and_function_linking</span>,
+            <span class="ident">struct_layout</span>,
+        }
+    }
+}
+
+<span class="comment">// When upgrading, the new abilities must be a superset of the old abilities.</span>
+<span class="comment">// Adding an ability is fine, but removing an ability could cause existing usages to fail.</span>
+<span class="kw">fn</span> <span class="ident">struct_abilities_compatibile</span>(<span class="ident">old_abilities</span>: <span class="ident">AbilitySet</span>, <span class="ident">new_abilities</span>: <span class="ident">AbilitySet</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="ident">old_abilities</span>.<span class="ident">is_subset</span>(<span class="ident">new_abilities</span>)
+}
+
+<span class="comment">// When upgrading, the new type parameters must be the same length, and the new type parameter</span>
+<span class="comment">// constraints must be compatible</span>
+<span class="kw">fn</span> <span class="ident">fun_type_parameters_compatibile</span>(
+    <span class="ident">old_type_parameters</span>: <span class="kw-2">&amp;</span>[<span class="ident">AbilitySet</span>],
+    <span class="ident">new_type_parameters</span>: <span class="kw-2">&amp;</span>[<span class="ident">AbilitySet</span>],
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="ident">old_type_parameters</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">new_type_parameters</span>.<span class="ident">len</span>()
+        <span class="op">&amp;&amp;</span> <span class="ident">old_type_parameters</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">new_type_parameters</span>).<span class="ident">all</span>(
+            <span class="op">|</span>(<span class="ident">old_type_parameter_constraint</span>, <span class="ident">new_type_parameter_constraint</span>)<span class="op">|</span> {
+                <span class="ident">type_parameter_constraints_compatibile</span>(
+                    <span class="kw-2">*</span><span class="ident">old_type_parameter_constraint</span>,
+                    <span class="kw-2">*</span><span class="ident">new_type_parameter_constraint</span>,
+                )
+            },
+        )
+}
+
+<span class="kw">fn</span> <span class="ident">struct_type_parameters_compatibile</span>(
+    <span class="ident">old_type_parameters</span>: <span class="kw-2">&amp;</span>[<span class="ident">StructTypeParameter</span>],
+    <span class="ident">new_type_parameters</span>: <span class="kw-2">&amp;</span>[<span class="ident">StructTypeParameter</span>],
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="ident">old_type_parameters</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">new_type_parameters</span>.<span class="ident">len</span>()
+        <span class="op">&amp;&amp;</span> <span class="ident">old_type_parameters</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">new_type_parameters</span>).<span class="ident">all</span>(
+            <span class="op">|</span>(<span class="ident">old_type_parameter</span>, <span class="ident">new_type_parameter</span>)<span class="op">|</span> {
+                <span class="ident">type_parameter_phantom_decl_compatibile</span>(<span class="ident">old_type_parameter</span>, <span class="ident">new_type_parameter</span>)
+                    <span class="op">&amp;&amp;</span> <span class="ident">type_parameter_constraints_compatibile</span>(
+                        <span class="ident">old_type_parameter</span>.<span class="ident">constraints</span>,
+                        <span class="ident">new_type_parameter</span>.<span class="ident">constraints</span>,
+                    )
+            },
+        )
+}
+
+<span class="comment">// When upgrading, the new constraints must be a subset of (or equal to) the old constraints.</span>
+<span class="comment">// Removing an ability is fine, but adding an ability could cause existing callsites to fail</span>
+<span class="kw">fn</span> <span class="ident">type_parameter_constraints_compatibile</span>(
+    <span class="ident">old_type_constraints</span>: <span class="ident">AbilitySet</span>,
+    <span class="ident">new_type_constraints</span>: <span class="ident">AbilitySet</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="ident">new_type_constraints</span>.<span class="ident">is_subset</span>(<span class="ident">old_type_constraints</span>)
+}
+
+<span class="comment">// Adding a phantom annotation to a parameter won&#39;t break clients because that can only increase the</span>
+<span class="comment">// the set of abilities in struct instantiations. Put it differently, adding phantom declarations</span>
+<span class="comment">// relaxes the requirements for clients.</span>
+<span class="kw">fn</span> <span class="ident">type_parameter_phantom_decl_compatibile</span>(
+    <span class="ident">old_type_parameter</span>: <span class="kw-2">&amp;</span><span class="ident">StructTypeParameter</span>,
+    <span class="ident">new_type_parameter</span>: <span class="kw-2">&amp;</span><span class="ident">StructTypeParameter</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="comment">// old_type_paramter.is_phantom =&gt; new_type_parameter.is_phantom</span>
+    <span class="op">!</span><span class="ident">old_type_parameter</span>.<span class="ident">is_phantom</span> <span class="op">|</span><span class="op">|</span> <span class="ident">new_type_parameter</span>.<span class="ident">is_phantom</span>
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="move_binary_format" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

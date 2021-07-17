@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["identifier",""],["jws",""],["payment_command",""],["subaddress",""],["types",""]]});

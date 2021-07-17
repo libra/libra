@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Entry","A raw entry extracted from the input. Used to build the global config table."],["Role",""]],"struct":[["AccountDefinition","Struct that specifies the initial setup of an account."],["Balance",""],["Config","A table of options either shared by all transactions or used to define the testing environment."]]});

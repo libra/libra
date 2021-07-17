@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["FunctionIdent",""],["ModuleIdent",""],["StructIdent",""]]});

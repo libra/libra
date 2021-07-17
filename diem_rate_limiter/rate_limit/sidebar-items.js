@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Bucket","A token bucket object that keeps track of everything related to a key This can be used as a standalone rate limiter; however, to make it more useful it should be wrapped in an `Arc` and a `Mutex` to be shared across threads."],["TokenBucketRateLimiter","A generic token bucket filter"]],"type":[["SharedBucket",""]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["pop_last_entries","Get up to MAX_EVENTS_IN_QUEUE last events and clears the queue"],["send_json_log","Sends event to event stream."]],"struct":[["JsonLogEntry",""]]});

@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["diem_vm"] = [];
+implementors["vm_validator"] = [{"text":"impl <a class=\"trait\" href=\"diem_vm/trait.VMValidator.html\" title=\"trait diem_vm::VMValidator\">VMValidator</a> for <a class=\"struct\" href=\"vm_validator/mocks/mock_vm_validator/struct.MockVMValidator.html\" title=\"struct vm_validator::mocks::mock_vm_validator::MockVMValidator\">MockVMValidator</a>","synthetic":false,"types":["vm_validator::mocks::mock_vm_validator::MockVMValidator"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

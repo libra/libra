@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["get_packed_types","Get all closed types that may be packed by (1) genesis and (2) all transaction scripts. This makes some simplifying assumptions that are not correct in general, but hold for the current Diem Framework:"]],"struct":[["PackedTypesProcessor",""]]});

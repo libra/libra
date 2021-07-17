@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["BlockContent",""]],"fn":[["generate_cfg_in_dot_format","Generate the dot representation of the CFG (which can be rendered by the Dot program)"]],"struct":[["StacklessControlFlowGraph",""]],"type":[["BlockId",""]]});

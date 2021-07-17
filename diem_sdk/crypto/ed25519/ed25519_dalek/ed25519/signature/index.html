@@ -1,0 +1,144 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="RustCrypto: `signature` crate."><meta name="keywords" content="rust, rustlang, rust-lang, signature"><title>diem_sdk::crypto::ed25519::ed25519_dalek::ed25519::signature - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../../../storage.js"></script><script src="../../../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../../../../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../../diem_sdk/index.html'><div class='logo-container rust-logo'><img src='../../../../../../rust-logo.png' alt='logo'></div></a><p class="location">Crate signature</p><div class="block version"><p>Version 0.0.2</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all signature's items</p></a><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li></ul></div><p class="location"><a href="../../../../../index.html">diem_sdk</a>::<wbr><a href="../../../../index.html">crypto</a>::<wbr><a href="../../../index.html">ed25519</a>::<wbr><a href="../../index.html">ed25519_dalek</a>::<wbr><a href="../index.html">ed25519</a></p><div id="sidebar-vars" data-name="signature" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../../../../settings.html"><img src="../../../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a href="../../../../../index.html">diem_sdk</a>::<wbr><a href="../../../../index.html">crypto</a>::<wbr><a href="../../../index.html">ed25519</a>::<wbr><a href="../../index.html">ed25519_dalek</a>::<wbr><a href="../index.html">ed25519</a>::<wbr><a class="mod" href="">signature</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="https://docs.rs/signature/1.3.0/src/signature/lib.rs.html#1-186" title="goto source code">[src]</a></span></h1><div class="docblock"><p>RustCrypto: <code>signature</code> crate.</p>
+<p>Traits which provide generic, object-safe APIs for generating and verifying
+digital signatures, i.e. message authentication using public-key cryptography.</p>
+<h2 id="minimum-supported-rust-version" class="section-header"><a href="#minimum-supported-rust-version">Minimum Supported Rust Version</a></h2>
+<p>Rust <strong>1.41</strong> or higher.</p>
+<p>Minimum supported Rust version may be changed in the future, but such
+changes will be accompanied with a minor version bump.</p>
+<h2 id="semver-policy" class="section-header"><a href="#semver-policy">SemVer policy</a></h2>
+<ul>
+<li>MSRV is considered exempt from SemVer as noted above</li>
+<li>All on-by-default features of this library are covered by SemVer</li>
+<li>Off-by-default features ending in <code>*-preview</code> (e.g. <code>derive-preview</code>,
+<code>digest-preview</code>) are unstable “preview” features which are also
+considered exempt from SemVer (typically because they rely on pre-1.0
+crates as dependencies). However, breaking changes to these features
+will, like MSRV, also be accompanied by a minor version bump.</li>
+</ul>
+<h1 id="design" class="section-header"><a href="#design">Design</a></h1>
+<p>This crate provides a common set of traits for signing and verifying
+digital signatures intended to be implemented by libraries which produce
+or contain implementations of digital signature algorithms, and used by
+libraries which want to produce or verify digital signatures while
+generically supporting any compatible backend.</p>
+<h2 id="goals" class="section-header"><a href="#goals">Goals</a></h2>
+<p>The traits provided by this crate were designed with the following goals
+in mind:</p>
+<ul>
+<li>Provide an easy-to-use, misuse resistant API optimized for consumers
+(as opposed to implementers) of its traits.</li>
+<li>Support common type-safe wrappers around “bag-of-bytes” representations
+which can be directly parsed from or written to the “wire”.</li>
+<li>Expose a trait/object-safe API where signers/verifiers spanning multiple
+homogeneous provider implementations can be seamlessly leveraged together
+in the same logical “keyring” so long as they operate on the same
+underlying signature type.</li>
+<li>Allow one provider type to potentially implement support (including
+being generic over) several signature types.</li>
+<li>Keep signature algorithm customizations / “knobs” out-of-band from the
+signing/verification APIs, ideally pushing such concerns into the type
+system so that algorithm mismatches are caught as type errors.</li>
+<li>Opaque error type which minimizes information leaked from cryptographic
+failures, as “rich” error types in these scenarios are often a source
+of sidechannel information for attackers (e.g. <a href="https://en.wikipedia.org/wiki/Daniel_Bleichenbacher">BB’06</a>)</li>
+</ul>
+<h2 id="implementation" class="section-header"><a href="#implementation">Implementation</a></h2>
+<p>To accomplish the above goals, the <a href="../../trait.Signer.html" title="Signer"><code>Signer</code></a> and <a href="../../trait.Verifier.html" title="Verifier"><code>Verifier</code></a> traits
+provided by this are generic over a <a href="trait.Signature.html" title="Signature"><code>Signature</code></a> return value, and use
+generic parameters rather than associated types. Notably, they use such
+a parameter for the return value, allowing it to be inferred by the type
+checker based on the desired signature type.</p>
+<p>The <a href="trait.Signature.html" title="Signature"><code>Signature</code></a> trait is bounded on <code>AsRef&lt;[u8]&gt;</code>, enforcing that
+signature types are thin wrappers around a “bag-of-bytes”
+serialization. Inspiration for this approach comes from the Ed25519
+signature system, which was based on the observation that past
+systems were not prescriptive about how signatures should be represented
+on-the-wire, and that lead to a proliferation of different wire formats
+and confusion about which ones should be used. This crate aims to provide
+similar simplicity by minimizing the number of steps involved to obtain
+a serializable signature.</p>
+<h2 id="alternatives-considered" class="section-header"><a href="#alternatives-considered">Alternatives considered</a></h2>
+<p>This crate is based on over two years of exploration of how to encapsulate
+digital signature systems in the most flexible, developer-friendly way.
+During that time many design alternatives were explored, tradeoffs
+compared, and ultimately the provided API was selected.</p>
+<p>The tradeoffs made in this API have all been to improve simplicity,
+ergonomics, type safety, and flexibility for <em>consumers</em> of the traits.
+At times, this has come at a cost to implementers. Below are some concerns
+we are cognizant of which were considered in the design of the API:</p>
+<ul>
+<li>“Bag-of-bytes” serialization precludes signature providers from using
+their own internal representation of a signature, which can be helpful
+for many reasons (e.g. advanced signature system features like batch
+verification). Alternatively each provider could define its own signature
+type, using a marker trait to identify the particular signature algorithm,
+have <code>From</code> impls for converting to/from <code>[u8; N]</code>, and a marker trait
+for identifying a specific signature algorithm.</li>
+<li>Associated types, rather than generic parameters of traits, could allow
+more customization of the types used by a particular signature system,
+e.g. using custom error types.</li>
+</ul>
+<p>It may still make sense to continue to explore the above tradeoffs, but
+with a <em>new</em> set of traits which are intended to be implementor-friendly,
+rather than consumer friendly. The existing <a href="../../trait.Signer.html" title="Signer"><code>Signer</code></a> and <a href="../../trait.Verifier.html" title="Verifier"><code>Verifier</code></a>
+traits could have blanket impls for the “provider-friendly” traits.
+However, as noted above this is a design space easily explored after
+stabilizing the consumer-oriented traits, and thus we consider these
+more important.</p>
+<p>That said, below are some caveats of trying to design such traits, and
+why we haven’t actively pursued them:</p>
+<ul>
+<li>Generics in the return position are already used to select which trait
+impl to use, i.e. for a particular signature algorithm/system. Avoiding
+a unified, concrete signature type adds another dimension to complexity
+and compiler errors, and in our experience makes them unsuitable for this
+sort of API. We believe such an API is the natural one for signature
+systems, reflecting the natural way they are written absent a trait.</li>
+<li>Associated types preclude multiple (or generic) implementations of the
+same trait. These parameters are common in signature systems, notably
+ones which support different digest algorithms.</li>
+<li>Digital signatures are almost always larger than the present 32-entry
+trait impl limitation on array types, which complicates trait signatures
+for these types (particularly things like <code>From</code> or <code>Borrow</code> bounds).
+This may be more interesting to explore after const generics.</li>
+</ul>
+<h2 id="unstable-features" class="section-header"><a href="#unstable-features">Unstable features</a></h2>
+<p>Despite being post-1.0, this crate includes a number of off-by-default
+unstable features named <code>*-preview</code>, each of which depends on a pre-1.0
+crate.</p>
+<p>These features are considered exempt from SemVer. See the
+<a href="#semver-policy">SemVer policy</a> above for more information.</p>
+<p>The following unstable features are presently supported:</p>
+<ul>
+<li><code>derive-preview</code>: for implementers of signature systems using
+[<code>DigestSigner</code>] and [<code>DigestVerifier</code>], the <code>derive-preview</code> feature
+can be used to derive <a href="../../trait.Signer.html" title="Signer"><code>Signer</code></a> and <a href="../../trait.Verifier.html" title="Verifier"><code>Verifier</code></a> traits which prehash
+the input message using the [<code>PrehashSignature::Digest</code>] algorithm for
+a given <a href="trait.Signature.html" title="Signature"><code>Signature</code></a> type. When the <code>derive-preview</code> feature is enabled
+import the proc macros with <code>use signature::{Signer, Verifier}</code> and then
+add a <code>derive(Signer)</code> or <code>derive(Verifier)</code> attribute to the given
+digest signer/verifier type. Enabling this feature also enables <code>digest</code>
+support (see immediately below).</li>
+<li><code>digest-preview</code>: enables the [<code>DigestSigner</code>] and [<code>DigestVerifier</code>]
+traits which are based on the <a href="https://docs.rs/digest/"><code>Digest</code></a> trait from the <a href="https://docs.rs/digest/"><code>digest</code></a> crate.
+These traits are used for representing signature systems based on the
+<a href="https://en.wikipedia.org/wiki/Fiat%E2%80%93Shamir_heuristic">Fiat-Shamir heuristic</a> which compute a random challenge value to sign
+by computing a cryptographically secure digest of the input message.</li>
+<li><code>rand-preview</code>: enables the [<code>RandomizedSigner</code>] trait for signature
+systems which rely on a cryptographically secure random number generator
+for security.</li>
+</ul>
+<p>NOTE: the <a href="https://docs.rs/async-signature"><code>async-signature</code></a> crate contains experimental <code>async</code> support
+for <a href="../../trait.Signer.html" title="Signer"><code>Signer</code></a> and [<code>DigestSigner</code>].</p>
+</div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.Error.html" title="diem_sdk::crypto::ed25519::ed25519_dalek::ed25519::signature::Error struct">Error</a></td><td class="docblock-short"><p>Signature errors.</p>
+</td></tr></table><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<table><tr class="module-item"><td><a class="trait" href="trait.Signature.html" title="diem_sdk::crypto::ed25519::ed25519_dalek::ed25519::signature::Signature trait">Signature</a></td><td class="docblock-short"><p>Trait impl’d by concrete types that represent digital signatures.</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.Signer.html" title="diem_sdk::crypto::ed25519::ed25519_dalek::ed25519::signature::Signer trait">Signer</a></td><td class="docblock-short"><p>Sign the provided message bytestring using <code>Self</code> (e.g. a cryptographic key
+or connection to an HSM), returning a digital signature.</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.Verifier.html" title="diem_sdk::crypto::ed25519::ed25519_dalek::ed25519::signature::Verifier trait">Verifier</a></td><td class="docblock-short"><p>Verify the provided message bytestring using <code>Self</code> (e.g. a public key)</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="diem_sdk" data-search-index-js="../../../../../../search-index.js" data-search-js="../../../../../../search.js"></div>
+    <script src="../../../../../../main.js"></script></body></html>

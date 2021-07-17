@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["add_prelude","Adds the prelude to the generated output."]],"mod":[["boogie_wrapper","Wrapper around the boogie program. Allows to call boogie and analyze the output."],["bytecode_translator","This module translates the bytecode of a module to Boogie code."],["options",""]]});

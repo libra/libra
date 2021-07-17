@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["get_directly_modified_memory",""],["get_directly_modified_memory_inst",""],["get_modified_memory",""],["get_modified_memory_inst",""],["get_used_memory",""],["get_used_memory_inst",""]],"struct":[["UsageProcessor",""]]});

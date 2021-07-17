@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["CurrencyInfoResource","Struct that represents a CurrencyInfo resource"]]});

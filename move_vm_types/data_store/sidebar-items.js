@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["DataStore","Provide an implementation for bytecodes related to data with a given data store."]]});

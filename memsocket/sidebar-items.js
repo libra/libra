@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Incoming","Stream returned by the `MemoryListener::incoming` function representing the stream of sockets received from a listener."],["MemoryListener","An in-memory socket server, listening for connections."],["MemorySocket","An in-memory stream between two local sockets."]]});

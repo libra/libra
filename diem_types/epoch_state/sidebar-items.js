@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["EpochState","EpochState represents a trusted validator set to validate messages from the specific epoch, it could be updated with EpochChangeProof."]]});

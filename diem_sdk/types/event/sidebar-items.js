@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["EventHandle","A Rust representation of an Event Handle Resource."],["EventKey","A struct that represents a globally unique id for an Event stream that a user can listen to. By design, the lower part of EventKey is the same as account address."],["EventKeyParseError",""]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["EpochRetrievalRequest","Request to get a EpochChangeProof from current_epoch to target_epoch"]]});

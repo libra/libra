@@ -1,0 +1,1 @@
+initSidebarItems({"attr":[["smoke_test","This macro allows tests to be defined using the “smoke_test” attribute. What this does is declare each test as a “rusty_fork_test” (so that it’s spawned in a separate process) and sets a test timeout of 2 minutes (so that if the test takes longer than 2 minutes to run, it will automatically be killed and marked as a test failure)."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["BaseUrlRotationEvent","Struct that represents a BaseUrlRotationEvent."]]});

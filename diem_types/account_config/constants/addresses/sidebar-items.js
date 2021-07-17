@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["CORE_CODE_ADDRESS",""]],"fn":[["diem_root_address",""],["reserved_vm_address",""],["testnet_dd_account_address",""],["treasury_compliance_account_address",""],["validator_set_address",""]]});

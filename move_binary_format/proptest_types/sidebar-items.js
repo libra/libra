@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["CompiledModuleStrategyGen","Contains configuration to generate [`CompiledModule`] instances."]],"type":[["TableSize","Represents how large [`CompiledModule`] tables can be."]]});

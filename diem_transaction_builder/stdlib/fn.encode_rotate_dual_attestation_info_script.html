@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Summary"><meta name="keywords" content="rust, rustlang, rust-lang, encode_rotate_dual_attestation_info_script"><title>encode_rotate_dual_attestation_info_script in diem_transaction_builder::stdlib - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc fn"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../diem_transaction_builder/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><div class="sidebar-elems"><p class="location"><a href="../index.html">diem_transaction_builder</a>::<wbr><a href="index.html">stdlib</a></p><div id="sidebar-vars" data-name="encode_rotate_dual_attestation_info_script" data-ty="fn" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Function <a href="../index.html">diem_transaction_builder</a>::<wbr><a href="index.html">stdlib</a>::<wbr><a class="fn" href="">encode_rotate_dual_attestation_info_script</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/diem_transaction_builder/stdlib.rs.html#7106-7115" title="goto source code">[src]</a></span></h1><pre class="rust fn">pub fn encode_rotate_dual_attestation_info_script(<br>&nbsp;&nbsp;&nbsp;&nbsp;new_url: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;new_key: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;<br>) -&gt; <a class="struct" href="../../diem_types/transaction/script/struct.Script.html" title="struct diem_types::transaction::script::Script">Script</a></pre><div class="docblock"><h1 id="summary" class="section-header"><a href="#summary">Summary</a></h1>
+<p>Updates the url used for off-chain communication, and the public key used to verify dual
+attestation on-chain. Transaction can be sent by any account that has dual attestation
+information published under it. In practice the only such accounts are Designated Dealers and
+Parent VASPs.</p>
+<h1 id="technical-description" class="section-header"><a href="#technical-description">Technical Description</a></h1>
+<p>Updates the <code>base_url</code> and <code>compliance_public_key</code> fields of the <code>DualAttestation::Credential</code>
+resource published under <code>account</code>. The <code>new_key</code> must be a valid ed25519 public key.</p>
+<h2 id="events" class="section-header"><a href="#events">Events</a></h2>
+<p>Successful execution of this transaction emits two events:</p>
+<ul>
+<li>A <code>DualAttestation::ComplianceKeyRotationEvent</code> containing the new compliance public key, and
+the blockchain time at which the key was updated emitted on the <code>DualAttestation::Credential</code>
+<code>compliance_key_rotation_events</code> handle published under <code>account</code>; and</li>
+<li>A <code>DualAttestation::BaseUrlRotationEvent</code> containing the new base url to be used for
+off-chain communication, and the blockchain time at which the url was updated emitted on the
+<code>DualAttestation::Credential</code> <code>base_url_rotation_events</code> handle published under <code>account</code>.</li>
+</ul>
+<h1 id="parameters" class="section-header"><a href="#parameters">Parameters</a></h1><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>account</code></td><td><code>&amp;signer</code></td><td>Signer reference of the sending account of the transaction.</td></tr>
+<tr><td><code>new_url</code></td><td><code>vector&lt;u8&gt;</code></td><td>ASCII-encoded url to be used for off-chain communication with <code>account</code>.</td></tr>
+<tr><td><code>new_key</code></td><td><code>vector&lt;u8&gt;</code></td><td>New ed25519 public key to be used for on-chain dual attestation checking.</td></tr>
+</tbody></table>
+<h1 id="common-abort-conditions" class="section-header"><a href="#common-abort-conditions">Common Abort Conditions</a></h1><table><thead><tr><th>Error Category</th><th>Error Reason</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>Errors::NOT_PUBLISHED</code></td><td><code>DualAttestation::ECREDENTIAL</code></td><td>A <code>DualAttestation::Credential</code> resource is not published under <code>account</code>.</td></tr>
+<tr><td><code>Errors::INVALID_ARGUMENT</code></td><td><code>DualAttestation::EINVALID_PUBLIC_KEY</code></td><td><code>new_key</code> is not a valid ed25519 public key.</td></tr>
+</tbody></table>
+<h1 id="related-scripts" class="section-header"><a href="#related-scripts">Related Scripts</a></h1>
+<ul>
+<li><code>Script::create_parent_vasp_account</code></li>
+<li><code>Script::create_designated_dealer</code></li>
+<li><code>Script::rotate_dual_attestation_info</code></li>
+</ul>
+</div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="diem_transaction_builder" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script></body></html>

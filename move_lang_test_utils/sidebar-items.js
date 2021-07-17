@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["COMPLETED_DIRECTORIES",""],["DEBUG_MODULE_FILE_NAME",""],["FUNCTIONAL_TEST_DIR",""],["MIGRATION_SUB_DIR",""],["MOVE_CHECK_DIR",""],["PATH_TO_IR_TESTS",""],["SENDER",""],["TODO_EXTENSION",""]],"fn":[["ir_tests",""],["translated_ir_test_name",""]],"struct":[["StringError",""]]});

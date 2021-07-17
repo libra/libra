@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["FilePathContext","Contains information for a single file path."]],"trait":[["FilePathLinter","Represents a linter that runs once per file path."]]});

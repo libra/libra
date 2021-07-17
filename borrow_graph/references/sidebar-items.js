@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["RefID","Unique identifier for the reference"]]});

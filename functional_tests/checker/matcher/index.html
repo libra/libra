@@ -1,0 +1,74 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This module implements a matcher that checks if an evaluation log matches the patterns specified by a list of directives."><meta name="keywords" content="rust, rustlang, rust-lang, matcher"><title>functional_tests::checker::matcher - Rust</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../functional_tests/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a><p class="location">Module matcher</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li></ul></div><p class="location"><a href="../../index.html">functional_tests</a>::<wbr><a href="../index.html">checker</a></p><div id="sidebar-vars" data-name="matcher" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Module <a href="../../index.html">functional_tests</a>::<wbr><a href="../index.html">checker</a>::<wbr><a class="mod" href="">matcher</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../../src/functional_tests/checker/matcher.rs.html#4-333" title="goto source code">[src]</a></span></h1><div class="docblock"><p>This module implements a matcher that checks if an evaluation log matches the
+patterns specified by a list of directives.</p>
+<p>The directives first get divided into groups, where each group consists of
+0 or more negative directives, followed by an optional positive directive.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="comment">// Directives:</span>
+<span class="comment">//     not: 1</span>
+<span class="comment">//     not: 2</span>
+<span class="comment">//     check: 3</span>
+<span class="comment">//     not: 4</span>
+<span class="comment">//     check: bar</span>
+<span class="comment">//     not : 6</span>
+
+<span class="comment">// Groups:</span>
+<span class="comment">//     group 1:</span>
+<span class="comment">//         not: 1</span>
+<span class="comment">//         not: 2</span>
+<span class="comment">//         check: 3</span>
+<span class="comment">//     group 2:</span>
+<span class="comment">//         not: 4</span>
+<span class="comment">//         check: bar</span>
+<span class="comment">//     group 3:</span>
+<span class="comment">//         not: 6</span></pre></div>
+<p>Then in order, we take one group at a time and match it against the evaluation log.
+Recall that the (stringified) evaluation log is essentially a list of string entries
+that look like this:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="comment">// [1] abc de</span>
+<span class="comment">// [2] foo 3</span>
+<span class="comment">// [3] bar 6</span>
+<span class="comment">// [4] 7</span></pre></div>
+<p>For each group, we find the earliest place in the current entry where any of the
+directives matches.
+- If the matched directive is negative, abort and report error.
+- If the matched directive is positive, move on to the next group and start a
+new match right after the last matched location.
+- If no match is found, retry the current group with the next entry in the log.</p>
+<p>Example matches:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="comment">// [1] abc de</span>
+<span class="comment">// [2] foo 3</span>
+<span class="comment">//         ^</span>
+<span class="comment">//         check: 3</span>
+<span class="comment">// [3] bar 6</span>
+<span class="comment">//     ^^^ ^</span>
+<span class="comment">//     |   not 6</span>
+<span class="comment">//     check: bar</span>
+<span class="comment">// [4] 7</span></pre></div>
+<p>Note: the group matching procedure above requires searching for multiple string patterns
+simultatenously. Right now this is implemented using the Aho-Corasick algorithm, achieving
+an overall time complexity of O(n), where n is the length of the log + the total length of
+the string patterns in the directives.</p>
+<p>In order for the match to succeed, it is required that:
+1) All positive directives are matched.
+2) No negative directives are matched.
+3) All error entries in the log are matched.</p>
+<p>The example above would fail with a negative match.</p>
+</div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.Match.html" title="functional_tests::checker::matcher::Match struct">Match</a></td><td class="docblock-short"><p>A single match consisting of the index of the log entry, the start location and the end location (in bytes).</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.MatchResult.html" title="functional_tests::checker::matcher::MatchResult struct">MatchResult</a></td><td class="docblock-short"><p>The result of matching the directives against the evaluation log.</p>
+</td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<table><tr class="module-item"><td><a class="enum" href="enum.MatchError.html" title="functional_tests::checker::matcher::MatchError enum">MatchError</a></td><td class="docblock-short"><p>A match error.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.MatchStatus.html" title="functional_tests::checker::matcher::MatchStatus enum">MatchStatus</a></td><td class="docblock-short"><p>The status of a match.
+Can be either success or failure with errors.</p>
+</td></tr></table><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<table><tr class="module-item"><td><a class="fn" href="fn.match_output.html" title="functional_tests::checker::matcher::match_output fn">match_output</a></td><td class="docblock-short"><p>Matches the directives against the evaluation log.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="functional_tests" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script></body></html>

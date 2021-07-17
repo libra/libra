@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["MockTransactionAccumulator","An immutable transaction accumulator (not a summary, since it stores all leaf nodes and caches internal nodes) that allows for easily computing root hashes, consistency proofs, etc… at any versions in the range `0..=self.version()`."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["BurnEvent","Struct that represents a BurnEvent."]]});

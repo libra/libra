@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["node_debug_service","Debug interface to access information in a specific node."]],"struct":[["AsyncNodeDebugClient","Implement default utility client for AsyncNodeDebugInterface"],["NodeDebugClient","Implement default utility client for NodeDebugInterface"]]});

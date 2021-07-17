@@ -1,0 +1,87 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A CLI tool for collecting and aggregating a VASPs current on-chain assets into an easily digestible json output."><meta name="keywords" content="rust, rustlang, rust-lang, diem_assets_proof"><title>diem_assets_proof - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../diem_assets_proof/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate diem_assets_proof</p><div class="block version"><p>Version 0.1.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all diem_assets_proof's items</p></a><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="diem_assets_proof" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">diem_assets_proof</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/diem_assets_proof/lib.rs.html#4-610" title="goto source code">[src]</a></span></h1><div class="docblock"><p>A CLI tool for collecting and aggregating a VASPs current on-chain assets into
+an easily digestible json output.</p>
+<h3 id="example-usage" class="section-header"><a href="#example-usage">Example usage:</a></h3>
+<pre><code class="language-sh">$ cargo run -p diem-assets-proof -- collect \
+    --json-server 'https://testnet.diem.com/v1' \
+    --parent-vasp 'ed34ba9396da470da8de0945555549f8' \
+    --child-vasps 'f236d4d977cbf08fe6e8e796bb6b41bd' \
+    --child-vasps 'ad8c1f9be3b9de371567eda247c1f290' \
+    --child-vasps '228d25d0c232c010be8bc1613f833ea0'
+
+{
+  &quot;diem_chain_id&quot;: 2,
+  &quot;diem_ledger_version&quot;: 88497519,
+  &quot;diem_ledger_timestampusec&quot;: 1616457122815922,
+  &quot;accumulator_root_hash&quot;: &quot;75e03d04f13f15450807ced2d8707fd90b3a95d71ce981396deacf6134f20b64&quot;,
+  &quot;all_child_vasps_valid&quot;: true,
+  &quot;total_unfrozen_balances&quot;: {
+    &quot;XUS&quot;: 100000000000
+  },
+  &quot;currencies&quot;: {
+    &quot;XDX&quot;: {
+      &quot;scaling_factor&quot;: 1000000,
+      &quot;fractional_part&quot;: 1000,
+      &quot;to_xdx_exchange_rate&quot;: 1.0
+    },
+    &quot;XUS&quot;: {
+      &quot;scaling_factor&quot;: 1000000,
+      &quot;fractional_part&quot;: 100,
+      &quot;to_xdx_exchange_rate&quot;: 1.0
+    }
+  },
+  &quot;parent_vasp&quot;: {
+    &quot;address&quot;: &quot;ED34BA9396DA470DA8DE0945555549F8&quot;,
+    &quot;balances&quot;: {
+      &quot;XUS&quot;: 70000000000
+    },
+    &quot;human_name&quot;: &quot;No. 63291 VASP&quot;,
+    &quot;base_url&quot;: &quot;http://localhost:54330&quot;,
+    &quot;num_children&quot;: 3
+  },
+  &quot;child_vasps&quot;: {
+    &quot;228D25D0C232C010BE8BC1613F833EA0&quot;: {
+      &quot;result&quot;: {
+        &quot;balances&quot;: {
+          &quot;XUS&quot;: 10000000000
+        }
+      }
+    },
+    &quot;AD8C1F9BE3B9DE371567EDA247C1F290&quot;: {
+      &quot;result&quot;: {
+        &quot;balances&quot;: {
+          &quot;XUS&quot;: 10000000000
+        }
+      }
+    },
+    &quot;F236D4D977CBF08FE6E8E796BB6B41BD&quot;: {
+      &quot;result&quot;: {
+        &quot;balances&quot;: {
+          &quot;XUS&quot;: 10000000000
+        }
+      }
+    }
+  }
+}
+</code></pre>
+</div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.Args.html" title="diem_assets_proof::Args struct">Args</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.AssetsProof.html" title="diem_assets_proof::AssetsProof struct">AssetsProof</a></td><td class="docblock-short"><p>A receipt containing the aggregate balance of a VASP and all of its child VASP
+accounts, in addition to each individual account’s balance and on-chain metadata.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.BalancesView.html" title="diem_assets_proof::BalancesView struct">BalancesView</a></td><td class="docblock-short"><p>A set of balances by currency.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ChildVASPView.html" title="diem_assets_proof::ChildVASPView struct">ChildVASPView</a></td><td class="docblock-short"><p>A simplified view of a single child VASP account. Currently we only display
+the balances for each account.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.CollectOptions.html" title="diem_assets_proof::CollectOptions struct">CollectOptions</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.CommonOptions.html" title="diem_assets_proof::CommonOptions struct">CommonOptions</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.ParentVASPView.html" title="diem_assets_proof::ParentVASPView struct">ParentVASPView</a></td><td class="docblock-short"><p>A simplified view of the parent VASP account, ignoring irrelevant info like
+the sent/receive event keys.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.SimpleCurrencyView.html" title="diem_assets_proof::SimpleCurrencyView struct">SimpleCurrencyView</a></td><td class="docblock-short"><p>A simplified view of the current on-chain currency metadata.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.SimpleMetadataView.html" title="diem_assets_proof::SimpleMetadataView struct">SimpleMetadataView</a></td><td class="docblock-short"><p>Truncated view of the <a href="../diem_json_rpc_types/views/struct.MetadataView.html" title="MetadataView"><code>MetadataView</code></a>.</p>
+</td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<table><tr class="module-item"><td><a class="enum" href="enum.Command.html" title="diem_assets_proof::Command enum">Command</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="enum" href="enum.ResultWrapper.html" title="diem_assets_proof::ResultWrapper enum">ResultWrapper</a></td><td class="docblock-short"><p>A helper type for serializing <code>Result&lt;T&gt;</code> with serde-json.</p>
+</td></tr></table><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<table><tr class="module-item"><td><a class="trait" href="trait.Client.html" title="diem_assets_proof::Client trait">Client</a></td><td class="docblock-short"><p>A small trait abstracting over the Diem json-rpc client so we can mock during
+testing.</p>
+</td></tr></table><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<table><tr class="module-item"><td><a class="fn" href="fn.pretty_print.html" title="diem_assets_proof::pretty_print fn">pretty_print</a></td><td class="docblock-short"><p>For pretty printing outputs in JSON</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="diem_assets_proof" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script></body></html>

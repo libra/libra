@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["diem_crypto"] = [];
+implementors["diem_types"] = [{"text":"impl <a class=\"trait\" href=\"diem_crypto/traits/trait.ValidCryptoMaterial.html\" title=\"trait diem_crypto::traits::ValidCryptoMaterial\">ValidCryptoMaterial</a> for <a class=\"struct\" href=\"diem_types/transaction/authenticator/struct.AuthenticationKey.html\" title=\"struct diem_types::transaction::authenticator::AuthenticationKey\">AuthenticationKey</a>","synthetic":false,"types":["diem_types::transaction::authenticator::AuthenticationKey"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

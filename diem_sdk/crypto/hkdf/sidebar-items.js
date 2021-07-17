@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["HkdfError","An error type for HKDF key derivation issues."]],"struct":[["Hkdf","Structure representing the HKDF, capable of HKDF-Extract and HKDF-Expand operations, as defined in RFC 5869."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["KeyGen","Ed25519 key generator."]]});

@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Summary"><meta name="keywords" content="rust, rustlang, rust-lang, encode_tiered_mint_script_function"><title>encode_tiered_mint_script_function in diem_sdk::transaction_builder::stdlib - Rust</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc fn"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../diem_sdk/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a><div class="sidebar-elems"><p class="location"><a href="../../index.html">diem_sdk</a>::<wbr><a href="../index.html">transaction_builder</a>::<wbr><a href="index.html">stdlib</a></p><div id="sidebar-vars" data-name="encode_tiered_mint_script_function" data-ty="fn" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Function <a href="../../index.html">diem_sdk</a>::<wbr><a href="../index.html">transaction_builder</a>::<wbr><a href="index.html">stdlib</a>::<wbr><a class="fn" href="">encode_tiered_mint_script_function</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../../src/diem_transaction_builder/stdlib.rs.html#5623-5629" title="goto source code">[src]</a></span></h1><pre class="rust fn">pub fn encode_tiered_mint_script_function(<br>&nbsp;&nbsp;&nbsp;&nbsp;coin_type: <a class="enum" href="../../move_types/language_storage/enum.TypeTag.html" title="enum diem_sdk::move_types::language_storage::TypeTag">TypeTag</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;sliding_nonce: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;designated_dealer_address: <a class="struct" href="../../move_types/account_address/struct.AccountAddress.html" title="struct diem_sdk::move_types::account_address::AccountAddress">AccountAddress</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;mint_amount: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;tier_index: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a><br>) -&gt; <a class="enum" href="../../types/transaction/enum.TransactionPayload.html" title="enum diem_sdk::types::transaction::TransactionPayload">TransactionPayload</a></pre><div class="docblock"><h1 id="summary" class="section-header"><a href="#summary">Summary</a></h1>
+<p>Mints a specified number of coins in a currency to a Designated Dealer. The sending account
+must be the Treasury Compliance account, and coins can only be minted to a Designated Dealer
+account.</p>
+<h1 id="technical-description" class="section-header"><a href="#technical-description">Technical Description</a></h1>
+<p>Mints <code>mint_amount</code> of coins in the <code>CoinType</code> currency to Designated Dealer account at
+<code>designated_dealer_address</code>. The <code>tier_index</code> parameter specifies which tier should be used to
+check verify the off-chain approval policy, and is based in part on the on-chain tier values
+for the specific Designated Dealer, and the number of <code>CoinType</code> coins that have been minted to
+the dealer over the past 24 hours. Every Designated Dealer has 4 tiers for each currency that
+they support. The sending <code>tc_account</code> must be the Treasury Compliance account, and the
+receiver an authorized Designated Dealer account.</p>
+<h1 id="events" class="section-header"><a href="#events">Events</a></h1>
+<p>Successful execution of the transaction will emit two events:</p>
+<ul>
+<li>A <code>Diem::MintEvent</code> with the amount and currency code minted is emitted on the
+<code>mint_event_handle</code> in the stored <code>Diem::CurrencyInfo&lt;CoinType&gt;</code> resource stored under
+<code>0xA550C18</code>; and</li>
+<li>A <code>DesignatedDealer::ReceivedMintEvent</code> with the amount, currency code, and Designated
+Dealer’s address is emitted on the <code>mint_event_handle</code> in the stored <code>DesignatedDealer::Dealer</code>
+resource published under the <code>designated_dealer_address</code>.</li>
+</ul>
+<h1 id="parameters" class="section-header"><a href="#parameters">Parameters</a></h1><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>CoinType</code></td><td>Type</td><td>The Move type for the <code>CoinType</code> being minted. <code>CoinType</code> must be an already-registered currency on-chain.</td></tr>
+<tr><td><code>tc_account</code></td><td><code>signer</code></td><td>The signer of the sending account of this transaction. Must be the Treasury Compliance account.</td></tr>
+<tr><td><code>sliding_nonce</code></td><td><code>u64</code></td><td>The <code>sliding_nonce</code> (see: <code>SlidingNonce</code>) to be used for this transaction.</td></tr>
+<tr><td><code>designated_dealer_address</code></td><td><code>address</code></td><td>The address of the Designated Dealer account being minted to.</td></tr>
+<tr><td><code>mint_amount</code></td><td><code>u64</code></td><td>The number of coins to be minted.</td></tr>
+<tr><td><code>tier_index</code></td><td><code>u64</code></td><td>[Deprecated] The mint tier index to use for the Designated Dealer account. Will be ignored</td></tr>
+</tbody></table>
+<h1 id="common-abort-conditions" class="section-header"><a href="#common-abort-conditions">Common Abort Conditions</a></h1><table><thead><tr><th>Error Category</th><th>Error Reason</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>Errors::NOT_PUBLISHED</code></td><td><code>SlidingNonce::ESLIDING_NONCE</code></td><td>A <code>SlidingNonce</code> resource is not published under <code>tc_account</code>.</td></tr>
+<tr><td><code>Errors::INVALID_ARGUMENT</code></td><td><code>SlidingNonce::ENONCE_TOO_OLD</code></td><td>The <code>sliding_nonce</code> is too old and it’s impossible to determine if it’s duplicated or not.</td></tr>
+<tr><td><code>Errors::INVALID_ARGUMENT</code></td><td><code>SlidingNonce::ENONCE_TOO_NEW</code></td><td>The <code>sliding_nonce</code> is too far in the future.</td></tr>
+<tr><td><code>Errors::INVALID_ARGUMENT</code></td><td><code>SlidingNonce::ENONCE_ALREADY_RECORDED</code></td><td>The <code>sliding_nonce</code> has been previously recorded.</td></tr>
+<tr><td><code>Errors::REQUIRES_ADDRESS</code></td><td><code>CoreAddresses::ETREASURY_COMPLIANCE</code></td><td><code>tc_account</code> is not the Treasury Compliance account.</td></tr>
+<tr><td><code>Errors::REQUIRES_ROLE</code></td><td><code>Roles::ETREASURY_COMPLIANCE</code></td><td><code>tc_account</code> is not the Treasury Compliance account.</td></tr>
+<tr><td><code>Errors::INVALID_ARGUMENT</code></td><td><code>DesignatedDealer::EINVALID_MINT_AMOUNT</code></td><td><code>mint_amount</code> is zero.</td></tr>
+<tr><td><code>Errors::NOT_PUBLISHED</code></td><td><code>DesignatedDealer::EDEALER</code></td><td><code>DesignatedDealer::Dealer</code> or <code>DesignatedDealer::TierInfo&lt;CoinType&gt;</code> resource does not exist at <code>designated_dealer_address</code>.</td></tr>
+<tr><td><code>Errors::REQUIRES_CAPABILITY</code></td><td><code>Diem::EMINT_CAPABILITY</code></td><td><code>tc_account</code> does not have a <code>Diem::MintCapability&lt;CoinType&gt;</code> resource published under it.</td></tr>
+<tr><td><code>Errors::INVALID_STATE</code></td><td><code>Diem::EMINTING_NOT_ALLOWED</code></td><td>Minting is not currently allowed for <code>CoinType</code> coins.</td></tr>
+<tr><td><code>Errors::LIMIT_EXCEEDED</code></td><td><code>DiemAccount::EDEPOSIT_EXCEEDS_LIMITS</code></td><td>The depositing of the funds would exceed the <code>account</code>’s account limits.</td></tr>
+</tbody></table>
+<h1 id="related-scripts" class="section-header"><a href="#related-scripts">Related Scripts</a></h1>
+<ul>
+<li><code>AccountCreationScripts::create_designated_dealer</code></li>
+<li><code>PaymentScripts::peer_to_peer_with_metadata</code></li>
+<li><code>AccountAdministrationScripts::rotate_dual_attestation_info</code></li>
+</ul>
+</div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="diem_sdk" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script></body></html>

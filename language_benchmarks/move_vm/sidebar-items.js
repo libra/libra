@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["bench","Entry point for the bench, provide a function name to invoke in Module Bench in bench.move."]]});

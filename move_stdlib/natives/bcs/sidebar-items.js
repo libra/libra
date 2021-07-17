@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["native_to_bytes","Rust implementation of Move’s `native public fun to_bytes<T>(&T): vector<u8>`"]]});

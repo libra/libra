@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Summary"><meta name="keywords" content="rust, rustlang, rust-lang, encode_preburn_script_function"><title>encode_preburn_script_function in diem_transaction_builder::stdlib - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc fn"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../diem_transaction_builder/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><div class="sidebar-elems"><p class="location"><a href="../index.html">diem_transaction_builder</a>::<wbr><a href="index.html">stdlib</a></p><div id="sidebar-vars" data-name="encode_preburn_script_function" data-ty="fn" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Function <a href="../index.html">diem_transaction_builder</a>::<wbr><a href="index.html">stdlib</a>::<wbr><a class="fn" href="">encode_preburn_script_function</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/diem_transaction_builder/stdlib.rs.html#4820-4830" title="goto source code">[src]</a></span></h1><pre class="rust fn">pub fn encode_preburn_script_function(<br>&nbsp;&nbsp;&nbsp;&nbsp;token: <a class="enum" href="../../move_core_types/language_storage/enum.TypeTag.html" title="enum move_core_types::language_storage::TypeTag">TypeTag</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;amount: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a><br>) -&gt; <a class="enum" href="../../diem_types/transaction/enum.TransactionPayload.html" title="enum diem_types::transaction::TransactionPayload">TransactionPayload</a></pre><div class="docblock"><h1 id="summary" class="section-header"><a href="#summary">Summary</a></h1>
+<p>Moves a specified number of coins in a given currency from the account’s
+balance to its preburn area after which the coins may be burned. This
+transaction may be sent by any account that holds a balance and preburn area
+in the specified currency.</p>
+<h1 id="technical-description" class="section-header"><a href="#technical-description">Technical Description</a></h1>
+<p>Moves the specified <code>amount</code> of coins in <code>Token</code> currency from the sending <code>account</code>’s
+<code>DiemAccount::Balance&lt;Token&gt;</code> to the <code>Diem::Preburn&lt;Token&gt;</code> published under the same
+<code>account</code>. <code>account</code> must have both of these resources published under it at the start of this
+transaction in order for it to execute successfully.</p>
+<h1 id="events" class="section-header"><a href="#events">Events</a></h1>
+<p>Successful execution of this script emits two events:</p>
+<ul>
+<li><code>DiemAccount::SentPaymentEvent </code> on <code>account</code>’s <code>DiemAccount::DiemAccount</code> <code>sent_events</code>
+handle with the <code>payee</code> and <code>payer</code> fields being <code>account</code>’s address; and</li>
+<li>A <code>Diem::PreburnEvent</code> with <code>Token</code>’s currency code on the
+<code>Diem::CurrencyInfo&lt;Token</code>’s <code>preburn_events</code> handle for <code>Token</code> and with
+<code>preburn_address</code> set to <code>account</code>’s address.</li>
+</ul>
+<h1 id="parameters" class="section-header"><a href="#parameters">Parameters</a></h1><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>Token</code></td><td>Type</td><td>The Move type for the <code>Token</code> currency being moved to the preburn area. <code>Token</code> must be an already-registered currency on-chain.</td></tr>
+<tr><td><code>account</code></td><td><code>signer</code></td><td>The signer of the sending account.</td></tr>
+<tr><td><code>amount</code></td><td><code>u64</code></td><td>The amount in <code>Token</code> to be moved to the preburn area.</td></tr>
+</tbody></table>
+<h1 id="common-abort-conditions" class="section-header"><a href="#common-abort-conditions">Common Abort Conditions</a></h1><table><thead><tr><th>Error Category</th><th>Error Reason</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>Errors::NOT_PUBLISHED</code></td><td><code>Diem::ECURRENCY_INFO</code></td><td>The <code>Token</code> is not a registered currency on-chain.</td></tr>
+<tr><td><code>Errors::INVALID_STATE</code></td><td><code>DiemAccount::EWITHDRAWAL_CAPABILITY_ALREADY_EXTRACTED</code></td><td>The withdrawal capability for <code>account</code> has already been extracted.</td></tr>
+<tr><td><code>Errors::LIMIT_EXCEEDED</code></td><td><code>DiemAccount::EINSUFFICIENT_BALANCE</code></td><td><code>amount</code> is greater than <code>payer</code>’s balance in <code>Token</code>.</td></tr>
+<tr><td><code>Errors::NOT_PUBLISHED</code></td><td><code>DiemAccount::EPAYER_DOESNT_HOLD_CURRENCY</code></td><td><code>account</code> doesn’t hold a balance in <code>Token</code>.</td></tr>
+<tr><td><code>Errors::NOT_PUBLISHED</code></td><td><code>Diem::EPREBURN</code></td><td><code>account</code> doesn’t have a <code>Diem::Preburn&lt;Token&gt;</code> resource published under it.</td></tr>
+<tr><td><code>Errors::INVALID_STATE</code></td><td><code>Diem::EPREBURN_OCCUPIED</code></td><td>The <code>value</code> field in the <code>Diem::Preburn&lt;Token&gt;</code> resource under the sender is non-zero.</td></tr>
+<tr><td><code>Errors::NOT_PUBLISHED</code></td><td><code>Roles::EROLE_ID</code></td><td>The <code>account</code> did not have a role assigned to it.</td></tr>
+<tr><td><code>Errors::REQUIRES_ROLE</code></td><td><code>Roles::EDESIGNATED_DEALER</code></td><td>The <code>account</code> did not have the role of DesignatedDealer.</td></tr>
+</tbody></table>
+<h1 id="related-scripts" class="section-header"><a href="#related-scripts">Related Scripts</a></h1>
+<ul>
+<li><code>TreasuryComplianceScripts::cancel_burn_with_amount</code></li>
+<li><code>TreasuryComplianceScripts::burn_with_amount</code></li>
+<li><code>TreasuryComplianceScripts::burn_txn_fees</code></li>
+</ul>
+</div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="diem_transaction_builder" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script></body></html>

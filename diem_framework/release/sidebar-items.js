@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["create_release","Create a Diem Framework release in the specified directory."],["sync_doc_files","Sync generated documentation from the current release to the previous locations of script and module docs."]],"struct":[["ReleaseOptions","Options to configure the generation of a release."]]});

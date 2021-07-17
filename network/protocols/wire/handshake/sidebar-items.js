@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["v1","This module defines the structs transported during the network handshake protocol v1. These should serialize as per the DiemNet Handshake v1 Specification."]]});

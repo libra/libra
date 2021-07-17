@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["output_map_to_file",""]],"struct":[["CoverageMap",""],["ExecCoverageMap",""],["ExecCoverageMapWithModules",""],["ModuleCoverageMap",""],["TraceEntry",""],["TraceMap",""]],"type":[["FunctionCoverage",""]]});

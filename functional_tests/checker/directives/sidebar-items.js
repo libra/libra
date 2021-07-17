@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Directive","Specification of an expected text pattern in the output."]]});

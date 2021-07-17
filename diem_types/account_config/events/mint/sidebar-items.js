@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["MintEvent","Struct that represents a MintEvent."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["XDX_IDENTIFIER",""],["XDX_NAME",""],["XUS_IDENTIFIER",""],["XUS_NAME",""]],"fn":[["coin_name","Return `Some(struct_name)` if `t` is a `StructTag` representing one of the current Diem coin types (XDX, XUS), `None` otherwise."],["xdx_type_tag",""],["xus_tag",""]],"static":[["XDX_MODULE",""]]});

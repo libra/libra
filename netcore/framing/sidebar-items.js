@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["read_u16frame","Read a u16 length prefixed frame from `Stream` into `buf`."],["write_u16frame","Write the contents of `buf` to `stream` prefixed with a u16 length. The length of `buf` must be less than or equal to u16::max_value()."]]});

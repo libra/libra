@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["AccountEntry","Account is represented either as an entry into accounts vector or as an address."]],"struct":[["AddressAndIndex","Account data is stored in a map and referenced by an index."],["ClientProxy","Proxy handling CLI commands/inputs."],["IndexAndSequence","Used to return the sequence and sender account index submitted for a transfer"]]});

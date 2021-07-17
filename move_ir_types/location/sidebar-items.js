@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["sp","Function used to have nearly tuple-like syntax for creating a Spanned"]],"struct":[["Loc",""],["Spanned",""]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["CodeWriter","A helper to emit code. Supports indentation and maintains source to target location information."],["CodeWriterLabel","A label which can be created at the code writers current output position to later insert code at this position."]]});

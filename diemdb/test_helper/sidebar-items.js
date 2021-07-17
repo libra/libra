@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["arb_blocks_to_commit",""],["arb_blocks_to_commit_impl","This returns a `proptest` `Strategy` that yields an arbitrary number of arbitrary batches of transactions to commit."],["arb_mock_genesis",""]]});

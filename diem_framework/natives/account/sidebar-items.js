@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["native_create_signer",""],["native_destroy_signer","NOTE: this function will be deprecated after the Diem v3 release, but must remain for replaying old transactions"]]});

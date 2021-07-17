@@ -1,0 +1,353 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `common/logger/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../diem_logger/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="comment">// Copyright (c) The Diem Core Contributors</span>
+<span class="comment">// SPDX-License-Identifier: Apache-2.0</span>
+
+<span class="doccomment">//! This crates provides an API for logging in diem.</span>
+<span class="doccomment">//! # Instrumenting with Logs</span>
+<span class="doccomment">//! ## Basic instrumenting with Logs</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A set of logging macros (`info!`, `error!`, `warn!`, `debug!`, and `trace!`) is provided for</span>
+<span class="doccomment">//! emitting logs at different levels. All of these macros support the addition of providing</span>
+<span class="doccomment">//! structured data along with a formatted text message.  For guidelines on which level to use,</span>
+<span class="doccomment">//! see the [coding guidelines](https://developers.diem.com/docs/core/coding-guidelines#logging).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The below examples do no type checking for structured log fields, and instead just serialize</span>
+<span class="doccomment">//! whatever is given.</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use diem_logger::info;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let world = &quot;world!&quot;;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Formatted message, similar to `printf!`</span>
+<span class="doccomment">//! info!(&quot;hello {}&quot;, world);</span>
+<span class="doccomment">//! // =&gt; &#39;{&quot;level&quot;:&quot;info&quot;, &quot;message&quot;: &quot;hello world!&quot;}&#39;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Structured data can be logged using the format &#39;key = value&#39;</span>
+<span class="doccomment">//! // where value implements Serialize.  This can be used for indexing and search later.</span>
+<span class="doccomment">//! let value1 = 5;</span>
+<span class="doccomment">//! info!(key1 = value1);</span>
+<span class="doccomment">//! // =&gt; &#39;{&quot;level&quot;:&quot;info&quot;, &quot;data&quot;: {&quot;key1&quot;: 5}}&#39;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // You can even set multiple key/value pairs and a format message together</span>
+<span class="doccomment">//! let value2 = false;</span>
+<span class="doccomment">//! info!(key1 = value1, key2 = value2, &quot;hello {}&quot;, world);</span>
+<span class="doccomment">//! // =&gt; &#39;{&quot;level&quot;:&quot;info&quot;, &quot;data&quot;: {&quot;key1&quot;: 5, &quot;key2&quot;: false}, &quot;message&quot;: &quot;hello world!&quot;}&#39;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Structured data can also use `Display` or `Debug` outputs instead.</span>
+<span class="doccomment">//! // Using the sigil `?` for debug and `%` for display.</span>
+<span class="doccomment">//! let value1 = 5;</span>
+<span class="doccomment">//! info!(debug_key = ?value1, display_key = %value1);</span>
+<span class="doccomment">//! // =&gt; &#39;{&quot;level&quot;:&quot;info&quot;, &quot;data&quot;: {&quot;display_key&quot;: 5, &quot;debug_key&quot;: 5}}&#39;</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Note</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Arguments used in a formatted message are **not** captured and included as structured data.</span>
+<span class="doccomment">//! Everything after the format string literal e.g. `&quot;hello {}&quot;` are only used in the format string.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Preferred instrumenting with Logs (Typed Schemas)</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The `Schema` trait can be used to implement typed logging schemas. This can either be</span>
+<span class="doccomment">//! implemented by hand or derived using the `Schema` derive proc-macro, implementing the `Schema`</span>
+<span class="doccomment">//! trait for the struct as well as providing setters for all fields.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use diem_logger::{info, Schema};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[derive(Schema)]</span>
+<span class="doccomment">//! struct LogSchema&lt;&#39;a&gt; {</span>
+<span class="doccomment">//!     // Log using this type&#39;s Serialize impl</span>
+<span class="doccomment">//!     a: usize,</span>
+<span class="doccomment">//!     // Log using this type&#39;s Debug impl</span>
+<span class="doccomment">//!     #[schema(debug)]</span>
+<span class="doccomment">//!     b: Option&lt;Vec&lt;bool&gt;&gt;,</span>
+<span class="doccomment">//!     // Log using this type&#39;s Display impl</span>
+<span class="doccomment">//!     #[schema(display)]</span>
+<span class="doccomment">//!     c: Option&lt;&amp;&#39;a str&gt;,</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let log = LogSchema { a: 5, b: None, c: None };</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Automatic setters are named based on the field names, and handle `Option`</span>
+<span class="doccomment">//! // None fields will be ignored</span>
+<span class="doccomment">//! info!(log.c(&quot;radiant&quot;));</span>
+<span class="doccomment">//! // =&gt; &#39;{&quot;level&quot;:&quot;info&quot;, &quot;data&quot;: { &quot;a&quot;: 5, &quot;c&quot;: &quot;radiant&quot;}}&#39;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[derive(Schema)]</span>
+<span class="doccomment">//! struct OtherSchema&lt;&#39;a&gt; {</span>
+<span class="doccomment">//!   val: Option&lt;&amp;&#39;a str&gt;</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let log = LogSchema { a: 5, b: None, c: None };</span>
+<span class="doccomment">//! let other = OtherSchema { val: None };</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Schemas can be combined</span>
+<span class="doccomment">//! info!(</span>
+<span class="doccomment">//!   other.val(&quot;awesome&quot;), // First schema</span>
+<span class="doccomment">//!   log // Second schema has fields added to it all</span>
+<span class="doccomment">//! );</span>
+<span class="doccomment">//! // =&gt; &#39;{&quot;level&quot;:&quot;info&quot;, &quot;data&quot;: { &quot;a&quot;: 5, &quot;val&quot;:&quot;awesome&quot;}}&#39;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let log = LogSchema { a: 5, b: None, c: None };</span>
+<span class="doccomment">//! let other = OtherSchema { val: None };</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Schemas can be combined with one off fields and messages like above</span>
+<span class="doccomment">//! info!(</span>
+<span class="doccomment">//!    other.val(&quot;awesome&quot;), // First schema</span>
+<span class="doccomment">//!    log, // Second schema has fields added to it all</span>
+<span class="doccomment">//!    new_field = &quot;new&quot;, // Basic structured fields</span>
+<span class="doccomment">//!    &quot;Message: {}&quot;, // Format messages</span>
+<span class="doccomment">//!    &quot;Some message&quot; // Format message fields (not added to indexed fields)</span>
+<span class="doccomment">//! );</span>
+<span class="doccomment">//! // =&gt; {&quot;level&quot;:&quot;info&quot;, &quot;message&quot;: &quot;Message: Some message&quot;,</span>
+<span class="doccomment">//! //     &quot;data&quot;: { &quot;a&quot;: 5, &quot;val&quot;:&quot;awesome&quot;, &quot;new_field&quot;: &quot;new&quot;}}&#39;</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Sampling logs</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Sometimes logging a large amount of data is expensive.  In order to log information only part</span>
+<span class="doccomment">//! of the time, we&#39;ve added a `sample!` macro that&#39;s configurable on how often we want to execute some code.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! `SampleRate` determines how often the sampled statement will occur.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use diem_logger::{info, sample, sample::{SampleRate, Sampling}};</span>
+<span class="doccomment">//! use std::time::Duration;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Sampled based on frequency of events, log only every 2 logs</span>
+<span class="doccomment">//! sample!(SampleRate::Frequency(2), info!(&quot;Long log&quot;));</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Sampled based on time passed, log at most once a minute</span>
+<span class="doccomment">//! sample!(SampleRate::Duration(Duration::from_secs(60)), info!(&quot;Long log&quot;));</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! # Configuration</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! In order for logs to be captured and emitted a Logger needs to be instantiated. This can be</span>
+<span class="doccomment">//! done by using the `Logger` type:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use diem_logger::{Level, Logger};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Logger::builder().level(Level::Info).build();</span>
+<span class="doccomment">//! ```</span>
+
+<span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>)]</span>
+
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span> {
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{
+        <span class="ident">debug</span>,
+        <span class="ident">diem_logger::FileWriter</span>,
+        <span class="ident">error</span>, <span class="ident">event</span>, <span class="ident">info</span>, <span class="ident">sample</span>,
+        <span class="ident">sample</span>::{<span class="ident">SampleRate</span>, <span class="ident">Sampling</span>},
+        <span class="ident">security::SecurityEvent</span>,
+        <span class="ident">trace</span>, <span class="ident">warn</span>,
+    };
+}
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">json_log</span>;
+
+<span class="kw">mod</span> <span class="ident">diem_logger</span>;
+<span class="kw">mod</span> <span class="ident">event</span>;
+<span class="kw">mod</span> <span class="ident">filter</span>;
+<span class="kw">mod</span> <span class="ident">kv</span>;
+<span class="kw">mod</span> <span class="ident">logger</span>;
+<span class="kw">mod</span> <span class="ident">macros</span>;
+<span class="kw">mod</span> <span class="ident">metadata</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sample</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tracing_adapter</span>;
+
+<span class="kw">mod</span> <span class="ident">security</span>;
+<span class="kw">mod</span> <span class="ident">struct_log</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::diem_logger</span>::{
+    <span class="ident">DiemLogger</span>, <span class="ident">DiemLogger</span> <span class="kw">as</span> <span class="ident">Logger</span>, <span class="ident">DiemLoggerBuilder</span>, <span class="ident">Writer</span>, <span class="ident">CHANNEL_SIZE</span>,
+};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">event::Event</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">filter</span>::{<span class="ident">Filter</span>, <span class="ident">LevelFilter</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">logger::flush</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metadata</span>::{<span class="ident">Level</span>, <span class="ident">Metadata</span>};
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diem_log_derive::Schema</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">kv</span>::{<span class="ident">Key</span>, <span class="ident">KeyValue</span>, <span class="ident">Schema</span>, <span class="ident">Value</span>, <span class="ident">Visitor</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">security::SecurityEvent</span>;
+
+<span class="kw">mod</span> <span class="ident">counters</span>;
+</pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="diem_logger" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

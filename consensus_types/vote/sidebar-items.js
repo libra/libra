@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Vote","Vote is the struct that is ultimately sent by the voter in response for receiving a proposal. Vote carries the `LedgerInfo` of a block that is going to be committed in case this vote is gathers QuorumCertificate (see the detailed explanation in the comments of `LedgerInfo`)."]]});

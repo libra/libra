@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Timeout","This structure contains all the information necessary to construct a signature on the equivalent of a timeout message"],["TimeoutHasher","Cryptographic hasher for an BCS-serializable #item"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["gen_validator_full_node_seed_peer_config","Retrieve the Fullnode seed peers from JSON-RPC"]]});

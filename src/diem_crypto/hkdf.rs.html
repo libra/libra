@@ -1,0 +1,407 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crypto/crypto/src/hkdf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hkdf.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../diem_crypto/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="comment">// Copyright (c) The Diem Core Contributors</span>
+<span class="comment">// SPDX-License-Identifier: Apache-2.0</span>
+
+<span class="doccomment">//! An implementation of HKDF, the HMAC-based Extract-and-Expand Key Derivation Function for the</span>
+<span class="doccomment">//! Diem project based on [RFC 5869](https://tools.ietf.org/html/rfc5869).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The key derivation function (KDF) is intended to support a wide range of applications and</span>
+<span class="doccomment">//! requirements, and is conservative in its use of cryptographic hash functions. In particular,</span>
+<span class="doccomment">//! this implementation is compatible with hash functions that output 256 bits or more, such as</span>
+<span class="doccomment">//! SHA256, SHA3-256 and SHA512.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! HKDF follows the &quot;extract-then-expand&quot; paradigm, where the KDF logically consists of two</span>
+<span class="doccomment">//! modules: the first stage takes the input keying material (the seed) and &quot;extracts&quot; from it a</span>
+<span class="doccomment">//! fixed-length pseudorandom key, and then the second stage &quot;expands&quot; this key into several</span>
+<span class="doccomment">//! additional pseudorandom keys (the output of the KDF). For convenience, a function that runs both</span>
+<span class="doccomment">//! steps in a single call is provided. Note that along with an initial high-entropy seed, a user</span>
+<span class="doccomment">//! can optionally provide salt and app-info byte-arrays for extra security guarantees and domain</span>
+<span class="doccomment">//! separation.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Applications</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! HKDF is intended for use in a wide variety of KDF applications (see [Key derivation function](https://en.wikipedia.org/wiki/Key_derivation_function)), including:</span>
+<span class="doccomment">//! a) derivation of keys from an origin high-entropy master seed. This is the recommended approach</span>
+<span class="doccomment">//! for generating keys in Diem, especially when a True Random Generator is not available.</span>
+<span class="doccomment">//! b) derivation of session keys from a shared Diffie-Hellman value in a key-agreement protocol.</span>
+<span class="doccomment">//! c) combining entropy from multiple sources of randomness, such as entropy collected</span>
+<span class="doccomment">//! from system events, user&#39;s keystrokes, /dev/urandom etc. The combined seed can then be used to</span>
+<span class="doccomment">//! generate cryptographic keys for account, network and transaction signing keys among the others.</span>
+<span class="doccomment">//! d) hierarchical private key derivation, similarly to Bitcoin&#39;s BIP32 protocol for easier key</span>
+<span class="doccomment">//! management.</span>
+<span class="doccomment">//! e) hybrid key generation that combines a master seed with a PRNG output for extra security</span>
+<span class="doccomment">//! guarantees against a master seed leak or low PRNG entropy.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Recommendations</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! **Salt**</span>
+<span class="doccomment">//! HKDF can operate with and without random &#39;salt&#39;. The use of salt adds to the strength of HKDF,</span>
+<span class="doccomment">//! ensuring independence between different uses of the hash function, supporting</span>
+<span class="doccomment">//! &quot;source-independent&quot; extraction, and strengthening the HKDF use. The salt value should be a</span>
+<span class="doccomment">//! random string of the same length as the hash output. A shorter or less random salt value can</span>
+<span class="doccomment">//! still make a contribution to the security of the output key material. Salt values should be</span>
+<span class="doccomment">//! independent of the input keying material. In particular, an application needs to make sure that</span>
+<span class="doccomment">//! salt values are not chosen or manipulated by an attacker.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! *Application info*</span>
+<span class="doccomment">//! Key expansion accepts an optional &#39;info&#39; value to which the application assigns some meaning.</span>
+<span class="doccomment">//! Its objective is to bind the derived key material to application- and context-specific</span>
+<span class="doccomment">//! information.  For example, &#39;info&#39; may contain a protocol number, algorithm identifier,</span>
+<span class="doccomment">//! child key number (similarly to [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)), etc. The only technical requirement for &#39;info&#39; is that</span>
+<span class="doccomment">//! it be independent of the seed.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! **Which function to use: extract, expand or both?**</span>
+<span class="doccomment">//! Unless absolutely sure of what they are doing, applications should use both steps — if only for</span>
+<span class="doccomment">//! the sake of compatibility with the general case.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Example</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Run HKDF extract-then-expand so as to return 64 bytes, using &#39;salt&#39;, &#39;seed&#39; and &#39;info&#39; as</span>
+<span class="doccomment">//! inputs.</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use diem_crypto::hkdf::Hkdf;</span>
+<span class="doccomment">//! use sha2::Sha256;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // some bytes required for this example.</span>
+<span class="doccomment">//! let raw_bytes = [2u8; 10];</span>
+<span class="doccomment">//! // define salt</span>
+<span class="doccomment">//! let salt = Some(&amp;raw_bytes[0..4]);</span>
+<span class="doccomment">//! // define seed - in production this is recommended to be a 32 bytes or longer random seed.</span>
+<span class="doccomment">//! let seed = [3u8; 32];</span>
+<span class="doccomment">//! // define application info</span>
+<span class="doccomment">//! let info = Some(&amp;raw_bytes[4..10]);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // HKDF extract-then-expand 64-bytes output</span>
+<span class="doccomment">//! let derived_bytes = Hkdf::&lt;Sha256&gt;::extract_then_expand(salt, &amp;seed, info, 64);</span>
+<span class="doccomment">//! assert_eq!(derived_bytes.unwrap().len(), 64)</span>
+<span class="doccomment">//! ```</span>
+
+<span class="kw">use</span> <span class="ident">digest</span>::{
+    <span class="ident">generic_array</span>::{<span class="self">self</span>, <span class="ident">ArrayLength</span>},
+    <span class="ident">BlockInput</span>, <span class="ident">FixedOutput</span>, <span class="ident">Reset</span>, <span class="ident">Update</span>,
+};
+
+<span class="kw">use</span> <span class="ident">generic_array::typenum</span>::{<span class="ident">IsGreaterOrEqual</span>, <span class="ident">True</span>, <span class="ident">U32</span>};
+
+<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+
+<span class="doccomment">/// Hash function is not supported if its output is less than 32 bits.</span>
+<span class="kw">type</span> <span class="ident">DMinimumSize</span> <span class="op">=</span> <span class="ident">U32</span>;
+
+<span class="doccomment">/// Seed (ikm = initial key material) is not accepted if its size is less than 16 bytes. This is a</span>
+<span class="doccomment">/// precautionary measure to prevent HKDF misuse. 128 bits is the minimum accepted seed entropy</span>
+<span class="doccomment">/// length in the majority of today&#39;s applications to avoid brute forcing.</span>
+<span class="doccomment">/// Note that for Ed25519 keys, random seeds of at least 32 bytes are recommended.</span>
+<span class="kw">const</span> <span class="ident">MINIMUM_SEED_LENGTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">16</span>;
+
+<span class="doccomment">/// Structure representing the HKDF, capable of HKDF-Extract and HKDF-Expand operations, as defined</span>
+<span class="doccomment">/// in RFC 5869.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Hkdf</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">D</span>: <span class="ident">Update</span> <span class="op">+</span> <span class="ident">BlockInput</span> <span class="op">+</span> <span class="ident">FixedOutput</span> <span class="op">+</span> <span class="ident">Reset</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    <span class="ident">D::BlockSize</span>: <span class="ident">ArrayLength</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="ident">D::OutputSize</span>: <span class="ident">ArrayLength</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="ident">D::OutputSize</span>: <span class="ident">IsGreaterOrEqual</span><span class="op">&lt;</span><span class="ident">DMinimumSize</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">True</span><span class="op">&gt;</span>,
+{
+    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> <span class="ident">Hkdf</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">D</span>: <span class="ident">Update</span> <span class="op">+</span> <span class="ident">BlockInput</span> <span class="op">+</span> <span class="ident">FixedOutput</span> <span class="op">+</span> <span class="ident">Reset</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    <span class="ident">D::BlockSize</span>: <span class="ident">ArrayLength</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    <span class="ident">D::OutputSize</span>: <span class="ident">ArrayLength</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="ident">D::OutputSize</span>: <span class="ident">IsGreaterOrEqual</span><span class="op">&lt;</span><span class="ident">DMinimumSize</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">True</span><span class="op">&gt;</span>,
+{
+    <span class="doccomment">/// The RFC5869 HKDF-Extract operation.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract</span>(<span class="ident">salt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">ikm</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">HkdfError</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">ikm</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">MINIMUM_SEED_LENGTH</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">HkdfError::InvalidSeedLengthError</span>);
+        }
+        <span class="prelude-val">Ok</span>(<span class="ident">Hkdf</span>::<span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span><span class="ident">::extract_no_ikm_check</span>(<span class="ident">salt</span>, <span class="ident">ikm</span>))
+    }
+
+    <span class="kw">fn</span> <span class="ident">extract_no_ikm_check</span>(<span class="ident">salt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">ikm</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> (<span class="ident">arr</span>, <span class="ident">_hkdf</span>) <span class="op">=</span> <span class="ident">hkdf::Hkdf</span>::<span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span><span class="ident">::extract</span>(<span class="ident">salt</span>, <span class="ident">ikm</span>);
+        <span class="ident">arr</span>.<span class="ident">to_vec</span>()
+    }
+
+    <span class="doccomment">/// The RFC5869 HKDF-Expand operation.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expand</span>(<span class="ident">prk</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">length</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">HkdfError</span><span class="op">&gt;</span> {
+        <span class="comment">// According to RFC5869, MAX_OUTPUT_LENGTH &lt;= 255 * HashLen — which is</span>
+        <span class="comment">// checked below.</span>
+        <span class="comment">// We specifically exclude a zero size length as well.</span>
+        <span class="kw">if</span> <span class="ident">length</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">HkdfError::InvalidOutputLengthError</span>);
+        }
+
+        <span class="kw">let</span> <span class="ident">hkdf</span> <span class="op">=</span>
+            <span class="ident">hkdf::Hkdf</span>::<span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span><span class="ident">::from_prk</span>(<span class="ident">prk</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">HkdfError::WrongPseudorandomKeyError</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">okm</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">length</span>];
+        <span class="ident">hkdf</span>.<span class="ident">expand</span>(<span class="ident">info</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="kw-2">&amp;</span>[]), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">okm</span>)
+            <span class="comment">// length &gt; D::OutputSize::to_usize() * 255</span>
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">HkdfError::InvalidOutputLengthError</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">okm</span>)
+    }
+
+    <span class="doccomment">/// HKDF Extract then Expand operation as a single step.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_then_expand</span>(
+        <span class="ident">salt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+        <span class="ident">ikm</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
+        <span class="ident">info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+        <span class="ident">length</span>: <span class="ident">usize</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">HkdfError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">prk</span> <span class="op">=</span> <span class="ident">Hkdf</span>::<span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span><span class="ident">::extract</span>(<span class="ident">salt</span>, <span class="ident">ikm</span>)<span class="question-mark">?</span>;
+        <span class="ident">Hkdf</span>::<span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span><span class="ident">::expand</span>(<span class="kw-2">&amp;</span><span class="ident">prk</span>, <span class="ident">info</span>, <span class="ident">length</span>)
+    }
+
+    <span class="doccomment">/// CAUTION: This is not recommended because it does not take an ikm (seed) as an input and</span>
+    <span class="doccomment">/// thus, it is not fully compliant with the HKDF RFC (which always expects a non-zero ikm).</span>
+    <span class="doccomment">/// Please use `extract_then_expand` instead, unless you know what you are doing.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This api is currently required by the Noise protocol [HKDF specs](https://noiseprotocol.org/noise.html#hash-functions).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// HKDF Extract then Expand operation as a single step, but without an ikm input.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_then_expand_no_ikm</span>(
+        <span class="ident">salt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+        <span class="ident">info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+        <span class="ident">length</span>: <span class="ident">usize</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">HkdfError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">prk</span> <span class="op">=</span> <span class="ident">Hkdf</span>::<span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span><span class="ident">::extract_no_ikm_check</span>(<span class="ident">salt</span>, <span class="kw-2">&amp;</span>[]);
+        <span class="ident">Hkdf</span>::<span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span><span class="ident">::expand</span>(<span class="kw-2">&amp;</span><span class="ident">prk</span>, <span class="ident">info</span>, <span class="ident">length</span>)
+    }
+}
+
+<span class="doccomment">/// An error type for HKDF key derivation issues.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This enum reflects there are various causes of HKDF failures, including:</span>
+<span class="doccomment">/// a) requested HKDF output size exceeds the maximum allowed or is zero.</span>
+<span class="doccomment">/// b) hash functions outputting less than 32 bits are not supported (i.e., SHA1 is not supported).</span>
+<span class="doccomment">/// c) small PRK value in HKDF-Expand according to RFC 5869.</span>
+<span class="doccomment">/// d) any other underlying HMAC error.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Error</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HkdfError</span> {
+    <span class="doccomment">/// HKDF expand output exceeds the maximum allowed or is zero.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;HKDF expand error - requested output size exceeds the maximum allowed or is zero&quot;</span>)]</span>
+    <span class="ident">InvalidOutputLengthError</span>,
+    <span class="doccomment">/// PRK on HKDF-Expand should not be less than the underlying hash output bits.</span>
+    <span class="attribute">#[<span class="ident">error</span>(
+        <span class="string">&quot;HKDF expand error - the pseudorandom key input (&#39;prk&#39; in RFC 5869) \
+         is less than the underlying hash output bits&quot;</span>
+    )]</span>
+    <span class="ident">WrongPseudorandomKeyError</span>,
+    <span class="doccomment">/// HMAC key related error; unlikely to happen because every key size is accepted in HMAC.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;HMAC key error&quot;</span>)]</span>
+    <span class="ident">MACKeyError</span>,
+    <span class="doccomment">/// HKDF extract input seed should not be less than the minimum accepted.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;HKDF extract error - input seed is too small&quot;</span>)]</span>
+    <span class="ident">InvalidSeedLengthError</span>,
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="diem_crypto" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

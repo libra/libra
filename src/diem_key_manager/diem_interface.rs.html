@@ -1,0 +1,401 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `secure/key-manager/src/diem_interface.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>diem_interface.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../diem_key_manager/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="comment">// Copyright (c) The Diem Core Contributors</span>
+<span class="comment">// SPDX-License-Identifier: Apache-2.0</span>
+
+<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::Error</span>;
+<span class="kw">use</span> <span class="ident">diem_client::BlockingClient</span>;
+<span class="kw">use</span> <span class="ident">diem_types</span>::{
+    <span class="ident">account_address::AccountAddress</span>, <span class="ident">account_config</span>, <span class="ident">account_state::AccountState</span>,
+    <span class="ident">account_state_blob::AccountStateBlob</span>, <span class="ident">on_chain_config::config_address</span>,
+    <span class="ident">transaction::Transaction</span>, <span class="ident">validator_config::ValidatorConfig</span>, <span class="ident">validator_info::ValidatorInfo</span>,
+};
+
+<span class="doccomment">/// This defines a generic trait used to interact with the Diem blockchain. In production, this</span>
+<span class="doccomment">/// will be talking to a JSON-RPC service. For tests, this may be an executor and storage directly.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DiemInterface</span> {
+    <span class="doccomment">/// Retrieves the current time from the blockchain, this is returned as microseconds.</span>
+    <span class="kw">fn</span> <span class="ident">diem_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Retrieves the last reconfiguration time from the blockchain, this is returned as</span>
+    <span class="doccomment">/// microseconds.</span>
+    <span class="kw">fn</span> <span class="ident">last_reconfiguration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Retrieve current sequence number for the provided account.</span>
+    <span class="kw">fn</span> <span class="ident">retrieve_sequence_number</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="ident">AccountAddress</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Submits a transaction to the block chain and returns successfully if the transaction was</span>
+    <span class="doccomment">/// successfully submitted. It does not necessarily mean the transaction successfully executed.</span>
+    <span class="kw">fn</span> <span class="ident">submit_transaction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">transaction</span>: <span class="ident">Transaction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Retrieves the ValidatorConfig at the specified AccountAddress if one exists.</span>
+    <span class="kw">fn</span> <span class="ident">retrieve_validator_config</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="ident">AccountAddress</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValidatorConfig</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Retrieves the ValidatorInfo for the specified account from the current ValidatorSet if one</span>
+    <span class="doccomment">/// exists.</span>
+    <span class="kw">fn</span> <span class="ident">retrieve_validator_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="ident">AccountAddress</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValidatorInfo</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Fetches the AccountState associated with a specific account. This is currently only</span>
+    <span class="doccomment">/// used by test code, but it&#39;s not completely inconceivable that non-test code will want</span>
+    <span class="doccomment">/// access to this in the future.</span>
+    <span class="kw">fn</span> <span class="ident">retrieve_account_state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="ident">AccountAddress</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AccountState</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+}
+
+<span class="doccomment">/// This implements the DiemInterface by talking directly to the JSON RPC API.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// DISCLAIMER: this implementation assumes that the json rpc client explicitly trusts the json rpc</span>
+<span class="doccomment">/// server that is responding to its requests (e.g., the client assumes the server has already been</span>
+<span class="doccomment">/// authenticated, provides encrypted and freshness protected messages, etc.). As such, the security</span>
+<span class="doccomment">/// of the server will need to be verified in production before this interface should be used.</span>
+<span class="doccomment">/// Pointing the client to an untrusted (and potentially malicious) json rpc server, can result in</span>
+<span class="doccomment">/// denial-of-service attacks (e.g., against the key manager).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// TODO(joshlind): add proof checks to the JsonRpcClient to verify the state returned by the json</span>
+<span class="doccomment">/// rpc server we&#39;re talking to. Although we won&#39;t be able to guarantee freshness, it&#39;s better than</span>
+<span class="doccomment">/// simply trusting the response for correctness..</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonRpcDiemInterface</span> {
+    <span class="ident">client</span>: <span class="ident">BlockingClient</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">JsonRpcDiemInterface</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">json_rpc_endpoint</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">client</span>: <span class="ident">BlockingClient::new</span>(<span class="ident">json_rpc_endpoint</span>),
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">DiemInterface</span> <span class="kw">for</span> <span class="ident">JsonRpcDiemInterface</span> {
+    <span class="kw">fn</span> <span class="ident">diem_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">account_config::diem_root_address</span>();
+        <span class="kw">let</span> <span class="ident">diem_timestamp_resource</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">retrieve_account_state</span>(<span class="ident">account</span>)<span class="question-mark">?</span>
+            .<span class="ident">get_diem_timestamp_resource</span>();
+
+        <span class="kw">match</span> <span class="ident">diem_timestamp_resource</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">timestamp_resource</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">timestamp_resource</span>
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">timestamp_resource</span><span class="op">|</span> <span class="ident">timestamp_resource</span>.<span class="ident">diem_timestamp</span>.<span class="ident">microseconds</span>)
+                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+                    <span class="ident">Error::DataDoesNotExist</span>(<span class="macro">format!</span>(
+                        <span class="string">&quot;DiemTimestampResource not found for account: {:?}&quot;</span>,
+                        <span class="ident">account</span>
+                    ))
+                }),
+            <span class="ident">e</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownError</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">e</span>))),
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">last_reconfiguration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">config_address</span>();
+        <span class="kw">let</span> <span class="ident">configuration_resource</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">retrieve_account_state</span>(<span class="ident">account</span>)<span class="question-mark">?</span>
+            .<span class="ident">get_configuration_resource</span>();
+
+        <span class="kw">match</span> <span class="ident">configuration_resource</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">config_resource</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">config_resource</span>
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">config_resource</span><span class="op">|</span> <span class="ident">config_resource</span>.<span class="ident">last_reconfiguration_time</span>())
+                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+                    <span class="ident">Error::DataDoesNotExist</span>(<span class="macro">format!</span>(
+                        <span class="string">&quot;ConfigurationResource not found for account: {:?}&quot;</span>,
+                        <span class="ident">account</span>
+                    ))
+                }),
+            <span class="ident">e</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownError</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">e</span>))),
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">retrieve_sequence_number</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="ident">AccountAddress</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">account_resource</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">retrieve_account_state</span>(<span class="ident">account</span>)<span class="question-mark">?</span>.<span class="ident">get_account_resource</span>();
+
+        <span class="kw">match</span> <span class="ident">account_resource</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">account_resource</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">account_resource</span>
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">account_resource</span><span class="op">|</span> <span class="ident">account_resource</span>.<span class="ident">sequence_number</span>())
+                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+                    <span class="ident">Error::DataDoesNotExist</span>(<span class="macro">format!</span>(
+                        <span class="string">&quot;AccountResource not found for account: {:?}&quot;</span>,
+                        <span class="ident">account</span>
+                    ))
+                }),
+            <span class="ident">e</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownError</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">e</span>))),
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">submit_transaction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">transaction</span>: <span class="ident">Transaction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Transaction::UserTransaction</span>(<span class="ident">signed_txn</span>) <span class="op">=</span> <span class="ident">transaction</span> {
+            <span class="self">self</span>.<span class="ident">client</span>
+                .<span class="ident">submit</span>(<span class="kw-2">&amp;</span><span class="ident">signed_txn</span>)
+                .<span class="ident">map</span>(<span class="ident">diem_client::Response::into_inner</span>)
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+                    <span class="ident">Error::UnknownError</span>(<span class="macro">format!</span>(
+                        <span class="string">&quot;Failed to submit signed transaction. Error: {:?}&quot;</span>,
+                        <span class="ident">e</span>,
+                    ))
+                })
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownError</span>(<span class="macro">format!</span>(
+                <span class="string">&quot;Unable to submit a transaction type that is not a SignedTransaction: {:?}&quot;</span>,
+                <span class="ident">transaction</span>
+            )))
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">retrieve_validator_config</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="ident">AccountAddress</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValidatorConfig</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">validator_config_resource</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">retrieve_account_state</span>(<span class="ident">account</span>)<span class="question-mark">?</span>
+            .<span class="ident">get_validator_config_resource</span>();
+
+        <span class="kw">match</span> <span class="ident">validator_config_resource</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">config_resource</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">config_resource</span>
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">config_resource</span><span class="op">|</span> <span class="ident">config_resource</span>.<span class="ident">validator_config</span>)
+                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+                    <span class="ident">Error::DataDoesNotExist</span>(<span class="macro">format!</span>(
+                        <span class="string">&quot;ValidatorConfigResource not found for account: {:?}&quot;</span>,
+                        <span class="ident">account</span>
+                    ))
+                }),
+            <span class="ident">e</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownError</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">e</span>))),
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">retrieve_validator_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="ident">AccountAddress</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValidatorInfo</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">validator_set_account</span> <span class="op">=</span> <span class="ident">account_config::validator_set_address</span>();
+        <span class="kw">let</span> <span class="ident">validator_set</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">retrieve_account_state</span>(<span class="ident">validator_set_account</span>)<span class="question-mark">?</span>
+            .<span class="ident">get_validator_set</span>();
+
+        <span class="kw">match</span> <span class="ident">validator_set</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">validator_set</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">validator_set</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">validator_set</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">validator_set</span>
+                    .<span class="ident">payload</span>()
+                    .<span class="ident">iter</span>()
+                    .<span class="ident">find</span>(<span class="op">|</span><span class="ident">validator_info</span><span class="op">|</span> <span class="ident">validator_info</span>.<span class="ident">account_address</span>() <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">account</span>)
+                    .<span class="ident">cloned</span>()
+                    .<span class="ident">ok_or</span>(<span class="ident">Error::ValidatorInfoNotFound</span>(<span class="ident">account</span>)),
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::DataDoesNotExist</span>(<span class="macro">format!</span>(
+                    <span class="string">&quot;ValidatorSet not found for account: {:?}&quot;</span>,
+                    <span class="ident">account</span>
+                ))),
+            },
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownError</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">e</span>))),
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">retrieve_account_state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="ident">AccountAddress</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AccountState</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">account_state</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">client</span>
+            .<span class="ident">get_account_state_with_proof</span>(<span class="ident">account</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>
+            .<span class="ident">into_inner</span>();
+
+        <span class="kw">let</span> <span class="ident">blob</span> <span class="op">=</span> <span class="ident">account_state</span>
+            .<span class="ident">blob</span>
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::UnknownError</span>(<span class="string">&quot;No validator set&quot;</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">account_state_blob</span> <span class="op">=</span> <span class="ident">AccountStateBlob::from</span>(<span class="ident">bcs::from_bytes</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">blob</span>)<span class="question-mark">?</span>);
+        <span class="kw">let</span> <span class="ident">account_state</span> <span class="op">=</span> <span class="ident">AccountState::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">account_state_blob</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">account_state</span>)
+    }
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="diem_key_manager" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

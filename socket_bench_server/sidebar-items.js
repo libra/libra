@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["build_memsocket_noise_transport","Build a MemorySocket + Noise transport"],["build_tcp_noise_transport","Build a Tcp + Noise transport"],["server_stream_handler","Server side handler for send throughput benchmark when the messages are sent over a simple stream (tcp or in-memory)."],["start_stream_server",""]],"struct":[["Args",""]]});

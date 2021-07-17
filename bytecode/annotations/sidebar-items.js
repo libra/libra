@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Annotations","A container for an extensible, dynamically typed set of annotations."]]});

@@ -1,0 +1,223 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `language/testing-infra/test-generation/src/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../test_generation/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="comment">// Copyright (c) The Diem Core Contributors</span>
+<span class="comment">// SPDX-License-Identifier: Apache-2.0</span>
+
+<span class="kw">use</span> <span class="ident">module_generation::ModuleGeneratorOptions</span>;
+<span class="kw">use</span> <span class="ident">structopt::StructOpt</span>;
+
+<span class="doccomment">/// This defines how tolerant the generator will be about deviating from</span>
+<span class="doccomment">/// the starting stack height.</span>
+<span class="doccomment">/// Default is `0.9`</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MUTATION_TOLERANCE</span>: <span class="ident">f32</span> <span class="op">=</span> <span class="number">0.9</span>;
+
+<span class="doccomment">/// This defines the maximum number of blocks that will be generated for</span>
+<span class="doccomment">/// a function body&#39;s CFG. During generation, a random number of blocks from</span>
+<span class="doccomment">/// 1 to this constant will be created.</span>
+<span class="doccomment">/// Default is `10`</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_CFG_BLOCKS</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">10</span>;
+
+<span class="doccomment">/// Whether preconditions will be negated to generate invalid programs</span>
+<span class="doccomment">/// in order to test error paths.</span>
+<span class="doccomment">/// Default is `false`</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NEGATE_PRECONDITIONS</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
+
+<span class="doccomment">/// The probability that preconditions will be negated for a pariticular</span>
+<span class="doccomment">/// bytecode instruction.</span>
+<span class="doccomment">/// Default is `0.1`</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NEGATION_PROBABILITY</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.1</span>;
+
+<span class="doccomment">/// Whether generation of instructions that require borrow checking will</span>
+<span class="doccomment">/// be allowed. (Note that if `NEGATE_PRECONDITIONS` is true then these</span>
+<span class="doccomment">/// instructions can still come up).</span>
+<span class="doccomment">/// Default is `false`</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ALLOW_MEMORY_UNSAFE</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
+
+<span class="doccomment">/// Whether the generated programs should be run on the VM</span>
+<span class="doccomment">/// Default is `true`</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RUN_ON_VM</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">true</span>;
+
+<span class="doccomment">/// Whether generated modules will be executed even if they fail the</span>
+<span class="doccomment">/// the bytecode verifier.</span>
+<span class="doccomment">/// Default is `false`</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EXECUTE_UNVERIFIED_MODULE</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
+
+<span class="doccomment">/// Whether gas will be metered when running generated programs. The default</span>
+<span class="doccomment">/// is `true` to bound the execution time.</span>
+<span class="doccomment">/// Default is `true`</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GAS_METERING</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">true</span>;
+
+<span class="doccomment">/// Call stack height limit. This is defined in the VM, and is replicated here. This should track</span>
+<span class="doccomment">/// that constant.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CALL_STACK_LIMIT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span>;
+
+<span class="doccomment">/// The value stack size limit. This is defined in the VM and is replicated here. This should</span>
+<span class="doccomment">/// remain in sync with the constant for this defined in the VM.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VALUE_STACK_LIMIT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span>;
+
+<span class="doccomment">/// Certain randomly generated types can lead to extremely long instruction sequences. This can</span>
+<span class="doccomment">/// lead to test generation taking quite a while in order to handle all of these. This parameter</span>
+<span class="doccomment">/// bounds the maximum allowable instruction length for a type. If the instruction sequence is</span>
+<span class="doccomment">/// larger then this, a new module and bytecode generation will be attempted.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">INHABITATION_INSTRUCTION_LIMIT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1000</span>;
+
+<span class="doccomment">/// The module generation settings that are used for generation module scaffolding for bytecode</span>
+<span class="doccomment">/// generation.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">module_generation_settings</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ModuleGeneratorOptions</span> {
+    <span class="ident">ModuleGeneratorOptions</span> {
+        <span class="ident">min_table_size</span>: <span class="number">10</span>,
+        <span class="comment">// The more structs, and the larger the number of type parameters the more complex the</span>
+        <span class="comment">// functions and bytecode sequences generated. Be careful about setting these parameters too</span>
+        <span class="comment">// large -- this can lead to expontial increases in the size and number of struct</span>
+        <span class="comment">// instantiations that can be generated.</span>
+        <span class="ident">max_ty_params</span>: <span class="number">4</span>,
+        <span class="ident">max_functions</span>: <span class="number">6</span>,
+        <span class="ident">max_fields</span>: <span class="number">10</span>,
+        <span class="ident">max_structs</span>: <span class="number">6</span>,
+        <span class="ident">args_for_ty_params</span>: <span class="bool-val">true</span>,
+        <span class="ident">references_allowed</span>: <span class="bool-val">false</span>,
+        <span class="comment">// Test generation cannot currently cope with resources</span>
+        <span class="ident">add_resources</span>: <span class="bool-val">false</span>,
+        ..<span class="ident">Default::default</span>()
+    }
+}
+
+<span class="doccomment">/// Command line arguments for the tool</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">StructOpt</span>)]</span>
+<span class="attribute">#[<span class="ident">structopt</span>(
+    <span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;Bytecode Test Generator&quot;</span>,
+    <span class="ident">author</span> <span class="op">=</span> <span class="string">&quot;Diem&quot;</span>,
+    <span class="ident">about</span> <span class="op">=</span> <span class="string">&quot;Tool for generating tests for the bytecode verifier and Move VM runtime.&quot;</span>
+)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Args</span> {
+    <span class="doccomment">/// The optional number of programs that will be generated. If not specified, program</span>
+    <span class="doccomment">/// generation will run infinitely.</span>
+    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;i&quot;</span>, <span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;iterations&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">num_iterations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Path where a serialized module should be saved.</span>
+    <span class="doccomment">/// If `None`, then the module will just be printed out.</span>
+    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;o&quot;</span>, <span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;output&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">output_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The optional seed used for test generation.</span>
+    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;s&quot;</span>, <span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;seed&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">seed</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The optional number of threads to use for test generation.</span>
+    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">short</span> <span class="op">=</span> <span class="string">&quot;t&quot;</span>, <span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;threads&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">num_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="test_generation" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

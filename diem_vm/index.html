@@ -1,0 +1,107 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="The VM runtime"><meta name="keywords" content="rust, rustlang, rust-lang, diem_vm"><title>diem_vm - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../diem_vm/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate diem_vm</p><div class="block version"><p>Version 0.1.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all diem_vm's items</p></a><div class="block items"><ul><li><a href="#reexports">Re-exports</a></li><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="diem_vm" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">diem_vm</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/diem_vm/lib.rs.html#4-171" title="goto source code">[src]</a></span></h1><div class="docblock"><h1 id="the-vm-runtime" class="section-header"><a href="#the-vm-runtime">The VM runtime</a></h1><h2 id="transaction-flow" class="section-header"><a href="#transaction-flow">Transaction flow</a></h2>
+<p>This is the path taken to process a single transaction.</p>
+<pre><code class="language-text">                  SignedTransaction
+                           +
+                           |
++--------------------------|-------------------+
+| Validate  +--------------+--------------+    |
+|           |                             |    |
+|           |       check signature       |    |
+|           |                             |    |
+|           +--------------+--------------+    |
+|                          |                   |
+|                          |                   |
+|                          v                   |
+|           +--------------+--------------+    |
+|           |                             |    |
+|           |      check size and gas     |    |
+|           |                             |    +---------------------------------+
+|           +--------------+--------------+    |         validation error        |
+|                          |                   |                                 |
+|                          |                   |                                 |
+|                          v                   |                                 |
+|           +--------------+--------------+    |                                 |
+|           |                             |    |                                 |
+|           |         run prologue        |    |                                 |
+|           |                             |    |                                 |
+|           +--------------+--------------+    |                                 |
+|                          |                   |                                 |
++--------------------------|-------------------+                                 |
+                           |                                                     |
++--------------------------|-------------------+                                 |
+|                          v                   |                                 |
+|  Verify   +--------------+--------------+    |                                 |
+|           |                             |    |                                 |
+|           |     deserialize script,     |    |                                 |
+|           |     verify arguments        |    |                                 |
+|           |                             |    |                                 |
+|           +--------------+--------------+    |                                 |
+|                          |                   |                                 |
+|                          |                   |                                 v
+|                          v                   |                    +----------------+------+
+|           +--------------+--------------+    |                    |                       |
+|           |                             |    +-------------------&gt;+ discard, no write set |
+|           |     deserialize modules     |    | verification error |                       |
+|           |                             |    |                    +----------------+------+
+|           +--------------+--------------+    |                                 ^
+|                          |                   |                                 |
+|                          |                   |                                 |
+|                          v                   |                                 |
+|           +--------------+--------------+    |                                 |
+|           |                             |    |                                 |
+|           | verify scripts and modules  |    |                                 |
+|           |                             |    |                                 |
+|           +--------------+--------------+    |                                 |
+|                          |                   |                                 |
++--------------------------|-------------------+                                 |
+                           |                                                     |
++--------------------------|-------------------+                                 |
+|                          v                   |                                 |
+| Execute   +--------------+--------------+    |                                 |
+|           |                             |    |                                 |
+|           |        execute main         |    |                                 |
+|           |                             |    |                                 |
+|           +--------------+--------------+    |                                 |
+|                          |                   |                                 |
+|      success or failure  |                   |                                 |
+|                          v                   |                                 |
+|           +--------------+--------------+    |                                 |
+|           |                             |    +---------------------------------+
+|           |        run epilogue         |    | invariant violation (internal panic)
+|           |                             |    |
+|           +--------------+--------------+    |
+|                          |                   |
+|                          |                   |
+|                          v                   |
+|           +--------------+--------------+    |                    +-----------------------+
+|           |                             |    | execution failure  |                       |
+|           |       make write set        +------------------------&gt;+ keep, only charge gas |
+|           |                             |    |                    |                       |
+|           +--------------+--------------+    |                    +-----------------------+
+|                          |                   |
++--------------------------|-------------------+
+                           |
+                           v
+            +--------------+--------------+
+            |                             |
+            |  keep, transaction executed |
+            |        + gas charged        |
+            |                             |
+            +-----------------------------+
+</code></pre>
+</div><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
+<table><tr class="import-item"><td><code>pub use crate::diem_transaction_executor::<a class="struct" href="diem_transaction_executor/struct.DiemVM.html" title="struct diem_vm::diem_transaction_executor::DiemVM">DiemVM</a>;</code></td><td class="docblock-short"></td></tr><tr class="import-item"><td><code>pub use crate::diem_transaction_validator::<a class="struct" href="diem_transaction_validator/struct.DiemVMValidator.html" title="struct diem_vm::diem_transaction_validator::DiemVMValidator">DiemVMValidator</a>;</code></td><td class="docblock-short"></td></tr></table><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<table><tr class="module-item"><td><a class="mod" href="data_cache/index.html" title="diem_vm::data_cache mod">data_cache</a></td><td class="docblock-short"><p>Scratchpad for on chain values during the execution.</p>
+</td></tr><tr class="module-item"><td><a class="mod" href="diem_transaction_executor/index.html" title="diem_vm::diem_transaction_executor mod">diem_transaction_executor</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="diem_transaction_validator/index.html" title="diem_vm::diem_transaction_validator mod">diem_transaction_validator</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="logging/index.html" title="diem_vm::logging mod">logging</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="natives/index.html" title="diem_vm::natives mod">natives</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="script_to_script_function/index.html" title="diem_vm::script_to_script_function mod">script_to_script_function</a></td><td class="docblock-short"><p>Module containing remapping information between script hashes and their remapped script
+function</p>
+</td></tr><tr class="module-item"><td><a class="mod" href="system_module_names/index.html" title="diem_vm::system_module_names mod">system_module_names</a></td><td class="docblock-short"><p>Names of modules, functions, and types used by Diem System.</p>
+</td></tr><tr class="module-item"><td><a class="mod" href="transaction_metadata/index.html" title="diem_vm::transaction_metadata mod">transaction_metadata</a></td><td class="docblock-short"></td></tr></table><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
+<table><tr class="module-item"><td><a class="macro" href="macro.ADD_CURRENCY_TO_ACCOUNT_BYTES.html" title="diem_vm::ADD_CURRENCY_TO_ACCOUNT_BYTES macro">ADD_CURRENCY_TO_ACCOUNT_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.ADD_RECOVERY_ROTATION_CAPABILITY_BYTES.html" title="diem_vm::ADD_RECOVERY_ROTATION_CAPABILITY_BYTES macro">ADD_RECOVERY_ROTATION_CAPABILITY_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.ADD_TO_SCRIPT_ALLOW_LIST_BYTES.html" title="diem_vm::ADD_TO_SCRIPT_ALLOW_LIST_BYTES macro">ADD_TO_SCRIPT_ALLOW_LIST_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.ADD_VALIDATOR_AND_RECONFIGURE_BYTES.html" title="diem_vm::ADD_VALIDATOR_AND_RECONFIGURE_BYTES macro">ADD_VALIDATOR_AND_RECONFIGURE_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.BURN_BYTES.html" title="diem_vm::BURN_BYTES macro">BURN_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.BURN_TXN_FEES_BYTES.html" title="diem_vm::BURN_TXN_FEES_BYTES macro">BURN_TXN_FEES_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.CANCEL_BURN_BYTES.html" title="diem_vm::CANCEL_BURN_BYTES macro">CANCEL_BURN_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.CREATE_CHILD_VASP_ACCOUNT_BYTES.html" title="diem_vm::CREATE_CHILD_VASP_ACCOUNT_BYTES macro">CREATE_CHILD_VASP_ACCOUNT_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.CREATE_DESIGNATED_DEALER_BYTES.html" title="diem_vm::CREATE_DESIGNATED_DEALER_BYTES macro">CREATE_DESIGNATED_DEALER_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.CREATE_PARENT_VASP_ACCOUNT_BYTES.html" title="diem_vm::CREATE_PARENT_VASP_ACCOUNT_BYTES macro">CREATE_PARENT_VASP_ACCOUNT_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.CREATE_RECOVERY_ADDRESS_BYTES.html" title="diem_vm::CREATE_RECOVERY_ADDRESS_BYTES macro">CREATE_RECOVERY_ADDRESS_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.CREATE_VALIDATOR_ACCOUNT_BYTES.html" title="diem_vm::CREATE_VALIDATOR_ACCOUNT_BYTES macro">CREATE_VALIDATOR_ACCOUNT_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.CREATE_VALIDATOR_OPERATOR_ACCOUNT_BYTES.html" title="diem_vm::CREATE_VALIDATOR_OPERATOR_ACCOUNT_BYTES macro">CREATE_VALIDATOR_OPERATOR_ACCOUNT_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.FREEZE_ACCOUNT_BYTES.html" title="diem_vm::FREEZE_ACCOUNT_BYTES macro">FREEZE_ACCOUNT_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.PEER_TO_PEER_WITH_METADATA_BYTES.html" title="diem_vm::PEER_TO_PEER_WITH_METADATA_BYTES macro">PEER_TO_PEER_WITH_METADATA_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.PREBURN_BYTES.html" title="diem_vm::PREBURN_BYTES macro">PREBURN_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.PUBLISH_SHARED_ED25519_PUBLIC_KEY_BYTES.html" title="diem_vm::PUBLISH_SHARED_ED25519_PUBLIC_KEY_BYTES macro">PUBLISH_SHARED_ED25519_PUBLIC_KEY_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.REGISTER_VALIDATOR_CONFIG_BYTES.html" title="diem_vm::REGISTER_VALIDATOR_CONFIG_BYTES macro">REGISTER_VALIDATOR_CONFIG_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.REMOVE_VALIDATOR_AND_RECONFIGURE_BYTES.html" title="diem_vm::REMOVE_VALIDATOR_AND_RECONFIGURE_BYTES macro">REMOVE_VALIDATOR_AND_RECONFIGURE_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.ROTATE_AUTHENTICATION_KEY_BYTES.html" title="diem_vm::ROTATE_AUTHENTICATION_KEY_BYTES macro">ROTATE_AUTHENTICATION_KEY_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.ROTATE_AUTHENTICATION_KEY_WITH_NONCE_ADMIN_BYTES.html" title="diem_vm::ROTATE_AUTHENTICATION_KEY_WITH_NONCE_ADMIN_BYTES macro">ROTATE_AUTHENTICATION_KEY_WITH_NONCE_ADMIN_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.ROTATE_AUTHENTICATION_KEY_WITH_NONCE_BYTES.html" title="diem_vm::ROTATE_AUTHENTICATION_KEY_WITH_NONCE_BYTES macro">ROTATE_AUTHENTICATION_KEY_WITH_NONCE_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.ROTATE_AUTHENTICATION_KEY_WITH_RECOVERY_ADDRESS_BYTES.html" title="diem_vm::ROTATE_AUTHENTICATION_KEY_WITH_RECOVERY_ADDRESS_BYTES macro">ROTATE_AUTHENTICATION_KEY_WITH_RECOVERY_ADDRESS_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.ROTATE_DUAL_ATTESTATION_INFO_BYTES.html" title="diem_vm::ROTATE_DUAL_ATTESTATION_INFO_BYTES macro">ROTATE_DUAL_ATTESTATION_INFO_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.ROTATE_SHARED_ED25519_PUBLIC_KEY_BYTES.html" title="diem_vm::ROTATE_SHARED_ED25519_PUBLIC_KEY_BYTES macro">ROTATE_SHARED_ED25519_PUBLIC_KEY_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.SET_VALIDATOR_CONFIG_AND_RECONFIGURE_BYTES.html" title="diem_vm::SET_VALIDATOR_CONFIG_AND_RECONFIGURE_BYTES macro">SET_VALIDATOR_CONFIG_AND_RECONFIGURE_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.SET_VALIDATOR_OPERATOR_BYTES.html" title="diem_vm::SET_VALIDATOR_OPERATOR_BYTES macro">SET_VALIDATOR_OPERATOR_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.SET_VALIDATOR_OPERATOR_WITH_NONCE_ADMIN_BYTES.html" title="diem_vm::SET_VALIDATOR_OPERATOR_WITH_NONCE_ADMIN_BYTES macro">SET_VALIDATOR_OPERATOR_WITH_NONCE_ADMIN_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.TIERED_MINT_BYTES.html" title="diem_vm::TIERED_MINT_BYTES macro">TIERED_MINT_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.UNFREEZE_ACCOUNT_BYTES.html" title="diem_vm::UNFREEZE_ACCOUNT_BYTES macro">UNFREEZE_ACCOUNT_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.UPDATE_DIEM_VERSION_BYTES.html" title="diem_vm::UPDATE_DIEM_VERSION_BYTES macro">UPDATE_DIEM_VERSION_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.UPDATE_DUAL_ATTESTATION_LIMIT_BYTES.html" title="diem_vm::UPDATE_DUAL_ATTESTATION_LIMIT_BYTES macro">UPDATE_DUAL_ATTESTATION_LIMIT_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.UPDATE_EXCHANGE_RATE_BYTES.html" title="diem_vm::UPDATE_EXCHANGE_RATE_BYTES macro">UPDATE_EXCHANGE_RATE_BYTES</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="macro" href="macro.UPDATE_MINTING_ABILITY_BYTES.html" title="diem_vm::UPDATE_MINTING_ABILITY_BYTES macro">UPDATE_MINTING_ABILITY_BYTES</a></td><td class="docblock-short"></td></tr></table><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<table><tr class="module-item"><td><a class="trait" href="trait.VMExecutor.html" title="diem_vm::VMExecutor trait">VMExecutor</a></td><td class="docblock-short"><p>This trait describes the VM’s execution interface.</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.VMValidator.html" title="diem_vm::VMValidator trait">VMValidator</a></td><td class="docblock-short"><p>This trait describes the VM’s validation interfaces.</p>
+</td></tr></table><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<table><tr class="module-item"><td><a class="fn" href="fn.convert_changeset_and_events.html" title="diem_vm::convert_changeset_and_events fn">convert_changeset_and_events</a></td><td class="docblock-short"></td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="diem_vm" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script></body></html>

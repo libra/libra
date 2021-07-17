@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["format_borrow_annotation","Format a borrow annotation."]],"struct":[["BorrowAnalysisProcessor","Borrow analysis processor."],["BorrowAnnotation","Borrow annotation computed by the borrow analysis processor."],["BorrowInfo",""],["BorrowInfoAtCodeOffset",""]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["JsonRpcClientWrapper","A wrapper around JSON RPC for error handling"]]});

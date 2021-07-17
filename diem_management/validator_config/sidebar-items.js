@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["build_validator_config_transaction","Requires that the validator storage has the following keys set:"],["validate_address","Validates an address to have a DNS/IP and a port, as well as to be resolvable"]],"struct":[["ValidatorConfig",""]]});

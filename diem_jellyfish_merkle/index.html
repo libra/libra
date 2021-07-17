@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This module implements `JellyfishMerkleTree` backed by storage module. The tree itself doesn’t persist anything, but realizes the logic of R/W only. The write path will produce all the intermediate results in a batch for storage layer to commit and the read path will return results directly. The public APIs are only `new`, `put_value_sets`, `put_value_set` and `get_with_proof`. After each put with a `value_set` based on a known version, the tree will return a new root hash with a `TreeUpdateBatch` containing all the new nodes and indices of stale nodes."><meta name="keywords" content="rust, rustlang, rust-lang, diem_jellyfish_merkle"><title>diem_jellyfish_merkle - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../diem_jellyfish_merkle/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate diem_jellyfish_merkle</p><div class="block version"><p>Version 0.1.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all diem_jellyfish_merkle's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="diem_jellyfish_merkle" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">diem_jellyfish_merkle</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/diem_jellyfish_merkle/lib.rs.html#4-1043" title="goto source code">[src]</a></span></h1><div class="docblock"><p>This module implements <a href="struct.JellyfishMerkleTree.html"><code>JellyfishMerkleTree</code></a> backed by storage module. The tree itself doesn’t
+persist anything, but realizes the logic of R/W only. The write path will produce all the
+intermediate results in a batch for storage layer to commit and the read path will return
+results directly. The public APIs are only <a href="struct.JellyfishMerkleTree.html#method.new"><code>new</code></a>, <a href="struct.JellyfishMerkleTree.html#method.put_value_sets"><code>put_value_sets</code></a>, <a href="struct.JellyfishMerkleTree.html#method.put_value_set"><code>put_value_set</code></a> and
+<a href="struct.JellyfishMerkleTree.html#method.get_with_proof"><code>get_with_proof</code></a>. After each put with a <code>value_set</code> based on a known version, the tree will
+return a new root hash with a <a href="struct.TreeUpdateBatch.html"><code>TreeUpdateBatch</code></a> containing all the new nodes and indices of
+stale nodes.</p>
+<p>A Jellyfish Merkle Tree itself logically is a 256-bit sparse Merkle tree with an optimization
+that any subtree containing 0 or 1 leaf node will be replaced by that leaf node or a placeholder
+node with default hash value. With this optimization we can save CPU by avoiding hashing on
+many sparse levels in the tree. Physically, the tree is structurally similar to the modified
+Patricia Merkle tree of Ethereum but with some modifications. A standard Jellyfish Merkle tree
+will look like the following figure:</p>
+<pre><code class="language-text">                                   .──────────────────────.
+                           _.─────'                        `──────.
+                      _.──'                                        `───.
+                  _.─'                                                  `──.
+              _.─'                                                          `──.
+            ,'                                                                  `.
+         ,─'                                                                      '─.
+       ,'                                                                            `.
+     ,'                                                                                `.
+    ╱                                                                                    ╲
+   ╱                                                                                      ╲
+  ╱                                                                                        ╲
+ ╱                                                                                          ╲
+;                                                                                            :
+;                                                                                            :
+;                                                                                              :
+│                                                                                              │
++──────────────────────────────────────────────────────────────────────────────────────────────+
+.''.  .''.  .''.  .''.  .''.  .''.  .''.  .''.  .''.  .''.  .''.  .''.  .''.  .''.  .''.  .''.
+/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \/    \
++----++----++----++----++----++----++----++----++----++----++----++----++----++----++----++----+
+(  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (
+ )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )
+(  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (
+ )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )
+(  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (
+ )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )
+(  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (
+ )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )  )
+(  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (  (
+■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■  ■
+■: the [`Value`] type this tree stores.
+</code></pre>
+<p>A Jellyfish Merkle Tree consists of <a href="node_type/struct.InternalNode.html"><code>InternalNode</code></a> and <a href="node_type/struct.LeafNode.html"><code>LeafNode</code></a>. <a href="node_type/struct.InternalNode.html"><code>InternalNode</code></a> is like
+branch node in ethereum patricia merkle with 16 children to represent a 4-level binary tree and
+<a href="node_type/struct.LeafNode.html"><code>LeafNode</code></a> is similar to that in patricia merkle too. In the above figure, each <code>bell</code> in the
+jellyfish is an <a href="node_type/struct.InternalNode.html"><code>InternalNode</code></a> while each tentacle is a <a href="node_type/struct.LeafNode.html"><code>LeafNode</code></a>. It is noted that
+Jellyfish merkle doesn’t have a counterpart for <code>extension</code> node of ethereum patricia merkle.</p>
+</div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<table><tr class="module-item"><td><a class="mod" href="iterator/index.html" title="diem_jellyfish_merkle::iterator mod">iterator</a></td><td class="docblock-short"><p>This module implements <code>JellyfishMerkleIterator</code>. Initialized with a version and a key, the
+iterator generates all the key-value pairs in this version of the tree, starting from the
+smallest key that is greater or equal to the given key, by performing a depth first traversal
+on the tree.</p>
+</td></tr><tr class="module-item"><td><a class="mod" href="metrics/index.html" title="diem_jellyfish_merkle::metrics mod">metrics</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="node_type/index.html" title="diem_jellyfish_merkle::node_type mod">node_type</a></td><td class="docblock-short"><p>Node types of <a href="struct.JellyfishMerkleTree.html"><code>JellyfishMerkleTree</code></a></p>
+</td></tr><tr class="module-item"><td><a class="mod" href="restore/index.html" title="diem_jellyfish_merkle::restore mod">restore</a></td><td class="docblock-short"><p>This module implements the functionality to restore a <code>JellyfishMerkleTree</code> from small chunks
+of accounts.</p>
+</td></tr><tr class="module-item"><td><a class="mod" href="test_helper/index.html" title="diem_jellyfish_merkle::test_helper mod">test_helper</a></td><td class="docblock-short"></td></tr></table><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.JellyfishMerkleTree.html" title="diem_jellyfish_merkle::JellyfishMerkleTree struct">JellyfishMerkleTree</a></td><td class="docblock-short"><p>The Jellyfish Merkle tree data structure. See <a href="index.html" title="crate"><code>crate</code></a> for description.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.MissingRootError.html" title="diem_jellyfish_merkle::MissingRootError struct">MissingRootError</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.NodeStats.html" title="diem_jellyfish_merkle::NodeStats struct">NodeStats</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.StaleNodeIndex.html" title="diem_jellyfish_merkle::StaleNodeIndex struct">StaleNodeIndex</a></td><td class="docblock-short"><p>Indicates a node becomes stale since <code>stale_since_version</code>.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.TreeUpdateBatch.html" title="diem_jellyfish_merkle::TreeUpdateBatch struct">TreeUpdateBatch</a></td><td class="docblock-short"><p>This is a wrapper of <a href="type.NodeBatch.html"><code>NodeBatch</code></a>,
+<a href="type.StaleNodeIndexBatch.html"><code>StaleNodeIndexBatch</code></a> and some stats of nodes that represents
+the incremental updates of a tree and pruning indices after applying a write set,
+which is a vector of <code>hashed_account_address</code> and <code>new_value</code> pairs.</p>
+</td></tr></table><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<table><tr class="module-item"><td><a class="trait" href="trait.TestValue.html" title="diem_jellyfish_merkle::TestValue trait">TestValue</a></td><td class="docblock-short"><p><code>TestValue</code> defines the types of data that can be stored in a Jellyfish Merkle tree and used in
+tests.</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.TreeReader.html" title="diem_jellyfish_merkle::TreeReader trait">TreeReader</a></td><td class="docblock-short"><p><code>TreeReader</code> defines the interface between
+<a href="struct.JellyfishMerkleTree.html"><code>JellyfishMerkleTree</code></a>
+and underlying storage holding nodes.</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.TreeWriter.html" title="diem_jellyfish_merkle::TreeWriter trait">TreeWriter</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="trait" href="trait.Value.html" title="diem_jellyfish_merkle::Value trait">Value</a></td><td class="docblock-short"><p><code>Value</code> defines the types of data that can be stored in a Jellyfish Merkle tree.</p>
+</td></tr></table><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<table><tr class="module-item"><td><a class="type" href="type.NodeBatch.html" title="diem_jellyfish_merkle::NodeBatch type">NodeBatch</a></td><td class="docblock-short"><p>Node batch that will be written into db atomically with other batches.</p>
+</td></tr><tr class="module-item"><td><a class="type" href="type.StaleNodeIndexBatch.html" title="diem_jellyfish_merkle::StaleNodeIndexBatch type">StaleNodeIndexBatch</a></td><td class="docblock-short"><p><a href="struct.StaleNodeIndex.html"><code>StaleNodeIndex</code></a> batch that will be written into db atomically
+with other batches.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="diem_jellyfish_merkle" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script></body></html>

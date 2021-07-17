@@ -1,0 +1,1 @@
+initSidebarItems({"derive":[["NumVariants","Derives an associated constant with the number of variants this enum has."]]});

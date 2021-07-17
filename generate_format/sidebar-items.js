@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Corpus","A corpus of Rust types to trace, and optionally record on disk."]],"fn":[["lint_bcs_format","Verify that a Serde format is compatible with BCS and follows best practices."]]});

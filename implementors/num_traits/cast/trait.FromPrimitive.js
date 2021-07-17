@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["diem_json_rpc_types"] = [{"text":"impl <a class=\"trait\" href=\"https://docs.rs/num-traits/0.2/num_traits/cast/trait.FromPrimitive.html\" title=\"trait num_traits::cast::FromPrimitive\">FromPrimitive</a> for <a class=\"enum\" href=\"diem_json_rpc_types/errors/enum.InvalidRequestCode.html\" title=\"enum diem_json_rpc_types::errors::InvalidRequestCode\">InvalidRequestCode</a>","synthetic":false,"types":["diem_json_rpc_types::errors::InvalidRequestCode"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

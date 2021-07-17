@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ResponseLedgerInfo","The response can carry different LedgerInfo types depending on whether the verification is done via the local trusted validator set or a local waypoint."]],"struct":[["GetChunkResponse","The returned chunk is bounded by the end of the known_epoch of the requester (i.e., a chunk never crosses epoch boundaries)."]]});

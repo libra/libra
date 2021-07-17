@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["v1","This module defines the DiemNet v1 message types, how they are serialized/deserialized, and provides a `Sink` and `Stream` implementation for sending `NetworkMessage`s over an abstract IO object (presumably a socket)."]]});

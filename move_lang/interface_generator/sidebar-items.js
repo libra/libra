@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["write_file_to_string","Generate the text for the “interface” file of a compiled module. This “interface” is the publically visible contents of the CompiledModule, represented in source language syntax Additionally, it returns the module id (address+name) of the module that was deserialized"],["write_module_to_string",""]]});

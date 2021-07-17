@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["EVENT_HANDLE_GENERATOR_STRUCT_IDENTIFIER",""],["EVENT_HANDLE_STRUCT_IDENTIFIER",""],["EVENT_MODULE_IDENTIFIER",""]],"fn":[["event_handle_generator_struct_tag",""]],"static":[["EVENT_MODULE",""]]});

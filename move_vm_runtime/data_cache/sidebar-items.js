@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["AccountDataCache",""]],"trait":[["MoveStorage","Trait for the Move VM to abstract storage operations."]]});

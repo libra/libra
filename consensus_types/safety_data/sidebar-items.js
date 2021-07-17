@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SafetyData","Data structure for safety rules to ensure consensus safety."]]});

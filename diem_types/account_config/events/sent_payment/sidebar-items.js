@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SentPaymentEvent","Struct that represents a SentPaymentEvent."]]});

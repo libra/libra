@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["TEST_ARGS_FILENAME","The filename that contains the arguments to the Move binary."]],"fn":[["create_test_scaffold","Create a directory scaffold for writing a Move CLI test."],["run_all",""],["run_one","Run the `args_path` batch file with`cli_binary`"]]});

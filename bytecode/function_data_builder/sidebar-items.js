@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["FunctionDataBuilder","A builder for `FunctionData`."],["FunctionDataBuilderOptions",""]]});

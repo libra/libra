@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["DiemId",""],["DiemIdParseError",""],["DiemIdUserIdentifier",""],["DiemIdVaspDomainIdentifier",""]]});

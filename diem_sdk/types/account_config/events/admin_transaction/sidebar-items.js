@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["AdminTransactionEvent","Struct that represents a AdminEvent."]]});

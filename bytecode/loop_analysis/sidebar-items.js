@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["FatLoop","A fat-loop captures the information of one or more natural loops that share the same loop header. This shared header is called the header of the fat-loop."],["LoopAnalysisProcessor",""],["LoopAnnotation",""]]});

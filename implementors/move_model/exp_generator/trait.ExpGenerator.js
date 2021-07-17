@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["bytecode"] = [{"text":"impl&lt;'env&gt; <a class=\"trait\" href=\"move_model/exp_generator/trait.ExpGenerator.html\" title=\"trait move_model::exp_generator::ExpGenerator\">ExpGenerator</a>&lt;'env&gt; for <a class=\"struct\" href=\"bytecode/function_data_builder/struct.FunctionDataBuilder.html\" title=\"struct bytecode::function_data_builder::FunctionDataBuilder\">FunctionDataBuilder</a>&lt;'env&gt;","synthetic":false,"types":["bytecode::function_data_builder::FunctionDataBuilder"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,95 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Derive macros for crypto operations"><meta name="keywords" content="rust, rustlang, rust-lang, diem_crypto_derive"><title>diem_crypto_derive - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../diem_crypto_derive/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate diem_crypto_derive</p><div class="block version"><p>Version 0.0.2</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all diem_crypto_derive's items</p></a><p class="location"></p><div id="sidebar-vars" data-name="diem_crypto_derive" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">diem_crypto_derive</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/diem_crypto_derive/lib.rs.html#4-446" title="goto source code">[src]</a></span></h1><div class="docblock"><h1 id="derive-macros-for-crypto-operations" class="section-header"><a href="#derive-macros-for-crypto-operations">Derive macros for crypto operations</a></h1>
+<p>This crate contains four types of derive macros:</p>
+<ul>
+<li>the <code>SilentDebug</code> and SilentDisplay macros are meant to be used on private key types, and
+elide their input for confidentiality.</li>
+<li>the <code>Deref</code> macro helps derive the canonical instances on new types.</li>
+<li>the derive macros for <code>diem_crypto::traits</code>, namely <code>ValidCryptoMaterial</code>, <code>PublicKey</code>, <code>PrivateKey</code>,
+<code>VerifyingKey</code>, <code>SigningKey</code> and <code>Signature</code> are meant to be derived on simple unions of types
+implementing these traits.</li>
+<li>the derive macro for <code>diem_crypto::hash::CryptoHasher</code>, which defines
+the domain-separation hasher structures described in <code>diem_crypto::hash</code>
+(look there for details). This derive macro has for sole difference that it
+automatically picks a unique salt for you, using the Serde name. For a container <code>Foo</code>,
+this is usually equivalent to:
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="macro">define_hasher!</span> {
+ (
+      <span class="ident">FooHasher</span>,
+      <span class="ident">FOO_HASHER</span>,
+      <span class="string">b&quot;Foo&quot;</span>
+  )
+}</pre></div>
+</li>
+</ul>
+<h1 id="unions-of-signing-traits-in-detail" class="section-header"><a href="#unions-of-signing-traits-in-detail">Unions of Signing Traits, in detail</a></h1>
+<p>Those types typically come into play when you need to accept several
+alternatives at runtime for several signature and verification schemes
+(ex: BLS or EdDSA, see below). In this case, it is possible to declare
+a triplet of enum types that each describe a ‘sum type’ (coproduct) of these
+alternatives. This happens to be a signing scheme itself (it has
+canonical signature, signing &amp; verifying key types, and verifies all
+expected properties by trivial dispatch).</p>
+<p>The macros below let you define this type of union trivially under two conditions:</p>
+<ul>
+<li>that the variant tags for the enum have the same name, i.e. if the BLS variant for the
+<code>SignatureUnion</code> is <code>SignatureUnion::BLS(BLS12381Signature)</code>, then the variant of the
+<code>PublicKeyUnion</code> for BLS must also be <code>PublicKeyUnion::BLS</code>,</li>
+<li>that you specify the associated types <code>PrivateKeyType</code>, <code>SignatureType</code> and <code>PublicKeyType</code>
+for each of the three unions. <code>PrivateKeyType</code> provides the value for the
+<code>VerifyingKeyMaterial</code> and <code>PublicKeyMaterial</code> associated types, <code>PublicKeyType</code> provides the
+valid for the <code>SigningKeyMaterial</code> and <code>PrivateKeyMaterial</code> associated types and
+<code>SignatureType</code> provides the value for the <code>SignatureMaterial</code> associated type.</li>
+</ul>
+<h2 id="example" class="section-header"><a href="#example">Example</a></h2>
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="kw">use</span> <span class="ident">diem_crypto</span>::{
+    <span class="ident">hash::HashValue</span>,
+    <span class="ident">bls12381</span>::{<span class="ident">BLS12381PrivateKey</span>, <span class="ident">BLS12381PublicKey</span>, <span class="ident">BLS12381Signature</span>},
+    <span class="ident">ed25519</span>::{<span class="ident">Ed25519PrivateKey</span>, <span class="ident">Ed25519PublicKey</span>, <span class="ident">Ed25519Signature</span>},
+};
+<span class="kw">use</span> <span class="ident">diem_crypto_derive</span>::{
+    <span class="ident">SilentDebug</span>, <span class="ident">PrivateKey</span>, <span class="ident">PublicKey</span>, <span class="ident">Signature</span>, <span class="ident">SigningKey</span>, <span class="ident">ValidCryptoMaterial</span>, <span class="ident">VerifyingKey</span>,
+};
+
+<span class="doccomment">/// Generic public key enum</span>
+<span class="attribute">#[<span class="ident">derive</span>(
+    <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">ValidCryptoMaterial</span>, <span class="ident">PublicKey</span>, <span class="ident">VerifyingKey</span>,
+)]</span>
+<span class="attribute">#[<span class="ident">PrivateKeyType</span> <span class="op">=</span> <span class="string">&quot;GenericPrivateKey&quot;</span>]</span>
+<span class="attribute">#[<span class="ident">SignatureType</span> <span class="op">=</span> <span class="string">&quot;GenericSignature&quot;</span>]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GenericPublicKey</span> {
+    <span class="doccomment">/// Ed25519 public key</span>
+    <span class="ident">Ed</span>(<span class="ident">Ed25519PublicKey</span>),
+    <span class="doccomment">/// BLS12-381 public key</span>
+    <span class="ident">BLS</span>(<span class="ident">BLS12381PublicKey</span>),
+}
+<span class="doccomment">/// Generic private key enum</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">SilentDebug</span>, <span class="ident">ValidCryptoMaterial</span>, <span class="ident">PrivateKey</span>, <span class="ident">SigningKey</span>)]</span>
+<span class="attribute">#[<span class="ident">PublicKeyType</span> <span class="op">=</span> <span class="string">&quot;GenericPublicKey&quot;</span>]</span>
+<span class="attribute">#[<span class="ident">SignatureType</span> <span class="op">=</span> <span class="string">&quot;GenericSignature&quot;</span>]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GenericPrivateKey</span> {
+    <span class="doccomment">/// Ed25519 private key</span>
+    <span class="ident">Ed</span>(<span class="ident">Ed25519PrivateKey</span>),
+    <span class="doccomment">/// BLS12-381 private key</span>
+    <span class="ident">BLS</span>(<span class="ident">BLS12381PrivateKey</span>),
+}
+<span class="doccomment">/// Generic signature enum</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Signature</span>)]</span>
+<span class="attribute">#[<span class="ident">PrivateKeyType</span> <span class="op">=</span> <span class="string">&quot;GenericPrivateKey&quot;</span>]</span>
+<span class="attribute">#[<span class="ident">PublicKeyType</span> <span class="op">=</span> <span class="string">&quot;GenericPublicKey&quot;</span>]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GenericSignature</span> {
+    <span class="doccomment">/// Ed25519 signature</span>
+    <span class="ident">Ed</span>(<span class="ident">Ed25519Signature</span>),
+    <span class="doccomment">/// BLS12-381 signature</span>
+    <span class="ident">BLS</span>(<span class="ident">BLS12381Signature</span>),
+}</pre></div>
+</div><h2 id="derives" class="section-header"><a href="#derives">Derive Macros</a></h2>
+<table><tr class="module-item"><td><a class="derive" href="derive.BCSCryptoHash.html" title="diem_crypto_derive::BCSCryptoHash derive">BCSCryptoHash</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="derive" href="derive.CryptoHasher.html" title="diem_crypto_derive::CryptoHasher derive">CryptoHasher</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="derive" href="derive.Deref.html" title="diem_crypto_derive::Deref derive">Deref</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="derive" href="derive.DeserializeKey.html" title="diem_crypto_derive::DeserializeKey derive">DeserializeKey</a></td><td class="docblock-short"><p>Deserialize from a human readable format where applicable</p>
+</td></tr><tr class="module-item"><td><a class="derive" href="derive.PrivateKey.html" title="diem_crypto_derive::PrivateKey derive">PrivateKey</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="derive" href="derive.PublicKey.html" title="diem_crypto_derive::PublicKey derive">PublicKey</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="derive" href="derive.SerializeKey.html" title="diem_crypto_derive::SerializeKey derive">SerializeKey</a></td><td class="docblock-short"><p>Serialize into a human readable format where applicable</p>
+</td></tr><tr class="module-item"><td><a class="derive" href="derive.Signature.html" title="diem_crypto_derive::Signature derive">Signature</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="derive" href="derive.SigningKey.html" title="diem_crypto_derive::SigningKey derive">SigningKey</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="derive" href="derive.SilentDebug.html" title="diem_crypto_derive::SilentDebug derive">SilentDebug</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="derive" href="derive.SilentDisplay.html" title="diem_crypto_derive::SilentDisplay derive">SilentDisplay</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="derive" href="derive.ValidCryptoMaterial.html" title="diem_crypto_derive::ValidCryptoMaterial derive">ValidCryptoMaterial</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="derive" href="derive.VerifyingKey.html" title="diem_crypto_derive::VerifyingKey derive">VerifyingKey</a></td><td class="docblock-short"></td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="diem_crypto_derive" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script></body></html>

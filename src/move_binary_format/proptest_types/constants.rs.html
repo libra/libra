@@ -1,0 +1,135 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `language/move-binary-format/src/proptest_types/constants.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>constants.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../move_binary_format/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1"> 1</span>
+<span id="2"> 2</span>
+<span id="3"> 3</span>
+<span id="4"> 4</span>
+<span id="5"> 5</span>
+<span id="6"> 6</span>
+<span id="7"> 7</span>
+<span id="8"> 8</span>
+<span id="9"> 9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="comment">// Copyright (c) The Diem Core Contributors</span>
+<span class="comment">// SPDX-License-Identifier: Apache-2.0</span>
+
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::file_format</span>::{<span class="ident">Constant</span>, <span class="ident">SignatureToken</span>};
+<span class="kw">use</span> <span class="ident">move_core_types::account_address::AccountAddress</span>;
+<span class="kw">use</span> <span class="ident">proptest</span>::{
+    <span class="ident">arbitrary::any</span>,
+    <span class="ident">collection</span>::{<span class="ident">btree_set</span>, <span class="ident">vec</span>, <span class="ident">SizeRange</span>},
+    <span class="ident">strategy::Strategy</span>,
+};
+
+<span class="comment">// A `ConstantPoolGen` gives you back a `Strategy` that makes a constant pool with</span>
+<span class="comment">// `Address` and `Vector&lt;U8&gt;` only.</span>
+<span class="comment">// TODO: make it more general and plug in a constant API</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConstantPoolGen</span> {
+    <span class="ident">addresses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AccountAddress</span><span class="op">&gt;</span>,
+    <span class="ident">byte_arrays</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">ConstantPoolGen</span> {
+    <span class="comment">// Return a `Strategy` that builds a ConstantPool with a number of `addresse`s and</span>
+    <span class="comment">// `vector&lt;u8&gt;` respectively driven by `address_count` and `byte_array_count`</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strategy</span>(
+        <span class="ident">address_count</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SizeRange</span><span class="op">&gt;</span>,
+        <span class="ident">byte_array_count</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SizeRange</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Strategy</span><span class="op">&lt;</span><span class="ident">Value</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="comment">// get unique sets of addresses and vector&lt;U8&gt; (empty vector allowed)</span>
+        (
+            <span class="ident">btree_set</span>(<span class="ident">any</span>::<span class="op">&lt;</span><span class="ident">AccountAddress</span><span class="op">&gt;</span>(), <span class="ident">address_count</span>),
+            <span class="ident">btree_set</span>(<span class="ident">vec</span>(<span class="ident">any</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>(), <span class="number">0</span>..<span class="op">=</span><span class="number">20</span>), <span class="ident">byte_array_count</span>),
+        )
+            .<span class="ident">prop_map</span>(<span class="op">|</span>(<span class="ident">addresses</span>, <span class="ident">byte_arrays</span>)<span class="op">|</span> <span class="self">Self</span> {
+                <span class="ident">addresses</span>: <span class="ident">addresses</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>(),
+                <span class="ident">byte_arrays</span>: <span class="ident">byte_arrays</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>(),
+            })
+    }
+
+    <span class="comment">// Return the `ConstantPool`</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">constant_pool</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Constant</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">constants</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+        <span class="kw">for</span> <span class="ident">address</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">addresses</span> {
+            <span class="ident">constants</span>.<span class="ident">push</span>(<span class="ident">Constant</span> {
+                <span class="ident">type_</span>: <span class="ident">SignatureToken::Address</span>,
+                <span class="ident">data</span>: <span class="ident">address</span>.<span class="ident">to_vec</span>(),
+            });
+        }
+        <span class="kw">for</span> <span class="kw-2">mut</span> <span class="ident">byte_array</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">byte_arrays</span> {
+            <span class="comment">// TODO: below is a trick to make serialization easy (size being one byte)</span>
+            <span class="comment">// This can hopefully help soon in defining an API for constants</span>
+            <span class="comment">// As a restriction is a non issue as we don&#39;t have input over big numbers (&gt;100)</span>
+            <span class="kw">if</span> <span class="ident">byte_array</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">127</span> {
+                <span class="kw">continue</span>;
+            }
+            <span class="ident">byte_array</span>.<span class="ident">push</span>(<span class="ident">byte_array</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>);
+            <span class="ident">byte_array</span>.<span class="ident">reverse</span>();
+            <span class="ident">constants</span>.<span class="ident">push</span>(<span class="ident">Constant</span> {
+                <span class="ident">type_</span>: <span class="ident">SignatureToken::Vector</span>(<span class="ident">Box::new</span>(<span class="ident">SignatureToken::U8</span>)),
+                <span class="ident">data</span>: <span class="ident">byte_array</span>,
+            });
+        }
+        <span class="ident">constants</span>
+    }
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="move_binary_format" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

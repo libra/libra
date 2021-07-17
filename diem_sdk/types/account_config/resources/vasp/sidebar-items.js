@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ChildVASP",""],["ParentVASP",""]]});

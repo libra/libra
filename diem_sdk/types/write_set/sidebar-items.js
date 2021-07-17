@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["WriteOp",""]],"struct":[["WriteSet","`WriteSet` contains all access paths that one transaction modifies. Each of them is a `WriteOp` where `Value(val)` means that serialized representation should be updated to `val`, and `Deletion` means that we are going to delete this access path."],["WriteSetMut","A mutable version of `WriteSet`."]]});

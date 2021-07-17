@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["MaybeSignedVoteProposal","Wraps a vote_proposal and its signature."],["VoteProposal","This structure contains all the information needed by safety rules to evaluate a proposal / block for correctness / safety and to produce a Vote."],["VoteProposalHasher","Cryptographic hasher for an BCS-serializable #item"]]});

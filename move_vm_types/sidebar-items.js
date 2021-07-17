@@ -1,0 +1,1 @@
+initSidebarItems({"macro":[["pop_arg","Return the argument at the top of the stack."]],"mod":[["data_store",""],["gas_schedule","This module lays out the basic abstract costing schedule for bytecode instructions."],["loaded_data","Loaded definition of code data used in runtime."],["natives",""],["values",""]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["MoveTypeLayout",""],["MoveValue",""]],"fn":[["serialize_values",""]],"struct":[["MoveStruct",""],["MoveStructLayout",""]]});

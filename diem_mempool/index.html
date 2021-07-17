@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Mempool is used to hold transactions that have been submitted but not yet agreed upon and executed."><meta name="keywords" content="rust, rustlang, rust-lang, diem_mempool"><title>diem_mempool - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../diem_mempool/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate diem_mempool</p><div class="block version"><p>Version 0.1.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all diem_mempool's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="diem_mempool" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">diem_mempool</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/diem_mempool/lib.rs.html#4-74" title="goto source code">[src]</a></span></h1><div class="docblock"><p>Mempool is used to hold transactions that have been submitted but not yet agreed upon and
+executed.</p>
+<p><strong>Flow</strong>: AC sends transactions into mempool which holds them for a period of time before
+sending them into consensus.  When a new transaction is added, Mempool shares this transaction
+with other nodes in the system.  This is a form of “shared mempool” in that transactions between
+mempools are shared with other validators.  This helps maintain a pseudo global ordering since
+when a validator receives a transaction from another mempool, it will be ordered when added in
+the ordered queue of the recipient validator. To reduce network consumption, in “shared mempool”
+each validator is responsible for delivery of its own transactions (we don’t rebroadcast
+transactions originated on a different peer). Also we only broadcast transactions that have some
+chance to be included in next block: their sequence number equals to the next sequence number of
+account or sequential to it. For example, if the current sequence number for an account is 2 and
+local mempool contains transactions with sequence numbers 2,3,4,7,8, then only transactions 2, 3
+and 4 will be broadcast.</p>
+<p>Consensus pulls transactions from mempool rather than mempool pushing into consensus. This is
+done so that while consensus is not yet ready for transactions, we keep ordering based on gas
+and consensus can let transactions build up.  This allows for batching of transactions into a
+single consensus block as well as prioritizing by gas price. Mempool doesn’t  keep track of
+transactions that were sent to Consensus. On each get_block request, Consensus additionally
+sends a set of transactions that were pulled from Mempool so far but were not committed yet.
+This is done so Mempool can be agnostic about different Consensus proposal branches.  Once a
+transaction is fully executed and written to storage,  Consensus notifies Mempool about it which
+later drops it from its internal state.</p>
+<p><strong>Internals</strong>: Internally Mempool is modeled as <code>HashMap&lt;AccountAddress, AccountTransactions&gt;</code>
+with various indexes built on top of it. The main index <code>PriorityIndex</code> is an ordered queue of
+transactions that are “ready” to be included in next block(i.e. have sequence number sequential
+to current for account). This queue is ordered by gas price so that if a client is willing to
+pay more (than other clients) per unit of execution, then they can enter consensus earlier. Note
+that although global ordering is maintained by gas price, for a single account, transactions are
+ordered by sequence number.</p>
+<p>All transactions that are not ready to be included in the next block are part of separate
+<code>ParkingLotIndex</code>. They will be moved to the ordered queue once some event unblocks them. For
+example, Mempool has transaction with sequence number 4, while current sequence number for that
+account is 3. Such transaction is considered to be “non-ready”. Then callback from Consensus
+notifies that transaction was committed(i.e. transaction 3 was submitted to different node).
+Such event “unblocks” local transaction and txn4 will be moved to OrderedQueue.</p>
+<p>Mempool only holds a limited number of transactions to prevent OOMing the system. Additionally
+there’s a limit of number of transactions per account to prevent different abuses/attacks</p>
+<p>Transactions in Mempool have two types of expirations: systemTTL and client-specified
+expiration. Once we hit either of those, the transaction is removed from Mempool. SystemTTL is
+checked periodically in the background, while the client-specified expiration is checked on
+every Consensus commit request. We use a separate system TTL to ensure that a transaction won’t
+remain stuck in Mempool forever, even if Consensus doesn’t make progress</p>
+</div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<table><tr class="module-item"><td><a class="mod" href="fuzzing/index.html" title="diem_mempool::fuzzing mod">fuzzing</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="mocks/index.html" title="diem_mempool::mocks mod">mocks</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="network/index.html" title="diem_mempool::network mod">network</a></td><td class="docblock-short"><p>Interface between Mempool and Network layers.</p>
+</td></tr></table><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.CommitNotification.html" title="diem_mempool::CommitNotification struct">CommitNotification</a></td><td class="docblock-short"><p>Notification from state sync to mempool of commit event.
+This notifies mempool to remove committed txns.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.CommitResponse.html" title="diem_mempool::CommitResponse struct">CommitResponse</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="struct" href="struct.CommittedTransaction.html" title="diem_mempool::CommittedTransaction struct">CommittedTransaction</a></td><td class="docblock-short"><p>Successfully executed and committed txn</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.TransactionExclusion.html" title="diem_mempool::TransactionExclusion struct">TransactionExclusion</a></td><td class="docblock-short"></td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<table><tr class="module-item"><td><a class="enum" href="enum.ConsensusRequest.html" title="diem_mempool::ConsensusRequest enum">ConsensusRequest</a></td><td class="docblock-short"><p>Message sent from consensus to mempool.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.ConsensusResponse.html" title="diem_mempool::ConsensusResponse enum">ConsensusResponse</a></td><td class="docblock-short"><p>Response sent from mempool to consensus.</p>
+</td></tr></table><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<table><tr class="module-item"><td><a class="fn" href="fn.bootstrap.html" title="diem_mempool::bootstrap fn">bootstrap</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="fn" href="fn.gen_mempool_reconfig_subscription.html" title="diem_mempool::gen_mempool_reconfig_subscription fn">gen_mempool_reconfig_subscription</a></td><td class="docblock-short"></td></tr></table><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
+<table><tr class="module-item"><td><a class="type" href="type.MempoolClientSender.html" title="diem_mempool::MempoolClientSender type">MempoolClientSender</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="type" href="type.SubmissionStatus.html" title="diem_mempool::SubmissionStatus type">SubmissionStatus</a></td><td class="docblock-short"></td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="diem_mempool" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script></body></html>

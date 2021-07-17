@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ToXDXExchangeRateUpdateEvent","Struct that represents a ToXDXExchangeRateUpdateEvent"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["AbstractSegment",""],["StringSegment",""]],"struct":[["FunctionSourceCoverage",""],["SourceCoverage",""],["SourceCoverageBuilder",""]],"type":[["AnnotatedLine",""]]});

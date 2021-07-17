@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Summary"><meta name="keywords" content="rust, rustlang, rust-lang, encode_burn_txn_fees_script_function"><title>encode_burn_txn_fees_script_function in diem_transaction_builder::stdlib - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc fn"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../diem_transaction_builder/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><div class="sidebar-elems"><p class="location"><a href="../index.html">diem_transaction_builder</a>::<wbr><a href="index.html">stdlib</a></p><div id="sidebar-vars" data-name="encode_burn_txn_fees_script_function" data-ty="fn" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Function <a href="../index.html">diem_transaction_builder</a>::<wbr><a href="index.html">stdlib</a>::<wbr><a class="fn" href="">encode_burn_txn_fees_script_function</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/diem_transaction_builder/stdlib.rs.html#3944-3954" title="goto source code">[src]</a></span></h1><pre class="rust fn">pub fn encode_burn_txn_fees_script_function(<br>&nbsp;&nbsp;&nbsp;&nbsp;coin_type: <a class="enum" href="../../move_core_types/language_storage/enum.TypeTag.html" title="enum move_core_types::language_storage::TypeTag">TypeTag</a><br>) -&gt; <a class="enum" href="../../diem_types/transaction/enum.TransactionPayload.html" title="enum diem_types::transaction::TransactionPayload">TransactionPayload</a></pre><div class="docblock"><h1 id="summary" class="section-header"><a href="#summary">Summary</a></h1>
+<p>Burns the transaction fees collected in the <code>CoinType</code> currency so that the
+Diem association may reclaim the backing coins off-chain. May only be sent
+by the Treasury Compliance account.</p>
+<h1 id="technical-description" class="section-header"><a href="#technical-description">Technical Description</a></h1>
+<p>Burns the transaction fees collected in <code>CoinType</code> so that the
+association may reclaim the backing coins. Once this transaction has executed
+successfully all transaction fees that will have been collected in
+<code>CoinType</code> since the last time this script was called with that specific
+currency. Both <code>balance</code> and <code>preburn</code> fields in the
+<code>TransactionFee::TransactionFee&lt;CoinType&gt;</code> resource published under the <code>0xB1E55ED</code>
+account address will have a value of 0 after the successful execution of this script.</p>
+<h1 id="events" class="section-header"><a href="#events">Events</a></h1>
+<p>The successful execution of this transaction will emit a <code>Diem::BurnEvent</code> on the event handle
+held in the <code>Diem::CurrencyInfo&lt;CoinType&gt;</code> resource’s <code>burn_events</code> published under
+<code>0xA550C18</code>.</p>
+<h1 id="parameters" class="section-header"><a href="#parameters">Parameters</a></h1><table><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>CoinType</code></td><td>Type</td><td>The Move type for the <code>CoinType</code> being added to the sending account of the transaction. <code>CoinType</code> must be an already-registered currency on-chain.</td></tr>
+<tr><td><code>tc_account</code></td><td><code>signer</code></td><td>The signer of the sending account of this transaction. Must be the Treasury Compliance account.</td></tr>
+</tbody></table>
+<h1 id="common-abort-conditions" class="section-header"><a href="#common-abort-conditions">Common Abort Conditions</a></h1><table><thead><tr><th>Error Category</th><th>Error Reason</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>Errors::REQUIRES_ADDRESS</code></td><td><code>CoreAddresses::ETREASURY_COMPLIANCE</code></td><td>The sending account is not the Treasury Compliance account.</td></tr>
+<tr><td><code>Errors::NOT_PUBLISHED</code></td><td><code>TransactionFee::ETRANSACTION_FEE</code></td><td><code>CoinType</code> is not an accepted transaction fee currency.</td></tr>
+<tr><td><code>Errors::INVALID_ARGUMENT</code></td><td><code>Diem::ECOIN</code></td><td>The collected fees in <code>CoinType</code> are zero.</td></tr>
+</tbody></table>
+<h1 id="related-scripts" class="section-header"><a href="#related-scripts">Related Scripts</a></h1>
+<ul>
+<li><code>TreasuryComplianceScripts::burn_with_amount</code></li>
+<li><code>TreasuryComplianceScripts::cancel_burn_with_amount</code></li>
+</ul>
+</div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="diem_transaction_builder" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script></body></html>

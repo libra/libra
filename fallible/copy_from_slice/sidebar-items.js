@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["copy_slice_to_vec","A fallible wrapper around [`std::vec::Vec::copy_from_slice`]"]],"struct":[["CopySliceError",""]]});

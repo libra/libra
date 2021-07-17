@@ -1,0 +1,1 @@
+initSidebarItems({"static":[["GENESIS_CHANGE_SET","Dummy genesis ChangeSet for testing"],["GENESIS_CHANGE_SET_FRESH",""]],"struct":[["FakeDataStore","An in-memory implementation of [`StateView`] and [`RemoteCache`] for the VM."]]});

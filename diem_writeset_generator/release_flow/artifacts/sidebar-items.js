@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["get_commit_hash",""],["hash_for_modules","Generate a unique hash for a list of modules"],["load_latest_artifact",""],["save_release_artifact",""]],"struct":[["ReleaseArtifact","Checkin the release artifact to a local file to make sure the release process is reproducible"]]});

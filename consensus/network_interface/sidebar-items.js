@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ConsensusMsg","Network type for consensus"]],"fn":[["network_endpoint_config","Configuration for the network endpoints to support consensus."]],"struct":[["ConsensusNetworkSender","The interface from Consensus to Networking layer."]],"type":[["ConsensusNetworkEvents","The interface from Network to Consensus layer."]]});

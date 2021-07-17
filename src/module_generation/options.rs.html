@@ -1,0 +1,127 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `language/testing-infra/module-generation/src/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../module_generation/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1"> 1</span>
+<span id="2"> 2</span>
+<span id="3"> 3</span>
+<span id="4"> 4</span>
+<span id="5"> 5</span>
+<span id="6"> 6</span>
+<span id="7"> 7</span>
+<span id="8"> 8</span>
+<span id="9"> 9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="comment">// Copyright (c) The Diem Core Contributors</span>
+<span class="comment">// SPDX-License-Identifier: Apache-2.0</span>
+
+<span class="doccomment">//! Defines constants and options that are used for module generation</span>
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ModuleGeneratorOptions</span> {
+    <span class="doccomment">/// The maximum number of locals that can be defined within a generated function definition.</span>
+    <span class="kw">pub</span> <span class="ident">max_locals</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The maximum number of fields that will be generated for any struct.</span>
+    <span class="kw">pub</span> <span class="ident">max_fields</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span> <span class="ident">min_fields</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The maximum number of structs that can be generated for a module</span>
+    <span class="kw">pub</span> <span class="ident">max_structs</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The maximum number of functions that can be generated for a module.</span>
+    <span class="kw">pub</span> <span class="ident">max_functions</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The maximum number of type parameters functions and structs.</span>
+    <span class="kw">pub</span> <span class="ident">max_ty_params</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The maximum size that generated byte arrays can be.</span>
+    <span class="kw">pub</span> <span class="ident">byte_array_max_size</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The maximum size that a generated string can be.</span>
+    <span class="kw">pub</span> <span class="ident">max_string_size</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The maximum number of arguments to generated function definitions.</span>
+    <span class="kw">pub</span> <span class="ident">max_function_call_size</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The maximum number of return types of generated function definitions.</span>
+    <span class="kw">pub</span> <span class="ident">max_ret_types_size</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Whether or not generate modules should only contain simple (non-reference, or nested</span>
+    <span class="doccomment">/// struct) types.</span>
+    <span class="kw">pub</span> <span class="ident">simple_types_only</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether references are allowed to be generated for e.g. function parameters, locals.</span>
+    <span class="kw">pub</span> <span class="ident">references_allowed</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether the generated modules should have any resources declared.</span>
+    <span class="kw">pub</span> <span class="ident">add_resources</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// The minimum number of entries in any table</span>
+    <span class="kw">pub</span> <span class="ident">min_table_size</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// If set, all functions with type parameters will have arguments of those types as well.</span>
+    <span class="kw">pub</span> <span class="ident">args_for_ty_params</span>: <span class="ident">bool</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ModuleGeneratorOptions</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">min_fields</span>: <span class="number">1</span>,
+            <span class="ident">max_locals</span>: <span class="number">10</span>,
+            <span class="ident">max_fields</span>: <span class="number">20</span>,
+            <span class="ident">max_structs</span>: <span class="number">100</span>,
+            <span class="ident">max_functions</span>: <span class="number">100</span>,
+            <span class="ident">max_ty_params</span>: <span class="number">5</span>,
+            <span class="ident">byte_array_max_size</span>: <span class="number">64</span>,
+            <span class="ident">max_string_size</span>: <span class="number">32</span>,
+            <span class="ident">max_function_call_size</span>: <span class="number">23</span>,
+            <span class="ident">max_ret_types_size</span>: <span class="number">4</span>,
+            <span class="ident">simple_types_only</span>: <span class="bool-val">false</span>,
+            <span class="ident">references_allowed</span>: <span class="bool-val">true</span>,
+            <span class="ident">add_resources</span>: <span class="bool-val">true</span>,
+            <span class="ident">min_table_size</span>: <span class="number">1</span>,
+            <span class="ident">args_for_ty_params</span>: <span class="bool-val">false</span>,
+        }
+    }
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="module_generation" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

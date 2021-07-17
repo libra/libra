@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["NetworkErrorKind",""]],"struct":[["NetworkError","Errors propagated from the network module."]]});
