@@ -39,6 +39,7 @@ enum Kind {
     Batch,
     Decode,
     InvalidProof,
+    NeedSync,
     Unknown,
 }
 
@@ -51,7 +52,7 @@ impl Error {
         match self.inner.kind {
             // internal server errors are retriable
             Kind::HttpStatus(status) => (500..=599).contains(&status),
-            Kind::Timeout | Kind::StaleResponse => true,
+            Kind::Timeout | Kind::StaleResponse | Kind::NeedSync => true,
             Kind::RpcResponse
             | Kind::Request
             | Kind::JsonRpcError
@@ -61,6 +62,10 @@ impl Error {
             | Kind::InvalidProof
             | Kind::Unknown => false,
         }
+    }
+
+    pub fn is_need_sync(&self) -> bool {
+        matches!(self.inner.kind, Kind::NeedSync)
     }
 
     //
@@ -112,6 +117,10 @@ impl Error {
 
     pub(crate) fn invalid_proof<E: Into<BoxError>>(e: E) -> Self {
         Self::new(Kind::InvalidProof, Some(e))
+    }
+
+    pub(crate) fn need_sync<E: Into<BoxError>>(e: E) -> Self {
+        Self::new(Kind::NeedSync, Some(e))
     }
 
     pub(crate) fn unknown<E: Into<BoxError>>(e: E) -> Self {
