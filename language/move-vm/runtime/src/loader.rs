@@ -31,7 +31,12 @@ use move_vm_types::{
 };
 use parking_lot::RwLock;
 use sha3::{Digest, Sha3_256};
-use std::{collections::HashMap, fmt::Debug, hash::Hash, sync::Arc};
+use std::{
+    collections::{BTreeMap, BTreeSet, HashMap},
+    fmt::Debug,
+    hash::Hash,
+    sync::Arc,
+};
 use tracing::error;
 
 type ScriptHash = [u8; 32];
@@ -595,57 +600,75 @@ impl Loader {
         Ok((func, type_params, parameter_tys, return_tys))
     }
 
-    // Entry point for module publishing (`MoveVM::publish_module`).
+    // Entry point for module publishing (`MoveVM::publish_module_bundle`).
+    //
+    // All modules in the bundle to be published must be loadable. This function performs all
+    // verification steps to load these modules without actually loading them into the code cache.
+    pub(crate) fn verify_module_bundle_for_publication(
+        &self,
+        modules: &[CompiledModule],
+        data_store: &mut impl DataStore,
+    ) -> VMResult<()> {
+        let mut bundle_unverified: BTreeSet<_> = modules.iter().map(|m| m.self_id()).collect();
+        let mut bundle_verified = BTreeMap::new();
+        for module in modules {
+            let module_id = module.self_id();
+            bundle_unverified.remove(&module_id);
+
+            self.verify_module_for_publication(
+                &module,
+                &bundle_verified,
+                &bundle_unverified,
+                data_store,
+            )?;
+            bundle_verified.insert(module_id.clone(), module.clone());
+        }
+        Ok(())
+    }
+
     // A module to be published must be loadable.
     // This step performs all verification steps to load the module without loading it.
     // The module is not added to the code cache. It is simply published to the data cache.
     // See `verify_script()` for script verification steps.
-    pub(crate) fn verify_module_for_publication(
+    //
+    // If a module `M` is published together with a bundle of modules (i.e., a vector of modules),
+    // - the `bundle_verified` argument tracks the modules that have already been verified in the
+    //   bundle. Basically, this represents the modules appears before `M` in the bundle vector.
+    // - the `bundle_unverified` argument tracks the modules that have not been verified when `M`
+    //   is being verified, i.e., the modules appears after `M` in the bundle vector.
+    fn verify_module_for_publication(
         &self,
         module: &CompiledModule,
+        bundle_verified: &BTreeMap<ModuleId, CompiledModule>,
+        bundle_unverified: &BTreeSet<ModuleId>,
         data_store: &mut impl DataStore,
     ) -> VMResult<()> {
         // Performs all verification steps to load the module without loading it, i.e., the new
         // module will NOT show up in `module_cache`. In the module republishing case, it means
         // that the old module is still in the `module_cache`, unless a new Loader is created,
         // which means that a new MoveVM instance needs to be created.
-        self.verify_module_verify_no_missing_dependencies(module, data_store)?;
 
-        // friendship is an upward edge in the dependencies DAG, so it has to be checked after the
-        // module is put into the bundle.
-        let friends = module.immediate_friends();
-        self.load_dependencies_verify_no_missing_dependencies(friends, data_store)?;
-        self.verify_module_cyclic_relations(module)
+        self.verify_module_verify_no_missing_dependencies(module, bundle_verified, data_store)?;
 
-        // NOTE: one might wonder why we don't need to worry about `module` (say M) being missing in
-        // the code cache? Obviously, if a `friend`, say module F, is being loaded and verified, and
-        // F may call into M; then M not being in the code cache will definitely lead to an error
-        // when verifying F because F depends on M.
-        //
-        // The answer is: given the current
-        // 1) *publish-one-module-at-a-time* model,
-        // 2) module compatibility checking scheme, and
-        // 3) how the code cache is maintained (insertion-only and no purging),
-        // we can indeed tolerate the cases where either M is not in the code cache or an old
-        // version of M is in the code cache. Here is the reason:
-        // - If F does not depends on M, then there is nothing we need to worry about. Loading and
-        //   verification of F will succeed (provided there is no other errors).
-        // - If F does depend on M, then there MUST BE an old version of M (say M') in the storage.
-        //   Loading and verifying F will load M' into the code cache (or retrieve M' if it is
-        //   already there). ==> But this is OK because the compatibility checking performed prior
-        //   to this function ensures that updating M' to M will not break compatibility! As a
-        //   result, we could tolerate the fact that F is verified against an old version of M'
-        //   with the guarantee that M is compatible with M'.
-        // - F cannot "suddenly" depend on M because we are not updating F under the current module
-        //   of publishing-one-module-at-a-time.
+        // friendship is an upward edge in the dependencies DAG, so for modules that are in the
+        // unverified portion of the bundle, their linking check is deferred after the current
+        // module is verified.
+        let cached_friends = module
+            .immediate_friends()
+            .into_iter()
+            .filter(|module_id| !bundle_unverified.contains(module_id))
+            .collect();
+        self.load_dependencies_verify_no_missing_dependencies(cached_friends, data_store)?;
+        self.verify_module_cyclic_relations(module, bundle_verified, bundle_unverified)
     }
 
     fn verify_module_verify_no_missing_dependencies(
         &self,
         module: &CompiledModule,
+        bundle_verified: &BTreeMap<ModuleId, CompiledModule>,
         data_store: &mut impl DataStore,
     ) -> VMResult<()> {
-        self.verify_module(module, data_store, true)
+        self.verify_module(module, bundle_verified, data_store, true)
     }
 
     fn verify_module_expect_no_missing_dependencies(
@@ -653,56 +676,73 @@ impl Loader {
         module: &CompiledModule,
         data_store: &mut impl DataStore,
     ) -> VMResult<()> {
-        self.verify_module(module, data_store, false)
+        self.verify_module(module, &BTreeMap::new(), data_store, false)
     }
 
     fn verify_module(
         &self,
         module: &CompiledModule,
+        bundle_verified: &BTreeMap<ModuleId, CompiledModule>,
         data_store: &mut impl DataStore,
         verify_no_missing_modules: bool,
     ) -> VMResult<()> {
         bytecode_verifier::verify_module(&module)?;
         self.check_natives(&module)?;
 
-        let deps = module.immediate_dependencies();
-        let loaded_imm_deps = if verify_no_missing_modules {
-            self.load_dependencies_verify_no_missing_dependencies(deps, data_store)?
-        } else {
-            self.load_dependencies_expect_no_missing_dependencies(deps, data_store)?
-        };
-        self.verify_module_dependencies(module, loaded_imm_deps)
-    }
+        // All immediate dependencies of the module being verified should be either in the code
+        // cache or in the verified portion of the bundle (e.g., verified before this module).
+        let mut bundle_deps = vec![];
+        let mut cached_deps = vec![];
+        for module_id in module.immediate_dependencies() {
+            match bundle_verified.get(&module_id) {
+                None => cached_deps.push(module_id),
+                Some(module) => bundle_deps.push(module),
+            }
+        }
 
-    fn verify_module_dependencies(
-        &self,
-        module: &CompiledModule,
-        imm_dependencies: Vec<Arc<Module>>,
-    ) -> VMResult<()> {
-        let imm_deps: Vec<_> = imm_dependencies
+        let loaded_imm_deps = if verify_no_missing_modules {
+            self.load_dependencies_verify_no_missing_dependencies(cached_deps, data_store)?
+        } else {
+            self.load_dependencies_expect_no_missing_dependencies(cached_deps, data_store)?
+        };
+        let all_imm_deps = loaded_imm_deps
             .iter()
             .map(|module| module.module())
-            .collect();
-        dependencies::verify_module(module, imm_deps)
+            .chain(bundle_deps.into_iter());
+        dependencies::verify_module(module, all_imm_deps)
     }
 
-    fn verify_module_cyclic_relations(&self, module: &CompiledModule) -> VMResult<()> {
+    fn verify_module_cyclic_relations(
+        &self,
+        module: &CompiledModule,
+        bundle_verified: &BTreeMap<ModuleId, CompiledModule>,
+        bundle_unverified: &BTreeSet<ModuleId>,
+    ) -> VMResult<()> {
         let module_cache = self.module_cache.read();
         cyclic_dependencies::verify_module(
             module,
             |module_id| {
-                module_cache
-                    .modules
+                bundle_verified
                     .get(module_id)
+                    .or_else(|| module_cache.modules.get(module_id).map(|m| m.module()))
+                    .map(|m| m.immediate_dependencies())
                     .ok_or_else(|| PartialVMError::new(StatusCode::MISSING_DEPENDENCY))
-                    .map(|m| m.module().immediate_dependencies())
             },
             |module_id| {
-                module_cache
-                    .modules
-                    .get(module_id)
-                    .ok_or_else(|| PartialVMError::new(StatusCode::MISSING_DEPENDENCY))
-                    .map(|m| m.module().immediate_friends())
+                if bundle_unverified.contains(module_id) {
+                    // If the module under verification declares a friend which is also in the
+                    // bundle (and positioned after this module in the bundle), we defer the cyclic
+                    // relation checking when we verify that module.
+                    Ok(vec![])
+                } else {
+                    // Otherwise, we get all the information we need to verify whether this module
+                    // creates a cyclic relation.
+                    bundle_verified
+                        .get(module_id)
+                        .or_else(|| module_cache.modules.get(module_id).map(|m| m.module()))
+                        .map(|m| m.immediate_friends())
+                        .ok_or_else(|| PartialVMError::new(StatusCode::MISSING_DEPENDENCY))
+                }
             },
         )
     }
@@ -848,7 +888,11 @@ impl Loader {
         // module is put into cache, otherwise it is a chicken-and-egg problem.
         let friends = module_ref.module().immediate_friends();
         self.load_dependencies_expect_no_missing_dependencies(friends, data_store)?;
-        self.verify_module_cyclic_relations(module_ref.module())?;
+        self.verify_module_cyclic_relations(
+            module_ref.module(),
+            &BTreeMap::new(),
+            &BTreeSet::new(),
+        )?;
 
         Ok(module_ref)
     }

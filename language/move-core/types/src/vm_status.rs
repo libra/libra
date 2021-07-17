@@ -552,8 +552,7 @@ pub enum StatusCode {
     GENERIC_MEMBER_OPCODE_MISMATCH = 1090,
     FUNCTION_RESOLUTION_FAILURE = 1091,
     INVALID_OPERATION_IN_SCRIPT = 1094,
-    // The sender is trying to publish a module named `M`, but the sender's account already
-    // contains a module with this name.
+    // The sender is trying to publish two modules with the same name in one transaction
     DUPLICATE_MODULE_NAME = 1095,
     // The sender is trying to publish a module that breaks the compatibility checks
     BACKWARD_INCOMPATIBLE_MODULE_UPDATE = 1096,

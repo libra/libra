@@ -1,8 +1,6 @@
 // Copyright (c) The Diem Core Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-use std::collections::BTreeMap;
-
 use crate::{
     sandbox::utils::{
         explain_publish_changeset, explain_publish_error, get_gas_status,
@@ -13,7 +11,8 @@ use crate::{
 use move_lang::{self, compiled_unit::CompiledUnit, Compiler, Flags};
 use move_vm_runtime::move_vm::MoveVM;
 
-use anyhow::Result;
+use anyhow::{bail, Result};
+use std::collections::BTreeMap;
 
 pub fn publish(
     natives: impl IntoIterator<Item = NativeFunctionRecord>,
@@ -21,6 +20,7 @@ pub fn publish(
     files: &[String],
     republish: bool,
     ignore_breaking_changes: bool,
+    override_ordering: Option<&[String]>,
     verbose: bool,
 ) -> Result<()> {
     if verbose {
@@ -57,28 +57,73 @@ pub fn publish(
 
     // use the the publish_module API frm the VM if we do not allow breaking changes
     if !ignore_breaking_changes {
+        let id_to_ident: BTreeMap<_, _> = modules
+            .iter()
+            .map(|(ident, module)| {
+                let id = module.self_id();
+                (id, ident.address_name.as_ref().map(|n| n.value.clone()))
+            })
+            .collect();
+
         let vm = MoveVM::new(natives).unwrap();
         let mut gas_status = get_gas_status(None)?;
         let mut session = vm.new_session(state);
 
         let mut has_error = false;
-        let mut id_to_ident = BTreeMap::new();
-        for (ident, module) in &modules {
-            let mut module_bytes = vec![];
-            module.serialize(&mut module_bytes)?;
+        match override_ordering {
+            None => {
+                for (_, module) in &modules {
+                    let mut module_bytes = vec![];
+                    module.serialize(&mut module_bytes)?;
 
-            let id = module.self_id();
-            let sender = *id.address();
-            id_to_ident.insert(
-                id.clone(),
-                ident.address_name.as_ref().map(|n| n.value.clone()),
-            );
+                    let id = module.self_id();
+                    let sender = *id.address();
 
-            let res = session.publish_module(module_bytes, sender, &mut gas_status);
-            if let Err(err) = res {
-                explain_publish_error(err, &state, module)?;
-                has_error = true;
-                break;
+                    let res = session.publish_module(module_bytes, sender, &mut gas_status);
+                    if let Err(err) = res {
+                        explain_publish_error(err, &state, module)?;
+                        has_error = true;
+                        break;
+                    }
+                }
+            }
+            Some(ordering) => {
+                let module_map: BTreeMap<_, _> = modules
+                    .into_iter()
+                    .map(|(ident, m)| (ident.module_name.0.value, m))
+                    .collect();
+
+                let mut sender_opt = None;
+                let mut module_bytes_vec = vec![];
+                for name in ordering {
+                    match module_map.get(name) {
+                        None => bail!("Invalid module name in publish ordering: {}", name),
+                        Some(module) => {
+                            let mut module_bytes = vec![];
+                            module.serialize(&mut module_bytes)?;
+                            module_bytes_vec.push(module_bytes);
+                            if sender_opt.is_none() {
+                                sender_opt = Some(*module.self_id().address());
+                            }
+                        }
+                    }
+                }
+
+                match sender_opt {
+                    None => bail!("No modules to publish"),
+                    Some(sender) => {
+                        let res = session.publish_module_bundle(
+                            module_bytes_vec,
+                            sender,
+                            &mut gas_status,
+                        );
+                        if let Err(err) = res {
+                            // TODO (mengxu): explain publish errors in multi-module publishing
+                            println!("Invalid multi-module publishing: {}", err);
+                            has_error = true;
+                        }
+                    }
+                }
             }
         }
 
