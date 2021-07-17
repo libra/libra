@@ -255,14 +255,23 @@ impl<'env> SpecTranslator<'env> {
                 &self.inst(&decl.type_),
             )
         });
+        // it is possible that the spec fun may refer to the same memory after monomorphization,
+        // (e.g., one via concrete type and the other via type parameter being instantiated).
+        // In this case, we mark the other parameter as unused
+        let mut mem_inst_seen = BTreeSet::new();
         let mem_params = fun.used_memory.iter().map(|memory| {
-            let memory = &memory.to_owned().instantiate(&self.type_inst);
+            let memory = memory.to_owned().instantiate(&self.type_inst);
             let struct_env = &self.env.get_struct_qid(memory.to_qualified_id());
-            format!(
+            let param_repr = format!(
                 "{}: $Memory {}",
-                boogie_resource_memory_name(self.env, memory, &None),
+                boogie_resource_memory_name(self.env, &memory, &None),
                 boogie_struct_name(struct_env, &memory.inst)
-            )
+            );
+            if mem_inst_seen.insert(memory) {
+                param_repr
+            } else {
+                format!("__unused_{}", param_repr)
+            }
         });
         let params = fun.params.iter().map(|(name, ty)| {
             format!(
