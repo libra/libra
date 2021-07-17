@@ -512,7 +512,7 @@ impl Options {
             options.prover.mutation = true;
         }
         if matches.is_present("mutas") {
-            options.prover.mutas = matches
+            options.prover.mutation_add_sub = matches
                 .value_of("mutas")
                 .unwrap()
                 .parse::<usize>()?;
