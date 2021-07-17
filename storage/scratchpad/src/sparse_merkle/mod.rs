@@ -83,7 +83,6 @@ use crate::sparse_merkle::{
     updater::SubTreeUpdater,
     utils::{partition, swap_if},
 };
-use arc_swap::{ArcSwap, ArcSwapOption};
 use diem_crypto::{
     hash::{CryptoHash, SPARSE_MERKLE_PLACEHOLDER_HASH},
     HashValue,
@@ -98,6 +97,7 @@ use std::{
     collections::{BTreeMap, BTreeSet, HashMap},
     sync::Arc,
 };
+use diem_infallible::Mutex;
 
 /// `AccountStatus` describes the result of querying an account from this SparseMerkleTree.
 #[derive(Debug, Eq, PartialEq)]
@@ -121,47 +121,43 @@ pub enum AccountStatus<V> {
     Unknown,
 }
 
+/// TODO(aldenhu): update doc
 /// The inner content of a sparse merkle tree, we have this so that even if a tree is dropped, the
-/// INNER of it can still live if referenced by a later version.
+/// INNER of it can still live if referenced by a previous version.
 #[derive(Debug)]
 struct Inner<V> {
-    /// Reference to the root node, initially a strong reference, and once pruned, becomes a weak
-    /// reference, allowing nodes created by this version to go away.
-    root: ArcSwap<SubTree<V>>,
-    /// Reference to the INNER base tree, needs to be a strong reference if the base is speculative
-    /// itself, so that nodes referenced in this version won't go away because the base tree is
-    /// dropped.
-    base: ArcSwapOption<Inner<V>>,
-}
-
-impl<V: CryptoHash> Inner<V> {
-    fn prune(&self) {
-        // Replace the link to the root node with a weak reference, so all nodes created by this
-        // version can be dropped. A weak link is still maintained so that if it's cached somehow,
-        // we still have access to it without resorting to the DB.
-        self.root.store(Arc::new(self.root.load().weak()));
-        // Disconnect the base tree, so that nodes created by previous versions can be dropped.
-        self.base.store(None);
-    }
+    root: SubTree<V>,
+    children: Mutex<Vec<Arc<Inner<V>>>>,
 }
 
 impl<V> Drop for Inner<V> {
     fn drop(&mut self) {
-        let mut cur = self.base.swap(None);
+        let mut q: Vec<_> = self.children.lock().drain(..).collect();
 
-        loop {
-            if let Some(arc) = cur {
-                if Arc::strong_count(&arc) == 1 {
-                    // The only ref is the one we are now holding, so it'll be dropped after we free
-                    // `arc`, which results in the chain of `base`s being dropped recursively,
-                    // and that might trigger a stack overflow. To prevent that we follow the chain
-                    // further to disconnect things beforehand.
-                    cur = arc.base.swap(None);
-                    continue;
-                }
+        while let Some(descendant) = q.pop() {
+            if Arc::strong_count(&descendant) == 1 {
+                // The only ref is the one we are now holding, so the structure will be dropped
+                // after we free the `Arc`, which results in a chain of such structures being
+                // dropped recursively and that might trigger a stack overflow. To prevent that we
+                // follow the chain further to disconnect things beforehand.
+                q.extend(descendant.children.lock().drain(..));
             }
-            break;
         }
+    }
+}
+
+impl<V> Inner<V> {
+    fn new(root: SubTree<V>) -> Arc<Self> {
+        Arc::new(Self {
+            root,
+            children: Mutex::new(Vec::new()),
+        })
+    }
+
+    fn spawn(&self, child_root: SubTree<V>) -> Arc<Self> {
+        let child = Self::new(child_root);
+        self.children.lock().push(child.clone());
+        child
     }
 }
 
@@ -186,33 +182,33 @@ where
     /// the scratch pad and the storage have identical state, so we use a single root hash to
     /// represent the entire state.
     pub fn new(root_hash: HashValue) -> Self {
-        Self::new_impl(
+        let root =
             if root_hash != *SPARSE_MERKLE_PLACEHOLDER_HASH {
                 SubTree::new_unknown(root_hash)
             } else {
                 SubTree::new_empty()
-            },
-            None,
-        )
-    }
-
-    fn new_with_base(root: SubTree<V>, base: &Self) -> Self {
-        Self::new_impl(root, Some(base.inner.clone()))
-    }
-
-    fn new_impl(root: SubTree<V>, base: Option<Arc<Inner<V>>>) -> Self {
-        let inner = Inner {
-            root: ArcSwap::from_pointee(root),
-            base: ArcSwapOption::new(base),
-        };
+            };
 
         Self {
-            inner: Arc::new(inner),
+            inner: Inner::new(root),
+        }
+    }
+
+    fn spawn(&self, child_root: SubTree<V>) -> Self {
+        Self {
+            inner: self.inner.spawn(child_root),
+        }
+    }
+
+    #[cfg(test)]
+    fn new_with_root(root: SubTree<V>) -> Self {
+        Self {
+            inner: Inner::new(root),
         }
     }
 
     fn root_weak(&self) -> SubTree<V> {
-        self.inner.root.load().weak()
+        self.inner.root.weak()
     }
 
     /// Constructs a new Sparse Merkle Tree as if we are updating the existing tree multiple
@@ -390,7 +386,7 @@ where
             txn_id += 1;
         }
 
-        Ok((root_hashes, Self::new_with_base(root, self)))
+        Ok((root_hashes, self.spawn(root)))
     }
 
     /// Given an existing subtree node at a specific depth, recursively apply the updates.
@@ -796,18 +792,13 @@ where
             Ok(self.clone())
         } else {
             let root = SubTreeUpdater::update(current_root, &kvs[..], proof_reader)?;
-            Ok(Self::new_with_base(root, self))
+            Ok(self.spawn(root))
         }
     }
 
     /// Returns the root hash of this tree.
     pub fn root_hash(&self) -> HashValue {
-        self.inner.root.load().hash()
-    }
-
-    /// Mark that all the nodes created by this tree and its ancestors are persisted in the DB.
-    pub fn prune(&self) {
-        self.inner.prune()
+        self.inner.root.hash()
     }
 }
 

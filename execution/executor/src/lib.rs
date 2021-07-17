@@ -455,6 +455,7 @@ where
             cache.committed_trees().version(),
             cache.committed_trees().state_root(),
             executed_trees.state_tree(),
+            Some(cache.committed_trees().state_tree().as_ref().clone()),
         )
     }
 
@@ -492,6 +493,7 @@ where
             read_lock.synced_trees().version(),
             read_lock.synced_trees().state_root(),
             read_lock.synced_trees().state_tree(),
+            None,
         );
 
         fail_point!("executor::vm_execute_chunk", |_| {
@@ -968,18 +970,7 @@ impl<V: VMExecutor> BlockExecutor for Executor<V> {
             )?;
         }
 
-        let mut write_lock = self.cache.write();
-        let arc_blocks = block_ids
-            .iter()
-            .map(|id| write_lock.get_block(id))
-            .collect::<Result<Vec<_>, Error>>()?;
-        let blocks = arc_blocks.iter().map(|b| b.lock()).collect::<Vec<_>>();
-
-        for block in blocks {
-            block.output().executed_trees().state_tree().prune()
-        }
-
-        write_lock.prune(ledger_info_with_sigs.ledger_info())?;
+        self.cache.write().prune(ledger_info_with_sigs.ledger_info())?;
 
         // Now that the blocks are persisted successfully, we can reply to consensus
         Ok(())

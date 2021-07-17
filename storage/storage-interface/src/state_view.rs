@@ -40,6 +40,9 @@ pub struct VerifiedStateView<'a> {
     /// The in-momery version of sparse Merkle tree of which the states haven't been committed.
     speculative_state: &'a SparseMerkleTree<AccountStateBlob>,
 
+    /// TODO(aldenhu): doc
+    _speculative_state_root: Option<SparseMerkleTree<AccountStateBlob>>,
+
     /// The cache of verified account states from `reader` and `speculative_state_view`,
     /// represented by a hashmap with an account address as key and a pair of an ordered
     /// account state map and an an optional account state proof as value. When the VM queries an
@@ -90,6 +93,7 @@ impl<'a> VerifiedStateView<'a> {
         latest_persistent_version: Option<Version>,
         latest_persistent_state_root: HashValue,
         speculative_state: &'a SparseMerkleTree<AccountStateBlob>,
+        speculative_state_root: Option<SparseMerkleTree<AccountStateBlob>>,
     ) -> Self {
         // Hack: When there's no transaction in the db but state tree root hash is not the
         // placeholder hash, it implies that there's pre-genesis state present.
@@ -108,6 +112,7 @@ impl<'a> VerifiedStateView<'a> {
             speculative_state,
             account_to_state_cache: RwLock::new(HashMap::new()),
             account_to_proof_cache: RwLock::new(HashMap::new()),
+            _speculative_state_root: speculative_state_root,
         }
     }
 }

@@ -107,9 +107,7 @@ pub fn test_smt_correctness_impl(input: Vec<(BlockOutput, bool)>) {
 
         if commit {
             persisted_smt = naive_smt.clone();
-            serial_smt.prune();
-            batches_smt.prune();
-            updater_smt.prune();
+            // TODO(aldenhu): fix logic
         }
     }
 }
@@ -120,7 +118,7 @@ trait AssertNoExternalStrongRef {
 
 impl<V> AssertNoExternalStrongRef for SparseMerkleTree<V> {
     fn assert_no_external_strong_ref(&self) {
-        assert_subtree_sole_strong_ref(&self.inner.root.load());
+        assert_subtree_sole_strong_ref(&self.inner.root);
     }
 }
 

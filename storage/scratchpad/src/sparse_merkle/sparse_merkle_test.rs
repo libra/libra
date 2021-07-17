@@ -38,7 +38,7 @@ fn test_replace_in_mem_leaf() {
     let key = b"hello".test_only_hash();
     let value_hash = b"world".test_only_hash();
     let leaf = SubTree::new_leaf_with_value_hash(key, value_hash);
-    let smt = SparseMerkleTree::new_impl(leaf, None);
+    let smt = SparseMerkleTree::new_with_root(leaf);
 
     let new_value: AccountStateBlob = vec![1, 2, 3].into();
     let root_hash = hash_leaf(key, new_value.hash());
@@ -53,7 +53,7 @@ fn test_split_in_mem_leaf() {
     let key1 = HashValue::from_slice(&[0; 32]).unwrap();
     let value1_hash = b"hello".test_only_hash();
     let leaf1 = SubTree::new_leaf_with_value_hash(key1, value1_hash);
-    let smt = SparseMerkleTree::new_impl(leaf1, None);
+    let smt = SparseMerkleTree::new_with_root(leaf1);
 
     let key2 = HashValue::from_slice(&[0xff; 32]).unwrap();
     let value2: AccountStateBlob = vec![1, 2, 3].into();
@@ -81,7 +81,7 @@ fn test_insert_at_in_mem_empty() {
     );
     let internal_hash = internal.hash();
     let root = SubTree::new_internal(internal, SubTree::new_empty());
-    let smt = SparseMerkleTree::new_impl(root, None);
+    let smt = SparseMerkleTree::new_with_root(root);
 
     let root_hash = hash_internal(internal_hash, hash_leaf(key3, value3.hash()));
     let updated = smt
@@ -361,8 +361,9 @@ fn test_update() {
         AccountStatus::ExistsInScratchPad(value4.clone())
     );
 
+    // TODO(aldenhu): reflect new "prune" logic
     // Now prune smt1.
-    smt1.prune();
+    // smt1.prune();
 
     // For smt2, only key1 should be available since smt2 was constructed by updating smt1 with
     // key1.
@@ -381,8 +382,9 @@ fn test_update() {
 
 #[test]
 fn test_drop() {
-    let mut smt = SparseMerkleTree::new(*SPARSE_MERKLE_PLACEHOLDER_HASH);
     let proof_reader = ProofReader::default();
+    let root_smt = SparseMerkleTree::new(*SPARSE_MERKLE_PLACEHOLDER_HASH);
+    let mut smt = root_smt.clone();
     for _ in 0..100000 {
         smt = smt
             .batch_update(
@@ -392,8 +394,10 @@ fn test_drop() {
             .unwrap()
     }
 
-    // smt with a lot of ancestors being dropped here. It's a stack overflow if a manual iterative
-    // `Drop` implementation is not in place.
+    // TODO(aldenhu): verify
+    // root_smt with a long chain of descendants being dropped here. It's a stack overflow if a
+    // manual iterative `Drop` implementation is not in place.
+    drop(root_smt);
 }
 
 proptest! {

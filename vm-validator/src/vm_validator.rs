@@ -45,6 +45,7 @@ impl VMValidator {
             Some(version),
             state_root,
             &smt,
+            None,
         );
 
         let vm = DiemVMValidator::new(&state_view);
@@ -76,6 +77,7 @@ impl TransactionValidation for VMValidator {
             Some(version),
             state_root,
             &smt,
+            None,
         );
 
         Ok(vm.validate_transaction(txn, &state_view))
