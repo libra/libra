@@ -1381,13 +1381,15 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
             let mut success = true;
             for (i, arg_ty) in arg_types.iter().enumerate() {
                 let instantiated = cand.arg_types[i].instantiate(&instantiation);
-                if let Err(err) = subs.unify(
-                    &self.type_display_context(),
-                    Variance::Allow,
-                    arg_ty,
-                    &instantiated,
-                ) {
-                    outruled.push((cand, format!("{} for argument {}", err.message, i + 1)));
+                if let Err(err) = subs.unify(Variance::Allow, arg_ty, &instantiated) {
+                    outruled.push((
+                        cand,
+                        format!(
+                            "{} for argument {}",
+                            err.message(&self.type_display_context()),
+                            i + 1
+                        ),
+                    ));
                     success = false;
                     break;
                 }
@@ -1837,15 +1839,17 @@ impl<'env, 'translator, 'module_translator> ExpTranslator<'env, 'translator, 'mo
         // the build. This is because we also need to inherently borrow self via the
         // type_display_context which is passed into unification.
         let mut subs = std::mem::replace(&mut self.subs, Substitution::new());
-        let result = match subs.unify(
-            &self.type_display_context(),
-            Variance::Shallow,
-            ty,
-            expected,
-        ) {
+        let result = match subs.unify(Variance::Shallow, ty, expected) {
             Ok(t) => t,
             Err(err) => {
-                self.error(&loc, &format!("{} {}", err.message, context_msg));
+                self.error(
+                    &loc,
+                    &format!(
+                        "{} {}",
+                        err.message(&self.type_display_context()),
+                        context_msg
+                    ),
+                );
                 Type::Error
             }
         };

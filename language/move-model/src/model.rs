@@ -59,7 +59,7 @@ use move_core_types::{
 
 use crate::{
     ast::{
-        ConditionKind, ExpData, GlobalInvariant, ModuleName, PropertyBag, PropertyValue, Spec,
+        ConditionKind, Exp, ExpData, GlobalInvariant, ModuleName, PropertyBag, PropertyValue, Spec,
         SpecBlockInfo, SpecFunDecl, SpecVarDecl, Value,
     },
     pragmas::{
@@ -67,11 +67,10 @@ use crate::{
         INTRINSIC_PRAGMA, OPAQUE_PRAGMA, VERIFY_PRAGMA,
     },
     symbol::{Symbol, SymbolPool},
-    ty::{PrimitiveType, Type, TypeDisplayContext},
+    ty::{PrimitiveType, Type, TypeDisplayContext, TypeUnifier, Variance},
 };
 
 // import and re-expose symbols
-use crate::ast::Exp;
 pub use move_binary_format::file_format::{AbilitySet, Visibility as FunctionVisibility};
 
 // =================================================================================================
@@ -883,27 +882,25 @@ impl GlobalEnv {
     pub fn get_global_invariants_for_memory(
         &self,
         memory: &QualifiedInstId<StructId>,
-    ) -> Vec<GlobalId> {
-        self.global_invariants_for_memory
-            .get(memory)
-            .map(|ids| ids.iter().cloned().collect_vec())
-            .unwrap_or_else(Default::default)
-    }
-
-    /// Given a set of invariants, find the subset that refer to the type in mem.
-    pub fn get_subset_invariants_for_memory(
-        &self,
-        mem: QualifiedInstId<StructId>,
-        inv_set_id: &BTreeSet<GlobalId>,
     ) -> BTreeSet<GlobalId> {
-        if let Some(modifies_inv_id_set) = self.global_invariants_for_memory.get(&mem) {
-            modifies_inv_id_set
-                .intersection(inv_set_id)
-                .cloned()
-                .collect()
-        } else {
-            BTreeSet::<GlobalId>::new()
+        let mut inv_ids = BTreeSet::new();
+        for (key, val) in &self.global_invariants_for_memory {
+            if key.module_id != memory.module_id || key.id != memory.id {
+                continue;
+            }
+            assert_eq!(key.inst.len(), memory.inst.len());
+            let unifier = TypeUnifier::new_vec(&memory.inst, &key.inst, true, true);
+            let rel = unifier.unify(Variance::Allow);
+            match rel {
+                None => (),
+                Some((subst_lhs, _)) => {
+                    if subst_lhs.is_empty() {
+                        inv_ids.extend(val.clone());
+                    }
+                }
+            }
         }
+        inv_ids
     }
 
     pub fn get_global_invariants_by_module(&self, module_id: ModuleId) -> BTreeSet<GlobalId> {
